@@ -1,0 +1,21 @@
+import '../collection_view.dart';
+
+class CollectionAnalytics {
+  final int totalRecords;
+  final List<GenreAnalytics> genres;
+  final List<DecadeAnalytics> decades;
+  final String mostCollectedGenre;
+  final String mostCollectedArtist;
+  final int oldestRecord;
+  final int newestRecord;
+
+  CollectionAnalytics({
+    required this.totalRecords,
+    required this.genres,
+    required this.decades,
+    required this.mostCollectedGenre,
+    required this.mostCollectedArtist,
+    required this.oldestRecord,
+    required this.newestRecord,
+  });
+}

@@ -1,0 +1,1385 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:kolektt/home/home_view.dart' as homeView;
+
+import '../home_view.dart';
+import '../model/popular_record.dart';
+
+// 기본 색상 (hex 코드 0036FF)
+final Color primaryColor = Color(0xFF0036FF);
+
+// 데이터 모델 (간략한 예제)
+class Article {
+  final String id;
+  final String title;
+  final String? subtitle;
+  final Uri coverImageURL;
+
+  Article({
+    required this.id,
+    required this.title,
+    this.subtitle,
+    required this.coverImageURL,
+  });
+}
+
+class DJPick {
+  final String id;
+  final String name;
+  final String imageUrl;
+  final int likes;
+
+  DJPick({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+    required this.likes,
+  });
+}
+
+class MusicTaste {
+  final String id;
+  final String title;
+  final String subtitle;
+  final String imageUrl;
+
+  MusicTaste({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.imageUrl,
+  });
+}
+
+class Record {
+  final String id;
+  final String title;
+  final String artist;
+  final int releaseYear;
+  final String genre;
+  final Uri coverImageURL;
+  final String? notes;
+  final int lowestPrice;
+  final int price;
+  final num priceChange;
+  final int sellersCount;
+  final String recordDescription;
+  final int rank;
+  final int rankChange;
+  final bool trending;
+
+  Record({
+    required this.id,
+    required this.title,
+    required this.artist,
+    required this.releaseYear,
+    required this.genre,
+    required this.coverImageURL,
+    this.notes,
+    required this.lowestPrice,
+    required this.price,
+    required this.priceChange,
+    required this.sellersCount,
+    required this.recordDescription,
+    required this.rank,
+    required this.rankChange,
+    required this.trending,
+  });
+
+  static List<Record> sampleData = [
+    Record(
+      id: "s1",
+      title: "Sample Record 1",
+      artist: "Artist 1",
+      releaseYear: 2000,
+      genre: "Pop",
+      coverImageURL: Uri.parse("https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain"),
+      notes: "",
+      lowestPrice: 100,
+      price: 150,
+      priceChange: 0,
+      sellersCount: 3,
+      recordDescription: "Description 1",
+      rank: 1,
+      rankChange: 0,
+      trending: true,
+    ),
+    // 추가 샘플 데이터...
+  ];
+}
+
+// MARK: - Cupertino ProfileView
+
+class ProfileView extends StatefulWidget {
+  const ProfileView({Key? key}) : super(key: key);
+
+  @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  int totalRecords = 248;
+  int totalSales = 1240000;
+  int selectedTab = 0;
+  final List<String> tabs = ["컬렉션", "판매중", "구매", "활동"];
+  final List<Record> records = Record.sampleData;
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text("프로필"),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(CupertinoIcons.news),
+          onPressed: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(builder: (_) => SalesHistoryView()),
+            );
+          },
+        ),
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              // 프로필 헤더
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                color: CupertinoColors.systemBackground,
+                child: Row(
+                  children: [
+                    // 프로필 이미지
+                    CircleAvatar(
+                      radius: 43,
+                      backgroundColor:
+                          CupertinoColors.systemGrey.withOpacity(0.2),
+                      child: Icon(CupertinoIcons.person_alt_circle,
+                          size: 40, color: CupertinoColors.systemGrey),
+                    ),
+                    SizedBox(width: 20),
+                    // 사용자 정보 및 팔로워/팔로잉
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("DJ Huey",
+                              style: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .navTitleTextStyle
+                                  .copyWith(fontWeight: FontWeight.w600)),
+                          Text("House / Techno",
+                              style: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .textStyle
+                                  .copyWith(color: CupertinoColors.systemGrey)),
+                          SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                child: Column(
+                                  children: [
+                                    Text("1.2k",
+                                        style: CupertinoTheme.of(context)
+                                            .textTheme
+                                            .navLargeTitleTextStyle),
+                                    Text("팔로워",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: CupertinoColors.systemGrey)),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                        builder: (_) => FollowersListView()),
+                                  );
+                                },
+                              ),
+                              CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                child: Column(
+                                  children: [
+                                    Text("824",
+                                        style: CupertinoTheme.of(context)
+                                            .textTheme
+                                            .navLargeTitleTextStyle),
+                                    Text("팔로잉",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: CupertinoColors.systemGrey)),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                        builder: (_) => FollowingListView()),
+                                  );
+                                },
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+              // 통계 카드
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: StatCard(
+                        title: "총 레코드",
+                        value: "$totalRecords장",
+                        icon: CupertinoIcons.music_note,
+                        color: primaryColor,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: SalesStatCard(
+                        totalSales: "${totalSales}원",
+                        soldCount: "24장",
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 24),
+              // 탭 메뉴
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: List.generate(tabs.length, (index) {
+                    return Expanded(
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          setState(() {
+                            selectedTab = index;
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              tabs[index],
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: selectedTab == index
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                  color: selectedTab == index
+                                      ? CupertinoColors.black
+                                      : CupertinoColors.systemGrey),
+                            ),
+                            SizedBox(height: 4),
+                            Container(
+                              height: 2,
+                              color: selectedTab == index
+                                  ? primaryColor
+                                  : Colors.transparent,
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              // 탭 컨텐츠
+              Builder(builder: (context) {
+                switch (selectedTab) {
+                  case 0:
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: records.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1,
+                          mainAxisSpacing: 1,
+                        ),
+                        itemBuilder: (context, index) {
+                          final record = records[index];
+                          return CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (_) => CollectionRecordDetailView(
+                                      record: record),
+                                ),
+                              );
+                            },
+                            child: InstagramStyleRecordCard(record: record),
+                          );
+                        },
+                      ),
+                    );
+                  case 1:
+                    return SaleListView();
+                  case 2:
+                    return PurchaseListView();
+                  case 3:
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        children: List.generate(3, (index) {
+                          return ActivityCard(
+                            type: ActivityType.activity,
+                            title: "새로운 레코드를 추가했습니다",
+                            subtitle: "Bicep - Isles",
+                            date: "2시간 전",
+                          );
+                        }),
+                      ),
+                    );
+                  default:
+                    return Container();
+                }
+              }),
+              // 리더보드 섹션
+              LeaderboardView(data: LeaderboardData.sampleData),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// MARK: - Cupertino StatCard & SalesStatCard
+
+class StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const StatCard({
+    Key? key,
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 28, color: color),
+          SizedBox(height: 8),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.black)),
+          SizedBox(height: 4),
+          Text(title,
+              style:
+                  TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+        ],
+      ),
+    );
+  }
+}
+
+class SalesStatCard extends StatelessWidget {
+  final String totalSales;
+  final String soldCount;
+  final Color color;
+
+  const SalesStatCard({
+    Key? key,
+    required this.totalSales,
+    required this.soldCount,
+    required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(CupertinoIcons.money_dollar_circle, size: 28, color: color),
+          SizedBox(height: 8),
+          Column(
+            children: [
+              Text(totalSales,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: CupertinoColors.black)),
+              Text(soldCount,
+                  style: TextStyle(
+                      fontSize: 14, color: CupertinoColors.systemGrey)),
+            ],
+          ),
+          SizedBox(height: 4),
+          Text("판매 수익",
+              style:
+                  TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+        ],
+      ),
+    );
+  }
+}
+
+// MARK: - ActivityCard
+
+enum ActivityType { sale, purchase, activity }
+
+class ActivityCard extends StatelessWidget {
+  final ActivityType type;
+  final String title;
+  final String subtitle;
+  final String date;
+  final String? status;
+  final Color? statusColor;
+
+  const ActivityCard({
+    Key? key,
+    required this.type,
+    required this.title,
+    required this.subtitle,
+    required this.date,
+    this.status,
+    this.statusColor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemBackground,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          // 앨범 커버 (임시 이미지)
+          Container(
+            width: 50,
+            height: 50,
+            color: CupertinoColors.systemGrey.withOpacity(0.2),
+            child: Icon(CupertinoIcons.music_note,
+                color: CupertinoColors.systemGrey),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        fontSize: 14, color: CupertinoColors.systemGrey)),
+                Text(subtitle,
+                    style:
+                        TextStyle(fontSize: 16, color: CupertinoColors.black)),
+                if (status != null)
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: (statusColor ?? primaryColor).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(status!,
+                        style: TextStyle(
+                            fontSize: 12, color: statusColor ?? primaryColor)),
+                  ),
+              ],
+            ),
+          ),
+          Text(date,
+              style:
+                  TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+        ],
+      ),
+    );
+  }
+}
+
+// MARK: - Followers / Following / OtherUserProfile Views
+
+class FollowersListView extends StatelessWidget {
+  const FollowersListView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("팔로워")),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: 20,
+        itemBuilder: (_, index) {
+          return CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (_) => OtherUserProfileView()),
+              );
+            },
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: CupertinoColors.systemGrey.withOpacity(0.2),
+                  child: Icon(CupertinoIcons.person,
+                      color: CupertinoColors.systemGrey),
+                ),
+                SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("DJ Name", style: TextStyle(fontSize: 16)),
+                    Text("House / Techno",
+                        style: TextStyle(
+                            fontSize: 12, color: CupertinoColors.systemGrey)),
+                  ],
+                )
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class FollowingListView extends StatelessWidget {
+  const FollowingListView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("팔로잉")),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: 20,
+        itemBuilder: (_, index) {
+          return CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (_) => OtherUserProfileView()),
+              );
+            },
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: CupertinoColors.systemGrey.withOpacity(0.2),
+                  child: Icon(CupertinoIcons.person,
+                      color: CupertinoColors.systemGrey),
+                ),
+                SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("DJ Name", style: TextStyle(fontSize: 16)),
+                    Text("House / Techno",
+                        style: TextStyle(
+                            fontSize: 12, color: CupertinoColors.systemGrey)),
+                  ],
+                )
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class OtherUserProfileView extends StatefulWidget {
+  const OtherUserProfileView({Key? key}) : super(key: key);
+
+  @override
+  _OtherUserProfileViewState createState() => _OtherUserProfileViewState();
+}
+
+class _OtherUserProfileViewState extends State<OtherUserProfileView> {
+  int selectedTab = 0;
+  final List<String> tabs = ["컬렉션", "활동"];
+  final List<Record> sampleRecords = Record.sampleData;
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("프로필")),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // 간략한 프로필 헤더
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 43,
+                      backgroundColor:
+                          CupertinoColors.systemGrey.withOpacity(0.2),
+                      child: Icon(CupertinoIcons.person,
+                          size: 40, color: CupertinoColors.systemGrey),
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("DJ Name",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600)),
+                          Text("House / Techno",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: CupertinoColors.systemGrey)),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              // 탭 메뉴
+              Row(
+                children: List.generate(tabs.length, (index) {
+                  return Expanded(
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        setState(() {
+                          selectedTab = index;
+                        });
+                      },
+                      child: Column(
+                        children: [
+                          Text(tabs[index],
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: selectedTab == index
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                  color: selectedTab == index
+                                      ? CupertinoColors.black
+                                      : CupertinoColors.systemGrey)),
+                          Container(
+                            height: 2,
+                            color: selectedTab == index
+                                ? primaryColor
+                                : Colors.transparent,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              // 탭 컨텐츠
+              if (selectedTab == 0)
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: sampleRecords.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 1,
+                    mainAxisSpacing: 1,
+                  ),
+                  itemBuilder: (context, index) {
+                    final record = sampleRecords[index];
+                    return CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (_) =>
+                                  CollectionRecordDetailView(record: record)),
+                        );
+                      },
+                      child: InstagramStyleRecordCard(record: record),
+                    );
+                  },
+                )
+              else
+                Column(
+                  children: List.generate(3, (index) {
+                    return ActivityCard(
+                      type: ActivityType.activity,
+                      title: "새로운 레코드를 추가했습니다",
+                      subtitle: "Bicep - Isles",
+                      date: "2시간 전",
+                    );
+                  }),
+                )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// MARK: - Sale / Purchase / SalesHistory Views
+
+class SaleListView extends StatelessWidget {
+  const SaleListView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("판매중")),
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(5, (index) {
+            return ActivityCard(
+              type: ActivityType.sale,
+              title: "판매중인 레코드",
+              subtitle: "Bicep - Isles",
+              date: "3일 전",
+              status: "판매중",
+              statusColor: primaryColor,
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+
+class PurchaseListView extends StatelessWidget {
+  const PurchaseListView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("구매")),
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(5, (index) {
+            return ActivityCard(
+              type: ActivityType.purchase,
+              title: "구매한 레코드",
+              subtitle: "Bicep - Isles",
+              date: "1주일 전",
+              status: "구매완료",
+              statusColor: CupertinoColors.systemGrey,
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+
+class SalesHistoryView extends StatefulWidget {
+  const SalesHistoryView({Key? key}) : super(key: key);
+
+  @override
+  _SalesHistoryViewState createState() => _SalesHistoryViewState();
+}
+
+class _SalesHistoryViewState extends State<SalesHistoryView> {
+  SalesHistoryPeriod selectedPeriod = SalesHistoryPeriod.all;
+  final List<SaleRecord> salesData = SaleRecord.sampleData;
+
+  List<SaleRecord> get filteredSales {
+    final now = DateTime.now();
+    return salesData.where((sale) {
+      final diff = now.difference(sale.saleDate);
+      switch (selectedPeriod) {
+        case SalesHistoryPeriod.week:
+          return diff.inDays <= 7;
+        case SalesHistoryPeriod.month:
+          return diff.inDays <= 30;
+        case SalesHistoryPeriod.threeMonths:
+          return diff.inDays <= 90;
+        case SalesHistoryPeriod.sixMonths:
+          return diff.inDays <= 180;
+        case SalesHistoryPeriod.year:
+          return diff.inDays <= 365;
+        case SalesHistoryPeriod.all:
+          return true;
+      }
+    }).toList();
+  }
+
+  int get totalRevenue =>
+      filteredSales.fold(0, (sum, sale) => sum + sale.price);
+
+  int get averagePrice =>
+      filteredSales.isEmpty ? 0 : totalRevenue ~/ filteredSales.length;
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("판매 내역")),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              // 기간 필터
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: SalesHistoryPeriod.values.length,
+                  separatorBuilder: (_, __) => SizedBox(width: 10),
+                  itemBuilder: (context, index) {
+                    final period = SalesHistoryPeriod.values[index];
+                    return CupertinoButton(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      color: selectedPeriod == period
+                          ? primaryColor
+                          : CupertinoColors.systemGrey4,
+                      borderRadius: BorderRadius.circular(20),
+                      onPressed: () {
+                        setState(() {
+                          selectedPeriod = period;
+                        });
+                      },
+                      child: Text(
+                        period.rawValue,
+                        style: TextStyle(
+                            color: selectedPeriod == period
+                                ? CupertinoColors.white
+                                : CupertinoColors.black),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 16),
+              // 판매 분석 카드
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SalesAnalysisCard(
+                        title: "총 판매액",
+                        value: "$totalRevenue원",
+                        icon: CupertinoIcons.money_dollar_circle,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: SalesAnalysisCard(
+                        title: "평균 판매가",
+                        value: "$averagePrice원",
+                        icon: CupertinoIcons.chart_bar,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+              // 판매 내역 리스트
+              Column(
+                children: filteredSales
+                    .map((sale) => SalesListRow(sale: sale))
+                    .toList(),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SalesAnalysisCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+
+  const SalesAnalysisCard(
+      {Key? key, required this.title, required this.value, required this.icon})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 28, color: primaryColor),
+          SizedBox(height: 8),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.black)),
+          SizedBox(height: 4),
+          Text(title,
+              style:
+                  TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+        ],
+      ),
+    );
+  }
+}
+
+// 임시 SaleRecord 모델 및 SalesListRow 위젯
+class SaleRecord {
+  final DateTime saleDate;
+  final int price;
+
+  SaleRecord({required this.saleDate, required this.price});
+
+  static List<SaleRecord> sampleData = [
+    SaleRecord(
+        saleDate: DateTime.now().subtract(Duration(days: 3)), price: 30000),
+    SaleRecord(
+        saleDate: DateTime.now().subtract(Duration(days: 10)), price: 50000),
+    // 추가 샘플 데이터...
+  ];
+}
+
+enum SalesHistoryPeriod { week, month, threeMonths, sixMonths, year, all }
+
+extension SalesHistoryPeriodExtension on SalesHistoryPeriod {
+  String get rawValue {
+    switch (this) {
+      case SalesHistoryPeriod.week:
+        return "1주일";
+      case SalesHistoryPeriod.month:
+        return "1개월";
+      case SalesHistoryPeriod.threeMonths:
+        return "3개월";
+      case SalesHistoryPeriod.sixMonths:
+        return "6개월";
+      case SalesHistoryPeriod.year:
+        return "1년";
+      case SalesHistoryPeriod.all:
+        return "전체";
+    }
+  }
+}
+
+class SalesListRow extends StatelessWidget {
+  final SaleRecord sale;
+
+  const SalesListRow({Key? key, required this.sale}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Icon(CupertinoIcons.doc_text, color: primaryColor),
+          SizedBox(width: 8),
+          Text("${sale.price}원", style: TextStyle(fontSize: 16)),
+          Spacer(),
+          Text(
+              "${sale.saleDate.month}/${sale.saleDate.day}/${sale.saleDate.year}",
+              style:
+                  TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+        ],
+      ),
+    );
+  }
+}
+
+// MARK: - InstagramStyleRecordCard
+
+class InstagramStyleRecordCard extends StatelessWidget {
+  final Record record;
+
+  const InstagramStyleRecordCard({Key? key, required this.record})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(
+          aspectRatio: 1,
+          child: Image.network(
+            record.coverImageURL.toString(),
+            fit: BoxFit.cover,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(record.title,
+                  style: TextStyle(fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+              Text(record.artist,
+                  style: TextStyle(
+                      fontSize: 10, color: CupertinoColors.systemGrey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+// 임시 상세 페이지들
+
+class MagazineDetailView extends StatelessWidget {
+  final Article article;
+
+  const MagazineDetailView({Key? key, required this.article}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text(article.title)),
+      child: Center(child: Text("Magazine Detail View")),
+    );
+  }
+}
+
+class DJsPickListView extends StatelessWidget {
+  const DJsPickListView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("DJ's List")),
+      child: Center(child: Text("All DJ Picks")),
+    );
+  }
+}
+
+enum InterviewContentType { text, quote, recordHighlight }
+
+class InterviewContent {
+  final String id;
+  final InterviewContentType type;
+  final String text;
+  final List<Record> records;
+
+  InterviewContent({
+    required this.id,
+    required this.type,
+    required this.text,
+    required this.records,
+  });
+}
+
+class DJ {
+  final String id;
+  final String name;
+  final String title;
+  final Uri imageURL;
+  final int yearsActive;
+  final int recordCount;
+  final List<InterviewContent> interviewContents;
+
+  DJ({
+    required this.id,
+    required this.name,
+    required this.title,
+    required this.imageURL,
+    required this.yearsActive,
+    required this.recordCount,
+    required this.interviewContents,
+  });
+}
+
+class DJsPickDetailView extends StatelessWidget {
+  final DJ dj;
+
+  const DJsPickDetailView({Key? key, required this.dj}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text(dj.name)),
+      child: Center(child: Text("DJ Pick Detail View")),
+    );
+  }
+}
+
+class RecordDetailView extends StatelessWidget {
+  final Record? record;
+
+  const RecordDetailView({Key? key, required this.record}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+          middle: Text(record?.title ?? "Record Detail")),
+      child: Center(child: Text("Record Detail View")),
+    );
+  }
+}
+
+class CollectionRecordDetailView extends StatelessWidget {
+  final Record record;
+
+  const CollectionRecordDetailView({Key? key, required this.record})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text(record.title)),
+      child: Center(child: Text("Collection Record Detail View")),
+    );
+  }
+}
+
+class MusicTasteCard extends StatelessWidget {
+  final MusicTaste musicTaste;
+
+  const MusicTasteCard({Key? key, required this.musicTaste}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final double width = (MediaQuery.of(context).size.width - 48) / 2;
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: () {
+        Navigator.push(
+          context,
+          CupertinoPageRoute(builder: (_) => RecordDetailView(record: null)),
+        );
+      },
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemBackground,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              child: Image.network(
+                musicTaste.imageUrl,
+                width: width,
+                height: width,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(musicTaste.title,
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                  Text(musicTaste.subtitle,
+                      style: TextStyle(
+                          fontSize: 12, color: CupertinoColors.systemGrey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GenreButton extends StatelessWidget {
+  final String title;
+  final bool isSelected;
+  final VoidCallback onPressed;
+
+  const GenreButton(
+      {Key? key,
+      required this.title,
+      required this.isSelected,
+      required this.onPressed})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoButton(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: isSelected ? CupertinoColors.black : CupertinoColors.systemGrey4,
+      borderRadius: BorderRadius.circular(20),
+      onPressed: onPressed,
+      child: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? CupertinoColors.white : CupertinoColors.black,
+        ),
+      ),
+    );
+  }
+}
+
+class GenreScrollView extends StatelessWidget {
+  final List<String> genres;
+  final ValueNotifier<String> selectedGenre;
+
+  const GenreScrollView(
+      {Key? key, required this.genres, required this.selectedGenre})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      child: ValueListenableBuilder<String>(
+        valueListenable: selectedGenre,
+        builder: (context, genre, _) => ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: genres.length,
+          separatorBuilder: (_, __) => SizedBox(width: 10),
+          itemBuilder: (context, index) {
+            final title = genres[index];
+            return GenreButton(
+              title: title,
+              isSelected: genre == title,
+              onPressed: () {
+                selectedGenre.value = title;
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class RecordsList extends StatelessWidget {
+  final List<PopularRecord> records;
+
+  const RecordsList({Key? key, required this.records}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final displayed = records.take(5).toList();
+    return Column(
+      children: List.generate(displayed.length, (index) {
+        final record = displayed[index];
+        return PopularRecordRow(record: record, rank: index + 1);
+      }),
+    );
+  }
+}
+
+class HomeToolbar extends StatelessWidget {
+  const HomeToolbar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(CupertinoIcons.search),
+          onPressed: () {
+            showCupertinoModalPopup(
+                context: context, builder: (_) => SearchView());
+          },
+        ),
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(CupertinoIcons.bell),
+          onPressed: () {
+            showCupertinoModalPopup(
+                context: context, builder: (_) => NotificationsView());
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class GenreTag extends StatelessWidget {
+  final String text;
+
+  const GenreTag({Key? key, required this.text}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemGrey4,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 12),
+      ),
+    );
+  }
+}
+
+// 임시 Search 및 Notifications 뷰
+class SearchView extends StatelessWidget {
+  const SearchView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("Search")),
+      child: Center(child: Text("Search View")),
+    );
+  }
+}
+
+class NotificationsView extends StatelessWidget {
+  const NotificationsView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text("Notifications")),
+      child: Center(child: Text("Notifications View")),
+    );
+  }
+}
