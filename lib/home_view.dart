@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 
+import 'home/djs_pick_detail_view.dart';
+import 'home/home_view.dart';
 import 'home/magzine_detail_view.dart' show MagazineDetailView;
 import 'model/popular_record.dart';
 import 'model/record.dart';
@@ -684,51 +686,6 @@ class DJsPickListView extends StatelessWidget {
   }
 }
 
-enum InterviewContentType { text, quote, recordHighlight }
-
-class InterviewContent {
-  final String id;
-  final InterviewContentType type;
-  final String text;
-  final List<Record> records;
-  InterviewContent({
-    required this.id,
-    required this.type,
-    required this.text,
-    required this.records,
-  });
-}
-
-class DJ {
-  final String id;
-  final String name;
-  final String title;
-  final Uri imageURL;
-  final int yearsActive;
-  final int recordCount;
-  final List<InterviewContent> interviewContents;
-  DJ({
-    required this.id,
-    required this.name,
-    required this.title,
-    required this.imageURL,
-    required this.yearsActive,
-    required this.recordCount,
-    required this.interviewContents,
-  });
-}
-
-class DJsPickDetailView extends StatelessWidget {
-  final DJ dj;
-  const DJsPickDetailView({Key? key, required this.dj}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(dj.name)),
-      child: Center(child: Text("DJ Pick Detail View")),
-    );
-  }
-}
 
 class CollectionRecordDetailView extends StatelessWidget {
   final Record record;
