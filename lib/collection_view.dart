@@ -1,12 +1,9 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/profile_view.dart';
 import 'package:kolektt/record_detail_view.dart';
-import 'package:kolektt/view_models/home_vm.dart';
 
 import 'analytics_section/analytics_section.dart';
-import 'home/home_view.dart';
 import 'model/record.dart';
 
 // ===== Models =====
@@ -184,7 +181,13 @@ class _CollectionViewState extends State<CollectionView> {
         middle: Text("컬렉션"),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.add),
+          child: IconButton(
+              onPressed: () {},
+              icon: Icon(
+                CupertinoIcons.add_circled_solid,
+                size: 32,
+                color: CupertinoColors.black,
+              )),
           onPressed: () {
             // 추가 메뉴 처리 (CupertinoActionSheet 등을 사용)
           },

@@ -24,11 +24,11 @@ class ContentView extends StatelessWidget {
               label: "홈",
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.square_grid_2x2),
+              icon: Icon(CupertinoIcons.square_grid_2x2_fill),
               label: "컬렉션",
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person),
+              icon: Icon(CupertinoIcons.person_fill),
               label: "프로필",
             ),
           ],
