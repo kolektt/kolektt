@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/home/home_view.dart' as homeView;
 
+import '../components/leaderboard_view.dart';
 import '../home_view.dart';
 import '../model/popular_record.dart';
 import '../model/record.dart';
@@ -175,25 +176,28 @@ class _ProfileViewState extends State<ProfileView> {
                           });
                         },
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              tabs[index],
+                            AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 300),
                               style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: selectedTab == index
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
-                                  color: selectedTab == index
-                                      ? CupertinoColors.black
-                                      : CupertinoColors.systemGrey),
+                                fontSize: 14,
+                                fontWeight: selectedTab == index
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                                color: selectedTab == index
+                                    ? CupertinoColors.black
+                                    : CupertinoColors.systemGrey,
+                              ),
+                              child: Text(tabs[index]),
                             ),
-                            SizedBox(height: 4),
-                            Container(
+                            const SizedBox(height: 4),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
                               height: 2,
-                              color: selectedTab == index
-                                  ? primaryColor
-                                  : Colors.transparent,
-                            )
+                              width: double.infinity,
+                              color: selectedTab == index ? primaryColor : Colors.transparent,
+                            ),
                           ],
                         ),
                       ),
@@ -202,62 +206,73 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
               // 탭 컨텐츠
-              Builder(builder: (context) {
-                switch (selectedTab) {
-                  case 0:
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: records.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 1,
-                          mainAxisSpacing: 1,
-                        ),
-                        itemBuilder: (context, index) {
-                          final record = records[index];
-                          return CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (_) => CollectionRecordDetailView(
-                                      record: record),
-                                ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+                child: Builder(
+                  // selectedTab에 따라 key를 변경하여 AnimatedSwitcher가 변경을 감지하게 함
+                  key: ValueKey<int>(selectedTab),
+                  builder: (context) {
+                    switch (selectedTab) {
+                      case 0:
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: records.length,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 1,
+                              mainAxisSpacing: 1,
+                              childAspectRatio: 0.76, // 이미지 1:1와 텍스트 영역 높이 고려
+                            ),
+                            itemBuilder: (context, index) {
+                              final record = records[index];
+                              return CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (_) => CollectionRecordDetailView(record: record),
+                                    ),
+                                  );
+                                },
+                                child: InstagramStyleRecordCard(record: record),
                               );
                             },
-                            child: InstagramStyleRecordCard(record: record),
-                          );
-                        },
-                      ),
-                    );
-                  case 1:
-                    return SaleListView();
-                  case 2:
-                    return PurchaseListView();
-                  case 3:
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Column(
-                        children: List.generate(3, (index) {
-                          return ActivityCard(
-                            type: ActivityType.activity,
-                            title: "새로운 레코드를 추가했습니다",
-                            subtitle: "Bicep - Isles",
-                            date: "2시간 전",
-                          );
-                        }),
-                      ),
-                    );
-                  default:
-                    return Container();
-                }
-              }),
+                          ),
+                        );
+                      case 1:
+                        return SaleListView();
+                      case 2:
+                        return PurchaseListView();
+                      case 3:
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Column(
+                            children: List.generate(3, (index) {
+                              return ActivityCard(
+                                type: ActivityType.activity,
+                                title: "새로운 레코드를 추가했습니다",
+                                subtitle: "Bicep - Isles",
+                                date: "2시간 전",
+                              );
+                            }),
+                          ),
+                        );
+                      default:
+                        return Container();
+                    }
+                  },
+                ),
+              ),
               // 리더보드 섹션
-              LeaderboardView(data: LeaderboardData.sampleData),
+              // LeaderboardView(data: LeaderboardData.sample),
             ],
           ),
         ),
@@ -934,6 +949,7 @@ class InstagramStyleRecordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min, // 자식 위젯 크기에 맞게 최소한의 공간만 사용
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AspectRatio(
@@ -946,20 +962,27 @@ class InstagramStyleRecordCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           child: Column(
+            mainAxisSize: MainAxisSize.min, // 여기서도 최소 크기로 설정
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(record.title,
-                  style: TextStyle(fontSize: 12),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis),
-              Text(record.artist,
-                  style: TextStyle(
-                      fontSize: 10, color: CupertinoColors.systemGrey),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis),
+              Text(
+                record.title,
+                style: const TextStyle(fontSize: 12),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                record.artist,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: CupertinoColors.systemGrey,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
-        )
+        ),
       ],
     );
   }

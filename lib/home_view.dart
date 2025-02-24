@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 
 import 'components/dj_pick_section.dart';
+import 'components/leaderboard_view.dart';
 import 'components/music_taste_card.dart';
 import 'components/popular_records_section.dart';
 import 'home/djs_pick_detail_view.dart';
@@ -11,27 +12,6 @@ import 'model/popular_record.dart';
 import 'model/record.dart';
 import 'record_detail_view.dart';
 
-// 임시 Leaderboard 데이터 및 뷰
-class LeaderboardData {
-  static List<LeaderboardData> sampleData = [];
-}
-
-class LeaderboardView extends StatelessWidget {
-  final List<LeaderboardData> data;
-  const LeaderboardView({Key? key, required this.data}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Center(child: Text("Leaderboard View", style: TextStyle(color: CupertinoColors.black))),
-    );
-  }
-}
 
 // --- 메인 홈 뷰 ---
 class HomeView extends StatelessWidget {
@@ -89,7 +69,7 @@ class HomeView extends StatelessWidget {
                   const SizedBox(height: 24),
                   MusicTasteSection(musicTastes: musicTastes),
                   const SizedBox(height: 24),
-                  LeaderboardView(data: LeaderboardData.sampleData),
+                  LeaderboardView(data: LeaderboardData.sample),
                 ],
               ),
             ),
