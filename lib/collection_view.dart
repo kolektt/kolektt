@@ -1,9 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/profile_view.dart';
 import 'package:kolektt/record_detail_view.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 
+import 'analytics_section/analytics_section.dart';
 import 'home/home_view.dart';
 import 'model/record.dart';
 
@@ -333,7 +335,8 @@ class SearchFilterBar extends StatelessWidget {
   final ValueChanged<SortOption> onSortOptionChanged;
   final List<String> genres;
 
-  SearchFilterBar({
+  const SearchFilterBar({
+    Key? key,
     required this.searchText,
     required this.onSearchTextChanged,
     required this.selectedGenre,
@@ -341,7 +344,96 @@ class SearchFilterBar extends StatelessWidget {
     required this.sortOption,
     required this.onSortOptionChanged,
     required this.genres,
-  });
+  }) : super(key: key);
+
+  Future<void> _showGenrePicker(BuildContext context) async {
+    int initialIndex = genres.indexOf(selectedGenre);
+    if (initialIndex < 0) initialIndex = 0;
+
+    final selected = await showCupertinoModalPopup<String>(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 250,
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: Column(
+            children: [
+              // 취소 버튼
+              Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("취소"),
+                ),
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: initialIndex),
+                  itemExtent: 32,
+                  onSelectedItemChanged: (int index) {
+                    // 선택이 변경될 때마다 즉시 반영하지 않고, 취소 버튼을 누른 후 처리할 수도 있음.
+                    // 여기서는 즉시 선택하도록 Navigator.pop 사용
+                    Navigator.pop(context, genres[index]);
+                  },
+                  children: genres.map((genre) => Center(child: Text(genre))).toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      onGenreChanged(selected);
+    }
+  }
+
+  Future<void> _showSortOptionPicker(BuildContext context) async {
+    final options = SortOption.values;
+    int initialIndex = options.indexOf(sortOption);
+
+    final selected = await showCupertinoModalPopup<SortOption>(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 250,
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("취소"),
+                ),
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: initialIndex),
+                  itemExtent: 32,
+                  onSelectedItemChanged: (int index) {
+                    Navigator.pop(context, options[index]);
+                  },
+                  children: options
+                      .map((option) => Center(child: Text(option.displayName)))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      onSortOptionChanged(selected);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -359,35 +451,47 @@ class SearchFilterBar extends StatelessWidget {
             onChanged: onSearchTextChanged,
           ),
         ),
-        // 장르 & 정렬 옵션
+        // 장르 및 정렬 옵션
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              DropdownButton<String>(
-                value: selectedGenre,
-                items: genres
-                    .map((genre) => DropdownMenuItem(
-                  value: genre,
-                  child: Text(genre),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) onGenreChanged(value);
-                },
+              // 장르 선택 버튼
+              Expanded(
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => _showGenrePicker(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        selectedGenre,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(CupertinoIcons.chevron_down, size: 16),
+                    ],
+                  ),
+                ),
               ),
-              SizedBox(width: 16),
-              DropdownButton<SortOption>(
-                value: sortOption,
-                items: SortOption.values
-                    .map((option) => DropdownMenuItem(
-                  value: option,
-                  child: Text(option.displayName),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) onSortOptionChanged(value);
-                },
+              const SizedBox(width: 16),
+              // 정렬 옵션 선택 버튼
+              Expanded(
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => _showSortOptionPicker(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        sortOption.displayName,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(CupertinoIcons.chevron_down, size: 16),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -597,485 +701,6 @@ class _EditRecordViewState extends State<EditRecordView> {
   }
 }
 
-// ===== Analytics Section (Cupertino 스타일) =====
-
-class AnalyticsSection extends StatefulWidget {
-  final CollectionAnalytics? analytics;
-  AnalyticsSection({this.analytics});
-
-  @override
-  _AnalyticsSectionState createState() => _AnalyticsSectionState();
-}
-
-class _AnalyticsSectionState extends State<AnalyticsSection> {
-  int currentPage = 0;
-  PageController _pageController = PageController();
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-  @override
-  Widget build(BuildContext context) {
-    double cardWidth = MediaQuery.of(context).size.width - 32;
-    double cardHeight = 340;
-    Color primaryColor = Color(0xFF0036FF);
-
-    return Column(
-      children: [
-        widget.analytics != null
-            ? Container(
-          height: cardHeight,
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                currentPage = index;
-              });
-            },
-            children: [
-              AnalyticCard(
-                title: "컬렉션 현황",
-                width: cardWidth,
-                height: cardHeight,
-                child: CollectionSummaryView(analytics: widget.analytics!),
-              ),
-              AnalyticCard(
-                title: "장르별 분포",
-                width: cardWidth,
-                height: cardHeight,
-                child: GenreDistributionView(genres: widget.analytics!.genres),
-              ),
-              AnalyticCard(
-                title: "연도별 분포",
-                width: cardWidth,
-                height: cardHeight,
-                child: DecadeDistributionView(decades: widget.analytics!.decades),
-              ),
-            ],
-          ),
-        )
-            : AnalyticCard(
-          title: "컬렉션 분석",
-          width: cardWidth,
-          height: cardHeight,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.music_note, size: 48, color: CupertinoColors.systemBlue),
-                SizedBox(height: 8),
-                Text(
-                  "컬렉션을 추가하여\n분석을 시작해보세요",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: CupertinoColors.systemGrey),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (widget.analytics != null)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(3, (index) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: currentPage == index ? primaryColor : Colors.grey.withOpacity(0.3),
-                ),
-              );
-            }),
-          ),
-      ],
-    );
-  }
-}
-
-class AnalyticCard extends StatelessWidget {
-  final String title;
-  final double width;
-  final double height;
-  final Widget child;
-  AnalyticCard({required this.title, required this.width, required this.height, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      width: width,
-      height: height,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-          ),
-          Expanded(child: Padding(padding: EdgeInsets.symmetric(horizontal: 20), child: child)),
-        ],
-      ),
-    );
-  }
-}
-
-class CollectionSummaryView extends StatelessWidget {
-  final CollectionAnalytics analytics;
-  CollectionSummaryView({required this.analytics});
-  @override
-  Widget build(BuildContext context) {
-    Color primaryColor = Color(0xFF0036FF);
-    if (analytics.totalRecords == 0) {
-      return Center(
-        child: Text("아직 레코드가 없습니다", style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
-      );
-    } else {
-      return Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: StatisticCard(
-                  title: "총 레코드",
-                  value: "${analytics.totalRecords}장",
-                  icon: CupertinoIcons.music_note,
-                  color: primaryColor,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: StatisticCard(
-                  title: "인기 장르",
-                  value: analytics.mostCollectedGenre.isEmpty ? "없음" : analytics.mostCollectedGenre,
-                  icon: CupertinoIcons.music_mic,
-                  color: primaryColor,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: StatisticCard(
-                  title: "가장 많은 아티스트",
-                  value: analytics.mostCollectedArtist.isEmpty ? "없음" : analytics.mostCollectedArtist,
-                  icon: CupertinoIcons.person_2,
-                  color: primaryColor,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: StatisticCard(
-                  title: "수집 기간",
-                  value: analytics.oldestRecord == 0 ? "없음" : "${analytics.oldestRecord} - ${analytics.newestRecord}",
-                  icon: CupertinoIcons.calendar,
-                  color: primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-    }
-  }
-}
-
-class StatisticCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  StatisticCard({required this.title, required this.value, required this.icon, required this.color});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CupertinoColors.white.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: color),
-              SizedBox(width: 8),
-              Text(title, style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis),
-        ],
-      ),
-    );
-  }
-}
-
-/// fl_chart를 이용한 장르 분포 뷰
-class GenreDistributionView extends StatelessWidget {
-  final List<GenreAnalytics> genres;
-  const GenreDistributionView({Key? key, required this.genres}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    Color primaryColor = const Color(0xFF0036FF);
-    if (genres.isEmpty) {
-      return Center(
-        child: Text(
-          "아직 장르 데이터가 없습니다",
-          style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
-        ),
-      );
-    }
-    List<GenreAnalytics> sortedGenres = List.from(genres)..sort((a, b) => b.count.compareTo(a.count));
-    List<GenreAnalytics> topGenres = sortedGenres.take(6).toList();
-    double maxY = topGenres.map((e) => e.count).reduce((a, b) => a > b ? a : b).toDouble() + 2;
-    return Container(
-      height: 200,
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxY,
-          barTouchData: BarTouchData(
-            enabled: true,
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final genre = topGenres[group.x.toInt()];
-                return BarTooltipItem(
-                  "${genre.count}장",
-                  TextStyle(color: CupertinoColors.white, fontSize: 12),
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  int index = value.toInt();
-                  if (index < topGenres.length) {
-                    String label = topGenres[index].name == "기타" ? "미분류" : topGenres[index].name;
-                    return SideTitleWidget(
-                      space: 4,
-                      meta: meta,
-                      child: Text(
-                        label,
-                        style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
-                      ),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 28,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
-                  );
-                },
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-          barGroups: topGenres.asMap().entries.map((entry) {
-            int index = entry.key;
-            final genre = entry.value;
-            return BarChartGroupData(
-              x: index,
-              barRods: [
-                BarChartRodData(
-                  toY: genre.count.toDouble(),
-                  width: 20,
-                  borderRadius: BorderRadius.circular(4),
-                  color: primaryColor,
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-}
-
-/// fl_chart를 이용한 연도 분포 뷰
-class DecadeDistributionView extends StatelessWidget {
-  final List<DecadeAnalytics> decades;
-  const DecadeDistributionView({Key? key, required this.decades}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    Color primaryColor = const Color(0xFF0036FF);
-    if (decades.isEmpty) {
-      return Center(
-        child: Text(
-          "아직 연도 데이터가 없습니다",
-          style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
-        ),
-      );
-    }
-    List<DecadeAnalytics> sortedDecades = List.from(decades)..sort((a, b) => a.decade.compareTo(b.decade));
-    double maxY = sortedDecades.map((e) => e.count).reduce((a, b) => a > b ? a : b).toDouble() + 2;
-    return Container(
-      height: 200,
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxY,
-          barTouchData: BarTouchData(
-            enabled: true,
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final decade = sortedDecades[group.x.toInt()];
-                return BarTooltipItem(
-                  "${decade.count}장",
-                  TextStyle(color: CupertinoColors.white, fontSize: 12),
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  int index = value.toInt();
-                  if (index < sortedDecades.length) {
-                    String label = sortedDecades[index].decade;
-                    return SideTitleWidget(
-                      space: 4,
-                      meta: meta,
-                      child: Text(
-                        label,
-                        style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
-                      ),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 28,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
-                  );
-                },
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-          barGroups: sortedDecades.asMap().entries.map((entry) {
-            int index = entry.key;
-            final decade = entry.value;
-            return BarChartGroupData(
-              x: index,
-              barRods: [
-                BarChartRodData(
-                  toY: decade.count.toDouble(),
-                  width: 20,
-                  borderRadius: BorderRadius.circular(4),
-                  color: primaryColor,
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-}
-
-class RecordCardView extends StatelessWidget {
-  final Record record;
-  RecordCardView({required this.record});
-  @override
-  Widget build(BuildContext context) {
-    double cardWidth = (MediaQuery.of(context).size.width - 48) / 2;
-    double imageHeight = 160;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: CupertinoColors.systemBackground,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-            child: Image.network(
-              record.coverImageURL ?? "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-              width: cardWidth,
-              height: imageHeight,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(record.title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                Text(record.artist,
-                    style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                Row(
-                  children: [
-                    if (record.releaseYear != null)
-                      Text("${record.releaseYear}",
-                          style: TextStyle(fontSize: 11, color: CupertinoColors.systemGrey)),
-                    if (record.releaseYear != null && record.genre != null)
-                      Text(" • ", style: TextStyle(fontSize: 11, color: CupertinoColors.systemGrey)),
-                    if (record.genre != null)
-                      Text(record.genre!,
-                          style: TextStyle(fontSize: 11, color: CupertinoColors.systemGrey),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ===== CatNo Input View (Cupertino Alert) =====
 
