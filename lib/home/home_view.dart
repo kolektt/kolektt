@@ -4,25 +4,13 @@ import 'package:kolektt/home/home_view.dart' as homeView;
 
 import '../home_view.dart';
 import '../model/popular_record.dart';
+import '../model/record.dart';
+import '../view_models/home_vm.dart';
 
 // 기본 색상 (hex 코드 0036FF)
 final Color primaryColor = Color(0xFF0036FF);
 
 // 데이터 모델 (간략한 예제)
-class Article {
-  final String id;
-  final String title;
-  final String? subtitle;
-  final Uri coverImageURL;
-
-  Article({
-    required this.id,
-    required this.title,
-    this.subtitle,
-    required this.coverImageURL,
-  });
-}
-
 class DJPick {
   final String id;
   final String name;
@@ -49,63 +37,6 @@ class MusicTaste {
     required this.subtitle,
     required this.imageUrl,
   });
-}
-
-class Record {
-  final String id;
-  final String title;
-  final String artist;
-  final int releaseYear;
-  final String genre;
-  final Uri coverImageURL;
-  final String? notes;
-  final int lowestPrice;
-  final int price;
-  final num priceChange;
-  final int sellersCount;
-  final String recordDescription;
-  final int rank;
-  final int rankChange;
-  final bool trending;
-
-  Record({
-    required this.id,
-    required this.title,
-    required this.artist,
-    required this.releaseYear,
-    required this.genre,
-    required this.coverImageURL,
-    this.notes,
-    required this.lowestPrice,
-    required this.price,
-    required this.priceChange,
-    required this.sellersCount,
-    required this.recordDescription,
-    required this.rank,
-    required this.rankChange,
-    required this.trending,
-  });
-
-  static List<Record> sampleData = [
-    Record(
-      id: "s1",
-      title: "Sample Record 1",
-      artist: "Artist 1",
-      releaseYear: 2000,
-      genre: "Pop",
-      coverImageURL: Uri.parse("https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain"),
-      notes: "",
-      lowestPrice: 100,
-      price: 150,
-      priceChange: 0,
-      sellersCount: 3,
-      recordDescription: "Description 1",
-      rank: 1,
-      rankChange: 0,
-      trending: true,
-    ),
-    // 추가 샘플 데이터...
-  ];
 }
 
 // MARK: - Cupertino ProfileView
@@ -1063,20 +994,6 @@ class InstagramStyleRecordCard extends StatelessWidget {
 }
 
 // 임시 상세 페이지들
-
-class MagazineDetailView extends StatelessWidget {
-  final Article article;
-
-  const MagazineDetailView({Key? key, required this.article}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(article.title)),
-      child: Center(child: Text("Magazine Detail View")),
-    );
-  }
-}
 
 class DJsPickListView extends StatelessWidget {
   const DJsPickListView({Key? key}) : super(key: key);

@@ -1,21 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:kolektt/view_models/home_vm.dart';
 
+import 'home/magzine_detail_view.dart' show MagazineDetailView;
 import 'model/popular_record.dart';
-
-// --- 데이터 모델 (실제 프로젝트에 맞게 정의) ---
-class Article {
-  final String id;
-  final String title;
-  final String? subtitle;
-  final Uri coverImageURL;
-  Article({
-    required this.id,
-    required this.title,
-    this.subtitle,
-    required this.coverImageURL,
-  });
-}
+import 'model/record.dart';
 
 class DJPick {
   final String id;
@@ -43,61 +31,6 @@ class MusicTaste {
   });
 }
 
-// 임시 모델: Record
-class Record {
-  final String id;
-  final String title;
-  final String artist;
-  final int releaseYear;
-  final String genre;
-  final Uri coverImageURL;
-  final String? notes;
-  final int lowestPrice;
-  final int price;
-  final num priceChange;
-  final int sellersCount;
-  final String recordDescription;
-  final int rank;
-  final int rankChange;
-  final bool trending;
-  Record({
-    required this.id,
-    required this.title,
-    required this.artist,
-    required this.releaseYear,
-    required this.genre,
-    required this.coverImageURL,
-    this.notes,
-    required this.lowestPrice,
-    required this.price,
-    required this.priceChange,
-    required this.sellersCount,
-    required this.recordDescription,
-    required this.rank,
-    required this.rankChange,
-    required this.trending,
-  });
-  static List<Record> sampleData = [
-    Record(
-      id: "s1",
-      title: "Sample Record 1",
-      artist: "Artist 1",
-      releaseYear: 2000,
-      genre: "Pop",
-      coverImageURL: Uri.parse("https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain"),
-      notes: "",
-      lowestPrice: 100,
-      price: 150,
-      priceChange: 0,
-      sellersCount: 3,
-      recordDescription: "Description 1",
-      rank: 1,
-      rankChange: 0,
-      trending: true,
-    ),
-    // 추가 샘플 데이터...
-  ];
-}
 
 // 임시 Leaderboard 데이터 및 뷰
 class LeaderboardData {
@@ -129,7 +62,13 @@ class HomeView extends StatelessWidget {
       id: '1',
       title: '레코드로 듣는 재즈의 매력',
       subtitle: '아날로그 사운드의 따뜻함을 느껴보세요',
-      coverImageURL: Uri.parse("https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain"),
+      coverImageURL: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
+      category: 'Jazz',
+      authorName: 'Kolektt',
+      authorTitle: '',
+      authorImageURL: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
+      date: DateTime.now(),
+      contents: [],
     ),
     // ... 추가 기사
   ];
@@ -516,6 +455,7 @@ class HomeToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         CupertinoButton(
           padding: EdgeInsets.zero,
@@ -621,15 +561,9 @@ class PopularRecordRow extends StatelessWidget {
                 artist: record.artist,
                 releaseYear: 2024,
                 genre: "Jazz",
-                coverImageURL: Uri.parse(record.imageUrl),
+                coverImageURL: record.imageUrl,
                 notes: "",
-                lowestPrice: record.price,
                 price: record.price,
-                priceChange: 0,
-                sellersCount: 3,
-                recordDescription: "A beautiful collection of timeless classics",
-                rank: rank,
-                rankChange: 2,
                 trending: record.trending,
               ),
             ),
@@ -752,18 +686,6 @@ class GenreTag extends StatelessWidget {
 }
 
 // --- 임시 상세 페이지 및 기타 뷰 ---
-class MagazineDetailView extends StatelessWidget {
-  final Article article;
-  const MagazineDetailView({Key? key, required this.article}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(article.title)),
-      child: Center(child: Text("Magazine Detail View")),
-    );
-  }
-}
-
 class DJsPickListView extends StatelessWidget {
   const DJsPickListView({Key? key}) : super(key: key);
   @override

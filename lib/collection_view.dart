@@ -1,74 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/view_models/home_vm.dart';
+
+import 'model/record.dart';
 
 // ===== Models =====
-
-class Record {
-  String title;
-  String artist;
-  int? releaseYear;
-  String? genre;
-  String? coverImageURL;
-  DateTime createdAt;
-  DateTime updatedAt;
-
-  // 추가 메타데이터
-  String? catalogNumber;
-  String? label;
-  String? format;
-  String? country;
-  String? style;
-  String? condition;
-  String? conditionNotes;
-  String? notes;
-
-  // 새로 추가할 필드
-  int price;
-  bool trending;
-
-  Record({
-    required this.title,
-    required this.artist,
-    this.releaseYear,
-    this.genre,
-    this.coverImageURL,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    this.catalogNumber,
-    this.label,
-    this.format,
-    this.country,
-    this.style,
-    this.condition,
-    this.conditionNotes,
-    this.notes,
-    this.price = 0,
-    this.trending = false,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
-
-  static List<Record> sampleData = [
-    Record(
-      title: "Sample Album",
-      artist: "Artist A",
-      releaseYear: 2000,
-      genre: "Rock",
-      coverImageURL: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-      price: 150,
-      trending: true,
-    ),
-    Record(
-      title: "Another Album",
-      artist: "Artist B",
-      releaseYear: 2010,
-      genre: "Pop",
-      coverImageURL: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-      price: 200,
-      trending: false,
-    ),
-  ];
-}
 
 
 class GenreAnalytics {
@@ -372,6 +309,10 @@ class _CollectionViewState extends State<CollectionView> {
         releaseYear: year,
         genre: genre,
         notes: notes,
+        id: '',
+        coverImageURL: '',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
       records.add(newRecord);
       updateAnalytics();
@@ -496,14 +437,14 @@ class RecordListItemView extends StatelessWidget {
                       style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis),
-                  Text("₩${record.price}",
-                      style: TextStyle(fontSize: 14)),
+                  // Text("₩${record.lowestPrice}",
+                  //     style: TextStyle(fontSize: 14)),
                 ],
               ),
             ),
             Icon(
-              record.trending ? CupertinoIcons.arrow_up : CupertinoIcons.arrow_down,
-              color: record.trending ? CupertinoColors.activeGreen : CupertinoColors.destructiveRed,
+              CupertinoIcons.arrow_up,
+              color: CupertinoColors.activeGreen,
             ),
           ],
         ),

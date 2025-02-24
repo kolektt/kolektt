@@ -1,6 +1,10 @@
+import 'dart:core';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../model/popular_record.dart';
+import '../model/record.dart';
 
 /// 샘플 데이터 모델 정의 (실제 프로젝트에서는 별도 파일로 관리)
 enum ArticleContentType { text, image, relatedRecords }
@@ -26,19 +30,19 @@ class ArticleContent {
 class Article {
   final String id;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final String category;
-  final Uri coverImageURL;
+  final String coverImageURL;
   final String authorName;
   final String authorTitle;
-  final Uri authorImageURL;
+  final String authorImageURL;
   final DateTime date;
   final List<ArticleContent> contents;
 
   Article({
     required this.id,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.category,
     required this.coverImageURL,
     required this.authorName,
@@ -47,80 +51,52 @@ class Article {
     required this.date,
     required this.contents,
   });
-}
 
-class Record {
-  final String id;
-  final String title;
-  final String artist;
-  final int releaseYear;
-  final String genre;
-  final Uri coverImageURL;
-  final String notes;
-  final int lowestPrice;
-  final int price;
-  final int priceChange;
-  final int sellersCount;
-  final String recordDescription;
-  final int rank;
-  final int rankChange;
-  final bool trending;
+  String get formattedDate {
+    final formatter = DateFormat('yyyy.MM.dd');
+    return formatter.format(date);
+  }
 
-  Record({
-    required this.id,
-    required this.title,
-    required this.artist,
-    required this.releaseYear,
-    required this.genre,
-    required this.coverImageURL,
-    required this.notes,
-    required this.lowestPrice,
-    required this.price,
-    required this.priceChange,
-    required this.sellersCount,
-    required this.recordDescription,
-    required this.rank,
-    required this.rankChange,
-    required this.trending,
-  });
-
-  // 예제용 샘플 데이터
-  static List<Record> sampleData = [
-    Record(
-      id: 'sample1',
-      title: 'Sample Record 1',
-      artist: 'Artist 1',
-      releaseYear: 2000,
-      genre: 'Pop',
-      coverImageURL: Uri.parse('https://via.placeholder.com/150'),
-      notes: '',
-      lowestPrice: 100,
-      price: 150,
-      priceChange: 0,
-      sellersCount: 3,
-      recordDescription: 'Description 1',
-      rank: 1,
-      rankChange: 0,
-      trending: true,
-    ),
-    Record(
-      id: 'sample2',
-      title: 'Sample Record 2',
-      artist: 'Artist 2',
-      releaseYear: 1990,
-      genre: 'Rock',
-      coverImageURL: Uri.parse('https://via.placeholder.com/150'),
-      notes: '',
-      lowestPrice: 120,
-      price: 180,
-      priceChange: 0,
-      sellersCount: 2,
-      recordDescription: 'Description 2',
-      rank: 2,
-      rankChange: 0,
-      trending: false,
-    ),
-  ];
+  static Article get sample => Article(
+        id: '1',
+        title: '레코드로 듣는 재즈의 매력',
+        subtitle: '아날로그 사운드의 따뜻함을 느껴보세요',
+        category: 'Feature',
+        coverImageURL: 'https://example.com/jazz-cover.jpg',
+        authorName: '김재즈',
+        authorTitle: '음악 칼럼니스트',
+        authorImageURL: 'https://example.com/author.jpg',
+        date: DateTime.now(),
+        contents: [
+          ArticleContent(
+            id: '1',
+            type: ArticleContentType.text,
+            text: '레코드는 단순한 음악 매체가 아닙니다. 그것은 음악을 경험하는 특별한 방식이자, 예술 작품 그 자체입니다.',
+            records: [],
+          ),
+          ArticleContent(
+            id: '2',
+            type: ArticleContentType.text,
+            imageURL: Uri.parse('htt/ps://example.com/record-player.jpg'),
+            caption: '빈티지 레코드 플레이어',
+            records: [],
+            text: '',
+          ),
+          ArticleContent(
+            id: '3',
+            type: ArticleContentType.text,
+            text:
+                '특히 재즈 음악은 레코드로 들을 때 그 진가를 발휘합니다. 아날로그 사운드의 따뜻함과 풍부한 음색이 재즈의 즉흥성과 완벽한 조화를 이룹니다.',
+            records: [],
+          ),
+          ArticleContent(
+            id: '4',
+            type: ArticleContentType.text,
+            records: Record.sampleData,
+            text: '',
+          ),
+        ],
+      );
 }
 
 class RecordShop {
@@ -195,10 +171,10 @@ class HomeViewModel extends ChangeNotifier {
         title: "레코드로 듣는 재즈의 매력",
         subtitle: "아날로그 사운드의 따뜻함을 느껴보세요",
         category: "Feature",
-        coverImageURL: Uri.parse("https://example.com/jazz-cover.jpg"),
+        coverImageURL: "https://example.com/jazz-cover.jpg",
         authorName: "김재즈",
         authorTitle: "음악 칼럼니스트",
-        authorImageURL: Uri.parse("https://example.com/author.jpg"),
+        authorImageURL: "https://example.com/author.jpg",
         date: DateTime.now(),
         contents: [
           ArticleContent(
@@ -240,10 +216,10 @@ class HomeViewModel extends ChangeNotifier {
         title: "LP 관리의 모든 것",
         subtitle: "소중한 레코드를 오래도록 보관하는 방법",
         category: "Guide",
-        coverImageURL: Uri.parse("https://example.com/lp-care.jpg"),
+        coverImageURL: "https://example.com/lp-care.jpg",
         authorName: "박컬렉터",
         authorTitle: "레코드 수집가",
-        authorImageURL: Uri.parse("https://example.com/author2.jpg"),
+        authorImageURL: "https://example.com/author2.jpg",
         date: DateTime.now().subtract(Duration(days: 1)),
         contents: [
           ArticleContent(
@@ -337,16 +313,18 @@ class HomeViewModel extends ChangeNotifier {
           artist: "Prince",
           releaseYear: 1984,
           genre: "Pop/Rock",
-          coverImageURL: Uri.parse("https://example.com/taste3.jpg"),
+          coverImageURL:
+              "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
           notes: "프린스의 상징적인 앨범을 레코드로 소장하세요.",
-          lowestPrice: 200,
-          price: 200,
-          priceChange: 0,
-          sellersCount: 4,
-          recordDescription: "프린스의 상징적인 앨범을 레코드로 소장하세요.",
-          rank: 3,
-          rankChange: 0,
-          trending: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          // price: 200,
+          // priceChange: 0,
+          // sellersCount: 4,
+          // recordDescription: "프린스의 상징적인 앨범을 레코드로 소장하세요.",
+          // rank: 3,
+          // rankChange: 0,
+          // trending: true,
         ),
       ),
     ];
