@@ -3,6 +3,7 @@ import 'package:kolektt/view_models/home_vm.dart';
 
 import 'components/dj_pick_section.dart';
 import 'components/music_taste_card.dart';
+import 'components/popular_records_section.dart';
 import 'home/djs_pick_detail_view.dart';
 import 'home/home_view.dart';
 import 'home/magzine_detail_view.dart' show MagazineDetailView;
@@ -47,17 +48,7 @@ class HomeView extends StatelessWidget {
     // ... 추가 DJPick
   ];
 
-  final List<PopularRecord> popularRecords = [
-    PopularRecord(
-      id: 'rec1',
-      title: "Kind of Blue",
-      artist: "Miles Davis",
-      price: 150000,
-      imageUrl: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-      trending: true,
-    ),
-    // ... 추가 PopularRecord
-  ];
+  final List<PopularRecord> popularRecords = PopularRecord.sample;
 
   final List<MusicTaste> musicTastes = MusicTaste.sample;
 
@@ -177,29 +168,6 @@ class MagazineSection extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-class PopularRecordsSection extends StatelessWidget {
-  final List<String> genres;
-  final ValueNotifier<String> selectedGenre;
-  final List<PopularRecord> records;
-  const PopularRecordsSection({
-    Key? key,
-    required this.genres,
-    required this.selectedGenre,
-    required this.records,
-  }) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: "인기", showMore: false),
-        GenreScrollView(genres: genres, selectedGenre: selectedGenre),
-        RecordsList(records: records),
-      ],
     );
   }
 }
