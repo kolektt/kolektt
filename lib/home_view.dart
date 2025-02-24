@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 
+import 'components/music_taste_card.dart';
 import 'home/djs_pick_detail_view.dart';
 import 'home/home_view.dart';
 import 'home/magzine_detail_view.dart' show MagazineDetailView;
@@ -18,19 +19,6 @@ class DJPick {
     required this.name,
     required this.imageUrl,
     required this.likes,
-  });
-}
-
-class MusicTaste {
-  final String id;
-  final String title;
-  final String subtitle;
-  final String imageUrl;
-  MusicTaste({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.imageUrl,
   });
 }
 
@@ -84,15 +72,7 @@ class HomeView extends StatelessWidget {
     // ... 추가 PopularRecord
   ];
 
-  final List<MusicTaste> musicTastes = [
-    MusicTaste(
-      id: 'mt1',
-      title: "Yesterday",
-      subtitle: "The Beatles",
-      imageUrl: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-    ),
-    // ... 추가 MusicTaste
-  ];
+  final List<MusicTaste> musicTastes = MusicTaste.sample;
 
   final List<String> genres = ["All", "Pop", "Jazz", "Japan", "Soul", "Rock"];
   final ValueNotifier<String> selectedGenre = ValueNotifier<String>("All");
@@ -600,61 +580,6 @@ class PopularRecordRow extends StatelessWidget {
             Icon(
               record.trending ? CupertinoIcons.arrow_up : CupertinoIcons.arrow_down,
               color: record.trending ? CupertinoColors.activeGreen : CupertinoColors.destructiveRed,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class MusicTasteCard extends StatelessWidget {
-  final MusicTaste musicTaste;
-  const MusicTasteCard({Key? key, required this.musicTaste}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final double width = (MediaQuery.of(context).size.width - 48) / 2;
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(builder: (_) => RecordDetailView(record: Record.sampleData.first)),
-        );
-      },
-      child: Container(
-        width: width,
-        decoration: BoxDecoration(
-          color: CupertinoColors.systemBackground,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.network(
-                musicTaste.imageUrl,
-                width: width,
-                height: width,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(musicTaste.title,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
-                  Text(musicTaste.subtitle,
-                      style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
-                ],
-              ),
             ),
           ],
         ),

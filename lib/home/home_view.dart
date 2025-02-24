@@ -26,20 +26,6 @@ class DJPick {
   });
 }
 
-class MusicTaste {
-  final String id;
-  final String title;
-  final String subtitle;
-  final String imageUrl;
-
-  MusicTaste({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.imageUrl,
-  });
-}
-
 // MARK: - Cupertino ProfileView
 
 class ProfileView extends StatefulWidget {
@@ -1102,65 +1088,6 @@ class CollectionRecordDetailView extends StatelessWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text(record.title)),
       child: Center(child: Text("Collection Record Detail View")),
-    );
-  }
-}
-
-class MusicTasteCard extends StatelessWidget {
-  final MusicTaste musicTaste;
-
-  const MusicTasteCard({Key? key, required this.musicTaste}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final double width = (MediaQuery.of(context).size.width - 48) / 2;
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(builder: (_) => RecordDetailView(record: Record.sampleData[0])),
-        );
-      },
-      child: Container(
-        width: width,
-        decoration: BoxDecoration(
-          color: CupertinoColors.systemBackground,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.network(
-                musicTaste.imageUrl,
-                width: width,
-                height: width,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(musicTaste.title,
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
-                  Text(musicTaste.subtitle,
-                      style: TextStyle(
-                          fontSize: 12, color: CupertinoColors.systemGrey),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
