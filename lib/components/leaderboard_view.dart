@@ -139,7 +139,6 @@ class _LeaderboardViewState extends State<LeaderboardView> {
             children: users.map((user) => LeaderboardCard(user: user)).toList(),
           ),
         ),
-        const SizedBox(height: 16),
       ],
     );
   }
@@ -153,7 +152,7 @@ class LeaderboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
-      padding: EdgeInsets.zero,
+      padding: EdgeInsets.only(bottom: 16),
       onPressed: () {
         Navigator.push(
           context,

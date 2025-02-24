@@ -39,42 +39,44 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       // CupertinoSliverNavigationBar는 CustomScrollView 내부에서 동작합니다.
-      child: CustomScrollView(
-        slivers: [
-          CupertinoSliverNavigationBar(
-            // largeTitle에 큰 제목을 지정
-            largeTitle: Text(
-              "Kolektt",
+      child: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            CupertinoSliverNavigationBar(
+              // largeTitle에 큰 제목을 지정
+              largeTitle: Text(
+                "Kolektt",
+              ),
+              trailing: HomeToolbar(),
             ),
-            trailing: HomeToolbar(),
-          ),
-          // 나머지 컨텐츠를 SliverToBoxAdapter로 감쌉니다.
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  MagazineSection(articles: articles),
-                  const SizedBox(height: 24),
-                  DJPickSection(djPicks: djPicks),
-                  const SizedBox(height: 24),
-                  ValueListenableBuilder<String>(
-                    valueListenable: selectedGenre,
-                    builder: (context, genre, _) => PopularRecordsSection(
-                      genres: genres,
-                      selectedGenre: selectedGenre,
-                      records: popularRecords,
+            // 나머지 컨텐츠를 SliverToBoxAdapter로 감쌉니다.
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  children: [
+                    MagazineSection(articles: articles),
+                    const SizedBox(height: 24),
+                    DJPickSection(djPicks: djPicks),
+                    const SizedBox(height: 24),
+                    ValueListenableBuilder<String>(
+                      valueListenable: selectedGenre,
+                      builder: (context, genre, _) => PopularRecordsSection(
+                        genres: genres,
+                        selectedGenre: selectedGenre,
+                        records: popularRecords,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  MusicTasteSection(musicTastes: musicTastes),
-                  const SizedBox(height: 24),
-                  LeaderboardView(data: LeaderboardData.sample),
-                ],
+                    const SizedBox(height: 24),
+                    MusicTasteSection(musicTastes: musicTastes),
+                    const SizedBox(height: 24),
+                    LeaderboardView(data: LeaderboardData.sample),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -177,7 +179,6 @@ class MusicTasteSection extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.8,
             ),
             itemBuilder: (context, index) {
               final taste = musicTastes[index];
