@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:kolektt/home/home_view.dart' as homeView;
 
 import '../collection_record_detail_view.dart';
-import '../components/leaderboard_view.dart';
 import '../home_view.dart';
 import '../model/popular_record.dart';
 import '../model/record.dart';
-import '../record_detail_view.dart';
-import '../view_models/home_vm.dart';
+import '../other_user_profile_view.dart';
 
 // 기본 색상 (hex 코드 0036FF)
 final Color primaryColor = Color(0xFF0036FF);
@@ -291,12 +289,12 @@ class StatCard extends StatelessWidget {
   final Color color;
 
   const StatCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.icon,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -307,18 +305,29 @@ class StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 28, color: color),
-          SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: CupertinoColors.black)),
-          SizedBox(height: 4),
-          Text(title,
-              style:
-                  TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+          Icon(
+            icon,
+            size: 28, // Equivalent to .title2
+            color: color,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
         ],
       ),
     );
@@ -457,39 +466,42 @@ class FollowersListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text("팔로워")),
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: 20,
-        itemBuilder: (_, index) {
-          return CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(builder: (_) => OtherUserProfileView()),
-              );
-            },
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: CupertinoColors.systemGrey.withOpacity(0.2),
-                  child: Icon(CupertinoIcons.person,
-                      color: CupertinoColors.systemGrey),
-                ),
-                SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("DJ Name", style: TextStyle(fontSize: 16)),
-                    Text("House / Techno",
-                        style: TextStyle(
-                            fontSize: 12, color: CupertinoColors.systemGrey)),
-                  ],
-                )
-              ],
-            ),
-          );
-        },
+      child: SafeArea(
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: 20,
+          itemBuilder: (_, index) {
+            return CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (_) => OtherUserProfileView()),
+                );
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor:
+                        CupertinoColors.systemGrey.withOpacity(0.2),
+                    child: Icon(CupertinoIcons.person,
+                        color: CupertinoColors.systemGrey),
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("DJ Name", style: TextStyle(fontSize: 16)),
+                      Text("House / Techno",
+                          style: TextStyle(
+                              fontSize: 12, color: CupertinoColors.systemGrey)),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -502,168 +514,41 @@ class FollowingListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text("팔로잉")),
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: 20,
-        itemBuilder: (_, index) {
-          return CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(builder: (_) => OtherUserProfileView()),
-              );
-            },
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: CupertinoColors.systemGrey.withOpacity(0.2),
-                  child: Icon(CupertinoIcons.person,
-                      color: CupertinoColors.systemGrey),
-                ),
-                SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("DJ Name", style: TextStyle(fontSize: 16)),
-                    Text("House / Techno",
-                        style: TextStyle(
-                            fontSize: 12, color: CupertinoColors.systemGrey)),
-                  ],
-                )
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class OtherUserProfileView extends StatefulWidget {
-  const OtherUserProfileView({Key? key}) : super(key: key);
-
-  @override
-  _OtherUserProfileViewState createState() => _OtherUserProfileViewState();
-}
-
-class _OtherUserProfileViewState extends State<OtherUserProfileView> {
-  int selectedTab = 0;
-  final List<String> tabs = ["컬렉션", "활동"];
-  final List<Record> sampleRecords = Record.sampleData;
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("프로필")),
       child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // 간략한 프로필 헤더
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 43,
-                      backgroundColor:
-                          CupertinoColors.systemGrey.withOpacity(0.2),
-                      child: Icon(CupertinoIcons.person,
-                          size: 40, color: CupertinoColors.systemGrey),
-                    ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("DJ Name",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600)),
-                          Text("House / Techno",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: CupertinoColors.systemGrey)),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              // 탭 메뉴
-              Row(
-                children: List.generate(tabs.length, (index) {
-                  return Expanded(
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        setState(() {
-                          selectedTab = index;
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          Text(tabs[index],
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: selectedTab == index
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
-                                  color: selectedTab == index
-                                      ? CupertinoColors.black
-                                      : CupertinoColors.systemGrey)),
-                          Container(
-                            height: 2,
-                            color: selectedTab == index
-                                ? primaryColor
-                                : Colors.transparent,
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-              // 탭 컨텐츠
-              if (selectedTab == 0)
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: sampleRecords.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 1,
-                    mainAxisSpacing: 1,
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: 20,
+          itemBuilder: (_, index) {
+            return CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (_) => OtherUserProfileView()),
+                );
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor:
+                        CupertinoColors.systemGrey.withOpacity(0.2),
+                    child: Icon(CupertinoIcons.person,
+                        color: CupertinoColors.systemGrey),
                   ),
-                  itemBuilder: (context, index) {
-                    final record = sampleRecords[index];
-                    return CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (_) =>
-                                  CollectionRecordDetailView(record: record)),
-                        );
-                      },
-                      child: InstagramStyleRecordCard(record: record),
-                    );
-                  },
-                )
-              else
-                Column(
-                  children: List.generate(3, (index) {
-                    return ActivityCard(
-                      type: ActivityType.activity,
-                      title: "새로운 레코드를 추가했습니다",
-                      subtitle: "Bicep - Isles",
-                      date: "2시간 전",
-                    );
-                  }),
-                )
-            ],
-          ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("DJ Name", style: TextStyle(fontSize: 16)),
+                      Text("House / Techno",
+                          style: TextStyle(
+                              fontSize: 12, color: CupertinoColors.systemGrey)),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
