@@ -217,8 +217,7 @@ class _ProfileViewState extends State<ProfileView> {
                   builder: (context) {
                     switch (selectedTab) {
                       case 0:
-                        return Padding(
-                          padding: const EdgeInsets.all(16),
+                        return SafeArea(
                           child: GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
@@ -251,8 +250,7 @@ class _ProfileViewState extends State<ProfileView> {
                       case 2:
                         return PurchaseListView();
                       case 3:
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        return SafeArea(
                           child: Column(
                             children: List.generate(3, (index) {
                               return ActivityCard(
@@ -417,8 +415,7 @@ class ActivityCard extends StatelessWidget {
             width: 50,
             height: 50,
             color: CupertinoColors.systemGrey.withOpacity(0.2),
-            child: Icon(CupertinoIcons.music_note,
-                color: CupertinoColors.systemGrey),
+            child: Icon(CupertinoIcons.music_note, color: CupertinoColors.systemGrey),
           ),
           SizedBox(width: 12),
           Expanded(
@@ -563,18 +560,20 @@ class SaleListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text("판매중")),
-      child: SingleChildScrollView(
-        child: Column(
-          children: List.generate(5, (index) {
-            return ActivityCard(
-              type: ActivityType.sale,
-              title: "판매중인 레코드",
-              subtitle: "Bicep - Isles",
-              date: "3일 전",
-              status: "판매중",
-              statusColor: primaryColor,
-            );
-          }),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: List.generate(5, (index) {
+              return ActivityCard(
+                type: ActivityType.sale,
+                title: "판매중인 레코드",
+                subtitle: "Bicep - Isles",
+                date: "3일 전",
+                status: "판매중",
+                statusColor: primaryColor,
+              );
+            }),
+          ),
         ),
       ),
     );
@@ -588,18 +587,20 @@ class PurchaseListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text("구매")),
-      child: SingleChildScrollView(
-        child: Column(
-          children: List.generate(5, (index) {
-            return ActivityCard(
-              type: ActivityType.purchase,
-              title: "구매한 레코드",
-              subtitle: "Bicep - Isles",
-              date: "1주일 전",
-              status: "구매완료",
-              statusColor: CupertinoColors.systemGrey,
-            );
-          }),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: List.generate(5, (index) {
+              return ActivityCard(
+                type: ActivityType.purchase,
+                title: "구매한 레코드",
+                subtitle: "Bicep - Isles",
+                date: "1주일 전",
+                status: "구매완료",
+                statusColor: CupertinoColors.systemGrey,
+              );
+            }),
+          ),
         ),
       ),
     );
