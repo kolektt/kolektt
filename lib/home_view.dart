@@ -57,21 +57,7 @@ class LeaderboardView extends StatelessWidget {
 // --- 메인 홈 뷰 ---
 class HomeView extends StatelessWidget {
   // 샘플 데이터 (실제 ViewModel은 Provider, Riverpod 등으로 관리)
-  final List<Article> articles = [
-    Article(
-      id: '1',
-      title: '레코드로 듣는 재즈의 매력',
-      subtitle: '아날로그 사운드의 따뜻함을 느껴보세요',
-      coverImageURL: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-      category: 'Jazz',
-      authorName: 'Kolektt',
-      authorTitle: '',
-      authorImageURL: "https://s.pstatic.net/dthumb.phinf/?src=%22https%3A%2F%2Fs.pstatic.net%2Fshop.phinf%2F20250217_3%2F17397898415832ySrH_PNG%2FED9994EBA9B4%252BECBAA1ECB298%252B2025-02-17%252B195422.png%22&type=ff364_236&service=navermain",
-      date: DateTime.now(),
-      contents: [],
-    ),
-    // ... 추가 기사
-  ];
+  final List<Article> articles = Article.sample;
 
   final List<DJPick> djPicks = [
     DJPick(
