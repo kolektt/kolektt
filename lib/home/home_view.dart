@@ -12,21 +12,6 @@ import '../view_models/home_vm.dart';
 final Color primaryColor = Color(0xFF0036FF);
 
 // 데이터 모델 (간략한 예제)
-class DJPick {
-  final String id;
-  final String name;
-  final String imageUrl;
-  final int likes;
-
-  DJPick({
-    required this.id,
-    required this.name,
-    required this.imageUrl,
-    required this.likes,
-  });
-}
-
-// MARK: - Cupertino ProfileView
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);

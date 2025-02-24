@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 
+import 'components/dj_pick_section.dart';
 import 'components/music_taste_card.dart';
 import 'home/djs_pick_detail_view.dart';
 import 'home/home_view.dart';
@@ -8,20 +9,6 @@ import 'home/magzine_detail_view.dart' show MagazineDetailView;
 import 'model/popular_record.dart';
 import 'model/record.dart';
 import 'record_detail_view.dart';
-
-class DJPick {
-  final String id;
-  final String name;
-  final String imageUrl;
-  final int likes;
-  DJPick({
-    required this.id,
-    required this.name,
-    required this.imageUrl,
-    required this.likes,
-  });
-}
-
 
 // 임시 Leaderboard 데이터 및 뷰
 class LeaderboardData {
@@ -194,96 +181,6 @@ class MagazineSection extends StatelessWidget {
   }
 }
 
-class DJPickSection extends StatelessWidget {
-  final List<DJPick> djPicks;
-  const DJPickSection({Key? key, required this.djPicks}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Text(
-                "DJ's",
-                style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
-              ),
-              Spacer(),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  Navigator.push(context, CupertinoPageRoute(builder: (_) => DJsPickListView()));
-                },
-                child: Row(
-                  children: [
-                    Text("더보기", style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(fontSize: 14)),
-                    Icon(CupertinoIcons.chevron_right, size: 16),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 300,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: djPicks.length,
-            separatorBuilder: (_, __) => SizedBox(width: 16),
-            itemBuilder: (context, index) {
-              final dj = djPicks[index];
-              return CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (_) => DJsPickDetailView(
-                        dj: DJ(
-                          id: dj.id,
-                          name: dj.name,
-                          title: "DJ",
-                          imageURL: Uri.parse(dj.imageUrl),
-                          yearsActive: 5,
-                          recordCount: dj.likes * 100,
-                          interviewContents: [
-                            InterviewContent(
-                              id: "1",
-                              type: InterviewContentType.text,
-                              text: "음악은 저에게 있어서 삶 그 자체입니다. 제가 선별한 레코드들을 통해 여러분도 음악의 진정한 매력을 느끼실 수 있기를 바랍니다.",
-                              records: [],
-                            ),
-                            InterviewContent(
-                              id: "2",
-                              type: InterviewContentType.quote,
-                              text: "좋은 음악은 시대를 초월하여 우리의 마음을 울립니다.",
-                              records: [],
-                            ),
-                            InterviewContent(
-                              id: "3",
-                              type: InterviewContentType.recordHighlight,
-                              text: "이번 주 추천 레코드",
-                              records: Record.sampleData,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                child: DJPickCard(dj: dj),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class PopularRecordsSection extends StatelessWidget {
   final List<String> genres;
   final ValueNotifier<String> selectedGenre;
@@ -362,7 +259,7 @@ class SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          Text(title, style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+          Text(title, style: CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle),
           Spacer(),
           if (showMore)
             CupertinoButton(
@@ -603,18 +500,6 @@ class GenreTag extends StatelessWidget {
         text,
         style: TextStyle(fontSize: 12),
       ),
-    );
-  }
-}
-
-// --- 임시 상세 페이지 및 기타 뷰 ---
-class DJsPickListView extends StatelessWidget {
-  const DJsPickListView({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("DJ's List")),
-      child: Center(child: Text("All DJ Picks")),
     );
   }
 }

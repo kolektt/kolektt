@@ -175,11 +175,12 @@ class MusicTaste {
 }
 
 class DJPick {
+  final String id;
   final String name;
   final String imageUrl;
   final int likes;
-
   DJPick({
+    required this.id,
     required this.name,
     required this.imageUrl,
     required this.likes,
@@ -191,14 +192,14 @@ class HomeViewModel extends ChangeNotifier {
   List<Article> articles = [];
   List<RecordShop> recordShops = [];
   List<DJPick> djPicks = [
-    DJPick(name: "Sickmode", imageUrl: "https://example.com/dj1.jpg", likes: 10),
-    DJPick(name: "Zedd", imageUrl: "https://example.com/dj2.jpg", likes: 15),
-    DJPick(name: "Skrillex", imageUrl: "https://example.com/dj3.jpg", likes: 20),
-    DJPick(name: "Diplo", imageUrl: "https://example.com/dj4.jpg", likes: 25),
-    DJPick(name: "Calvin Harris", imageUrl: "https://example.com/dj5.jpg", likes: 30),
-    DJPick(name: "David Guetta", imageUrl: "https://example.com/dj6.jpg", likes: 35),
-    DJPick(name: "Martin Garrix", imageUrl: "https://example.com/dj7.jpg", likes: 40),
-    DJPick(name: "Avicii", imageUrl: "https://example.com/dj8.jpg", likes: 45),
+    DJPick(name: "Sickmode", imageUrl: "https://example.com/dj1.jpg", likes: 10, id: ''),
+    DJPick(name: "Zedd", imageUrl: "https://example.com/dj2.jpg", likes: 15, id: ''),
+    DJPick(name: "Skrillex", imageUrl: "https://example.com/dj3.jpg", likes: 20, id: ''),
+    DJPick(name: "Diplo", imageUrl: "https://example.com/dj4.jpg", likes: 25, id: ''),
+    DJPick(name: "Calvin Harris", imageUrl: "https://example.com/dj5.jpg", likes: 30, id: ''),
+    DJPick(name: "David Guetta", imageUrl: "https://example.com/dj6.jpg", likes: 35, id: ''),
+    DJPick(name: "Martin Garrix", imageUrl: "https://example.com/dj7.jpg", likes: 40, id: ''),
+    DJPick(name: "Avicii", imageUrl: "https://example.com/dj8.jpg", likes: 45, id: ''),
   ];
   List<PopularRecord> popularRecords = [];
   List<MusicTaste> musicTastes = [];
