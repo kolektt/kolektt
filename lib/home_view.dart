@@ -100,35 +100,43 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text("Kolektt"),
-        trailing: HomeToolbar(),
-      ),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Use min to wrap content tightly
-            children: [
-              MagazineSection(articles: articles),
-              SizedBox(height: 24),
-              DJPickSection(djPicks: djPicks),
-              SizedBox(height: 24),
-              ValueListenableBuilder<String>(
-                valueListenable: selectedGenre,
-                builder: (context, genre, _) => PopularRecordsSection(
-                  genres: genres,
-                  selectedGenre: selectedGenre,
-                  records: popularRecords,
-                ),
-              ),
-              SizedBox(height: 24),
-              MusicTasteSection(musicTastes: musicTastes),
-              SizedBox(height: 24),
-              LeaderboardView(data: LeaderboardData.sampleData),
-            ],
+      // CupertinoSliverNavigationBar는 CustomScrollView 내부에서 동작합니다.
+      child: CustomScrollView(
+        slivers: [
+          CupertinoSliverNavigationBar(
+            // largeTitle에 큰 제목을 지정
+            largeTitle: Text(
+              "Kolektt",
+            ),
+            trailing: HomeToolbar(),
           ),
-        ),
+          // 나머지 컨텐츠를 SliverToBoxAdapter로 감쌉니다.
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                children: [
+                  MagazineSection(articles: articles),
+                  const SizedBox(height: 24),
+                  DJPickSection(djPicks: djPicks),
+                  const SizedBox(height: 24),
+                  ValueListenableBuilder<String>(
+                    valueListenable: selectedGenre,
+                    builder: (context, genre, _) => PopularRecordsSection(
+                      genres: genres,
+                      selectedGenre: selectedGenre,
+                      records: popularRecords,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  MusicTasteSection(musicTastes: musicTastes),
+                  const SizedBox(height: 24),
+                  LeaderboardView(data: LeaderboardData.sampleData),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

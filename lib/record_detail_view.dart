@@ -55,7 +55,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(widget.record.title),
-        previousPageTitle: '뒤로',
+        previousPageTitle: 'Kolektt',
       ),
       child: SafeArea(
         child: SingleChildScrollView(

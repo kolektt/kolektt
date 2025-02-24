@@ -263,6 +263,7 @@ class DJsPickDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
+        previousPageTitle: 'Kolektt',
         middle: Text('DJ 상세'),
       ),
       child: SafeArea(

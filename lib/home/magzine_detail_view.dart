@@ -18,7 +18,7 @@ class MagazineDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        previousPageTitle: '뒤로',
+        previousPageTitle: 'Kolektt',
       ),
       child: SafeArea(
         child: SingleChildScrollView(
