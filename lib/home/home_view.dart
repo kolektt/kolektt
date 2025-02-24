@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/home/home_view.dart' as homeView;
 
+import '../collection_record_detail_view.dart';
 import '../components/leaderboard_view.dart';
 import '../home_view.dart';
 import '../model/popular_record.dart';
@@ -1083,21 +1084,6 @@ class DJ {
       ],
     ),
   ];
-}
-
-class CollectionRecordDetailView extends StatelessWidget {
-  final Record record;
-
-  const CollectionRecordDetailView({Key? key, required this.record})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(record.title)),
-      child: Center(child: Text("Collection Record Detail View")),
-    );
-  }
 }
 
 class GenreButton extends StatelessWidget {

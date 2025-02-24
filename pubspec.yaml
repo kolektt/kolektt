@@ -20,6 +20,7 @@ dependencies:
   fl_chart: ^0.70.2
   audioplayers: ^6.2.0
   modal_bottom_sheet: ^3.0.0
+  webview_flutter: ^4.10.0
 
 flutter:
   uses-material-design: true

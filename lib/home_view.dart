@@ -461,16 +461,3 @@ class GenreTag extends StatelessWidget {
     );
   }
 }
-
-
-class CollectionRecordDetailView extends StatelessWidget {
-  final Record record;
-  const CollectionRecordDetailView({Key? key, required this.record}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(record.title)),
-      child: Center(child: Text("Collection Record Detail View")),
-    );
-  }
-}
