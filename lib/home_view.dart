@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/view_models/home_vm.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import 'SearchView.dart';
 import 'components/dj_pick_section.dart';
 import 'components/leaderboard_view.dart';
 import 'components/music_taste_card.dart';
 import 'components/popular_records_section.dart';
-import 'home/djs_pick_detail_view.dart';
-import 'home/home_view.dart';
 import 'home/magzine_detail_view.dart' show MagazineDetailView;
 import 'model/popular_record.dart';
 import 'model/record.dart';
+import 'notification.dart';
 import 'record_detail_view.dart';
 
 
@@ -283,15 +284,23 @@ class HomeToolbar extends StatelessWidget {
         CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.search),
-          onPressed: () {
-            showCupertinoModalPopup(context: context, builder: (_) => SearchView());
+          onPressed: () async {
+            await showCupertinoModalBottomSheet(
+                context: context,
+                builder: (_) => SearchView(),
+                useRootNavigator: true,
+            );
           },
         ),
         CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.bell),
-          onPressed: () {
-            showCupertinoModalPopup(context: context, builder: (_) => NotificationsView());
+          onPressed: () async {
+            await showCupertinoModalBottomSheet(
+                context: context,
+                builder: (_) => NotificationsView(),
+                useRootNavigator: true,
+            );
           },
         ),
       ],
@@ -462,29 +471,6 @@ class CollectionRecordDetailView extends StatelessWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text(record.title)),
       child: Center(child: Text("Collection Record Detail View")),
-    );
-  }
-}
-
-// 임시 Search 및 Notifications 뷰
-class SearchView extends StatelessWidget {
-  const SearchView({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("Search")),
-      child: Center(child: Text("Search View")),
-    );
-  }
-}
-
-class NotificationsView extends StatelessWidget {
-  const NotificationsView({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("Notifications")),
-      child: Center(child: Text("Notifications View")),
     );
   }
 }

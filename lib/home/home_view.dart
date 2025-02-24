@@ -1181,34 +1181,6 @@ class RecordsList extends StatelessWidget {
   }
 }
 
-class HomeToolbar extends StatelessWidget {
-  const HomeToolbar({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.search),
-          onPressed: () {
-            showCupertinoModalPopup(
-                context: context, builder: (_) => SearchView());
-          },
-        ),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.bell),
-          onPressed: () {
-            showCupertinoModalPopup(
-                context: context, builder: (_) => NotificationsView());
-          },
-        ),
-      ],
-    );
-  }
-}
-
 class GenreTag extends StatelessWidget {
   final String text;
 
@@ -1226,31 +1198,6 @@ class GenreTag extends StatelessWidget {
         text,
         style: TextStyle(fontSize: 12),
       ),
-    );
-  }
-}
-
-// 임시 Search 및 Notifications 뷰
-class SearchView extends StatelessWidget {
-  const SearchView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("Search")),
-      child: Center(child: Text("Search View")),
-    );
-  }
-}
-
-class NotificationsView extends StatelessWidget {
-  const NotificationsView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("Notifications")),
-      child: Center(child: Text("Notifications View")),
     );
   }
 }
