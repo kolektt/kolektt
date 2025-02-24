@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../collection_view.dart';
+import '../home_view.dart';
 import '../model/record.dart';
+import '../record_detail_view.dart';
 import '../view_models/home_vm.dart';
 
 class MagazineDetailView extends StatelessWidget {
@@ -15,7 +17,9 @@ class MagazineDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(),
+      navigationBar: const CupertinoNavigationBar(
+        previousPageTitle: '뒤로',
+      ),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,7 +27,7 @@ class MagazineDetailView extends StatelessWidget {
             // Cover Image
             SizedBox(
               height: 250,
-              width: double.infinity,
+              width: MediaQuery.sizeOf(context).width,
               child: Image.network(
                 article.coverImageURL,
                 fit: BoxFit.cover,
@@ -221,6 +225,7 @@ class MagazineDetailView extends StatelessWidget {
                 ],
               ),
             ),
+            SizedBox(height: 64)
           ],
         ),
       ),

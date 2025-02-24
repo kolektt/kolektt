@@ -4,6 +4,7 @@ import 'package:kolektt/view_models/home_vm.dart';
 import 'home/magzine_detail_view.dart' show MagazineDetailView;
 import 'model/popular_record.dart';
 import 'model/record.dart';
+import 'record_detail_view.dart';
 
 class DJPick {
   final String id;
@@ -608,7 +609,7 @@ class MusicTasteCard extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          CupertinoPageRoute(builder: (_) => RecordDetailView(record: null)),
+          CupertinoPageRoute(builder: (_) => RecordDetailView(record: Record.sampleData.first)),
         );
       },
       child: Container(
@@ -725,18 +726,6 @@ class DJsPickDetailView extends StatelessWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text(dj.name)),
       child: Center(child: Text("DJ Pick Detail View")),
-    );
-  }
-}
-
-class RecordDetailView extends StatelessWidget {
-  final Record? record;
-  const RecordDetailView({Key? key, required this.record}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(record?.title ?? "Record Detail")),
-      child: Center(child: Text("Record Detail View")),
     );
   }
 }

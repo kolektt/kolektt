@@ -1,8 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/record_detail_view.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 
+import 'home/home_view.dart';
 import 'model/record.dart';
 
 // ===== Models =====
@@ -1174,20 +1176,6 @@ class _AddRecordViewState extends State<AddRecordView> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ===== Record Detail View (Cupertino 스타일) =====
-
-class RecordDetailView extends StatelessWidget {
-  final Record record;
-  RecordDetailView({required this.record});
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(record.title)),
-      child: Center(child: Text("상세 정보 페이지")),
     );
   }
 }

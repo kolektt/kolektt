@@ -5,6 +5,7 @@ import 'package:kolektt/home/home_view.dart' as homeView;
 import '../home_view.dart';
 import '../model/popular_record.dart';
 import '../model/record.dart';
+import '../record_detail_view.dart';
 import '../view_models/home_vm.dart';
 
 // 기본 색상 (hex 코드 0036FF)
@@ -1057,21 +1058,6 @@ class DJsPickDetailView extends StatelessWidget {
   }
 }
 
-class RecordDetailView extends StatelessWidget {
-  final Record? record;
-
-  const RecordDetailView({Key? key, required this.record}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-          middle: Text(record?.title ?? "Record Detail")),
-      child: Center(child: Text("Record Detail View")),
-    );
-  }
-}
-
 class CollectionRecordDetailView extends StatelessWidget {
   final Record record;
 
@@ -1100,7 +1086,7 @@ class MusicTasteCard extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          CupertinoPageRoute(builder: (_) => RecordDetailView(record: null)),
+          CupertinoPageRoute(builder: (_) => RecordDetailView(record: Record.sampleData[0])),
         );
       },
       child: Container(
