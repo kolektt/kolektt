@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kolektt/home/home_view.dart' as homeView;
 
 import '../collection_record_detail_view.dart';
+import '../components/build_status_column.dart';
 import '../home_view.dart';
 import '../model/popular_record.dart';
 import '../model/record.dart';
@@ -81,52 +82,27 @@ class _ProfileViewState extends State<ProfileView> {
                                   .copyWith(color: CupertinoColors.systemGrey)),
                           SizedBox(height: 12),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                child: Column(
-                                  children: [
-                                    Text("1.2k",
-                                        style: CupertinoTheme.of(context)
-                                            .textTheme
-                                            .navLargeTitleTextStyle),
-                                    Text("팔로워",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: CupertinoColors.systemGrey)),
-                                  ],
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                        builder: (_) => FollowersListView()),
-                                  );
-                                },
-                              ),
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                child: Column(
-                                  children: [
-                                    Text("824",
-                                        style: CupertinoTheme.of(context)
-                                            .textTheme
-                                            .navLargeTitleTextStyle),
-                                    Text("팔로잉",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: CupertinoColors.systemGrey)),
-                                  ],
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                        builder: (_) => FollowingListView()),
-                                  );
-                                },
-                              ),
+                              GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                          builder: (_) => FollowersListView()),
+                                    );
+                                  },
+                                  child: buildStatColumn("1.2k", "레코드")),
+                              SizedBox(width: 24),
+                              GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                          builder: (_) => FollowingListView()),
+                                    );
+                                  },
+                                  child: buildStatColumn('824', '팔로잉')),
                             ],
                           )
                         ],

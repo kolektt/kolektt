@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'collection_record_detail_view.dart';
+import 'components/build_status_column.dart';
 import 'home/home_view.dart';
 import 'model/record.dart';
 
@@ -82,9 +83,9 @@ class _OtherUserProfileViewState extends State<OtherUserProfileView> {
                               // Followers/Following
                               Row(
                                 children: [
-                                  _buildStatColumn('1.2k', '팔로워'),
+                                  buildStatColumn('1.2k', '팔로워'),
                                   const SizedBox(width: 24),
-                                  _buildStatColumn('824', '팔로잉'),
+                                  buildStatColumn('824', '팔로잉'),
                                 ],
                               ),
 
@@ -199,28 +200,6 @@ class _OtherUserProfileViewState extends State<OtherUserProfileView> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStatColumn(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: CupertinoColors.systemGrey,
-          ),
-        ),
-      ],
     );
   }
 
