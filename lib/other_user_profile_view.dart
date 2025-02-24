@@ -269,6 +269,7 @@ class _OtherUserProfileViewState extends State<OtherUserProfileView> {
         crossAxisCount: 3,
         crossAxisSpacing: 1,
         mainAxisSpacing: 1,
+        childAspectRatio: 0.7
       ),
       itemCount: sampleRecords.length,
       itemBuilder: (context, index) {
