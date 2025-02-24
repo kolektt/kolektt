@@ -1,8 +1,9 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'model/record.dart';
 
+// AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
 class AudioPlayerService {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool isPlaying = false;
@@ -27,6 +28,7 @@ class AudioPlayerService {
   }
 }
 
+// RecordDetailView: SwiftUI의 RecordDetailView와 유사한 화면입니다.
 class RecordDetailView extends StatefulWidget {
   final Record record;
 
@@ -37,12 +39,13 @@ class RecordDetailView extends StatefulWidget {
 }
 
 class _RecordDetailViewState extends State<RecordDetailView> {
-  final AudioPlayerService _audioPlayer = AudioPlayerService();
+  final AudioPlayerService audioPlayer = AudioPlayerService();
   bool isPlaying = false;
+  bool showingPurchaseSheet = false;
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 
@@ -53,137 +56,182 @@ class _RecordDetailViewState extends State<RecordDetailView> {
         middle: Text(widget.record.title),
         previousPageTitle: '뒤로',
       ),
-      child: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.width,
-                  width: double.infinity,
-                  child: widget.record.coverImageURL != null
-                      ? Image.network(
-                    widget.record.coverImageURL!,
-                    fit: BoxFit.cover,
-                  )
-                      : Container(
-                    color: CupertinoColors.systemGrey6,
-                    child: const Icon(
-                      CupertinoIcons.music_note,
-                      size: 64,
-                      color: CupertinoColors.systemGrey,
-                    ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 앨범 커버 이미지
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.width,
+                child: widget.record.coverImageURL != null
+                    ? Image.network(
+                  widget.record.coverImageURL!,
+                  fit: BoxFit.cover,
+                )
+                    : Container(
+                  color: CupertinoColors.systemGrey6,
+                  child: const Icon(
+                    CupertinoIcons.music_note,
+                    size: 64,
+                    color: CupertinoColors.systemGrey,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.record.title,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 앨범 정보
+                    Text(
+                      widget.record.title,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.record.artist,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    if (widget.record.recordDescription != null) ...[
                       const SizedBox(height: 8),
                       Text(
-                        widget.record.artist,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: CupertinoColors.systemGrey,
+                        widget.record.recordDescription!,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    // 미리듣기 플레이어 (previewUrl이 존재할 경우)
+                    if (widget.record.previewUrl != null)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.systemGrey5,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                if (isPlaying) {
+                                  audioPlayer.pause();
+                                } else {
+                                  audioPlayer.play(widget.record.previewUrl!);
+                                }
+                                setState(() {
+                                  isPlaying = !isPlaying;
+                                });
+                              },
+                              child: Icon(
+                                isPlaying
+                                    ? CupertinoIcons.pause_circle_fill
+                                    : CupertinoIcons.play_circle_fill,
+                                size: 44,
+                                color: CupertinoColors.activeBlue,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  '미리듣기',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  '30초',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: CupertinoColors.systemGrey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      if (widget.record.notes != null) ...[
-                        const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                    // 판매자 목록
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '판매자 목록',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         Text(
-                          widget.record.notes!,
-                          style: const TextStyle(fontSize: 16),
+                          '${widget.record.sellersCount}개의 매물',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: CupertinoColors.systemGrey,
+                          ),
                         ),
                       ],
-                      const SizedBox(height: 24),
-                      _buildSellersList(context),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8),
+                    Column(
+                      children: List.generate(3, (index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: SellerRow(
+                            sellerName: 'DJ Name ${index + 1}',
+                            price: 50000 + (index * 5000),
+                            condition: 'VG+',
+                            onPurchase: () {
+                              _showPurchaseSheet();
+                            },
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: CupertinoButton(
+                        color: CupertinoColors.activeBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) =>
+                                  SellersListView(record: widget.record),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          '전체 판매자 보기',
+                          style: TextStyle(color: CupertinoColors.activeBlue),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
+      // 화면 떠날 때 미리듣기 정지
+      // (didChangeDependencies 혹은 onDisappear와 유사한 역할)
     );
   }
 
-  Widget _buildSellersList(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            Text(
-              '판매자 목록',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              '1개의 매물',
-              style: TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-          ],
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: SellerRow(
-                sellerName: 'DJ Name ${index + 1}',
-                price: 50000 + (index * 5000),
-                condition: 'VG+',
-                onPurchase: () {
-                  _showPurchaseSheet(context);
-                },
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: MediaQuery.sizeOf(context).width,
-          child: CupertinoButton(
-            color: CupertinoColors.activeBlue.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            onPressed: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => SellersListView(record: widget.record),
-                ),
-              );
-            },
-            child: const Text(
-              '전체 판매자 보기',
-              style: TextStyle(color: CupertinoColors.activeBlue),
-            ),
-          ),
-        ),
-        const SizedBox(height: 64)
-      ],
-    );
-  }
-
-  void _showPurchaseSheet(BuildContext context) {
+  void _showPurchaseSheet() {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => PurchaseView(record: widget.record),
@@ -191,6 +239,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
   }
 }
 
+// SellerRow: 판매자 정보를 표시하는 위젯
 class SellerRow extends StatelessWidget {
   final String sellerName;
   final int price;
@@ -208,13 +257,14 @@ class SellerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: CupertinoColors.systemGrey6,
         borderRadius: BorderRadius.circular(12),
       ),
-      padding: const EdgeInsets.all(16),
       child: Row(
         children: [
+          // 판매자 프로필 아이콘
           Container(
             width: 40,
             height: 40,
@@ -245,12 +295,15 @@ class SellerRow extends StatelessWidget {
                     Text(
                       '$price원',
                       style: const TextStyle(
-                        color: CupertinoColors.activeBlue,
                         fontSize: 14,
+                        color: CupertinoColors.activeBlue,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text('•'),
+                    const Text(
+                      '•',
+                      style: TextStyle(color: CupertinoColors.systemGrey),
+                    ),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -272,14 +325,14 @@ class SellerRow extends StatelessWidget {
             ),
           ),
           CupertinoButton(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: CupertinoColors.activeBlue,
             borderRadius: BorderRadius.circular(8),
             onPressed: onPurchase,
-            child: const Text('구매', style: TextStyle(color: CupertinoColors.white)),
+            child: const Text(
+              '구매',
+              style: TextStyle(color: CupertinoColors.white),
+            ),
           ),
         ],
       ),
@@ -287,6 +340,7 @@ class SellerRow extends StatelessWidget {
   }
 }
 
+// SellersListView: 전체 판매자 목록 화면
 class SellersListView extends StatelessWidget {
   final Record record;
 
@@ -295,29 +349,32 @@ class SellersListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('판매자 목록'),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('판매자 목록'),
         previousPageTitle: '뒤로',
       ),
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 96, horizontal: 16),
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: SellerRow(
-              sellerName: 'DJ Name ${index + 1}',
-              price: 50000 + (index * 5000),
-              condition: 'VG+',
-              onPurchase: () {},
-            ),
-          );
-        },
+      child: SafeArea(
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 96, horizontal: 16),
+          itemCount: 10,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: SellerRow(
+                sellerName: 'DJ Name ${index + 1}',
+                price: 50000 + (index * 5000),
+                condition: 'VG+',
+                onPurchase: () {},
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
+// PurchaseView: 구매 진행 중인 모달 액션 시트
 class PurchaseView extends StatelessWidget {
   final Record record;
 
@@ -329,7 +386,9 @@ class PurchaseView extends StatelessWidget {
       title: const Text('구매하기'),
       message: const Text('구매 진행 중...'),
       cancelButton: CupertinoActionSheetAction(
-        onPressed: () => Navigator.pop(context),
+        onPressed: () {
+          Navigator.pop(context);
+        },
         child: const Text('취소'),
       ),
     );

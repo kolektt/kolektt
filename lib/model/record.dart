@@ -7,6 +7,9 @@ class Record {
   String? coverImageURL;
   DateTime createdAt;
   DateTime updatedAt;
+  final String? recordDescription;
+  String? previewUrl;
+  int? sellersCount;
 
   // 추가 메타데이터
   String? catalogNumber;
@@ -29,6 +32,7 @@ class Record {
     this.releaseYear,
     this.genre,
     this.coverImageURL,
+    this.recordDescription,
     DateTime? createdAt,
     DateTime? updatedAt,
     this.catalogNumber,
