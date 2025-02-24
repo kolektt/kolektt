@@ -558,22 +558,19 @@ class SaleListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("판매중")),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: List.generate(5, (index) {
-              return ActivityCard(
-                type: ActivityType.sale,
-                title: "판매중인 레코드",
-                subtitle: "Bicep - Isles",
-                date: "3일 전",
-                status: "판매중",
-                statusColor: primaryColor,
-              );
-            }),
-          ),
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(5, (index) {
+            return ActivityCard(
+              type: ActivityType.sale,
+              title: "판매중인 레코드",
+              subtitle: "Bicep - Isles",
+              date: "3일 전",
+              status: "판매중",
+              statusColor: primaryColor,
+            );
+          }),
         ),
       ),
     );
@@ -585,22 +582,19 @@ class PurchaseListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("구매")),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: List.generate(5, (index) {
-              return ActivityCard(
-                type: ActivityType.purchase,
-                title: "구매한 레코드",
-                subtitle: "Bicep - Isles",
-                date: "1주일 전",
-                status: "구매완료",
-                statusColor: CupertinoColors.systemGrey,
-              );
-            }),
-          ),
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(5, (index) {
+            return ActivityCard(
+              type: ActivityType.purchase,
+              title: "구매한 레코드",
+              subtitle: "Bicep - Isles",
+              date: "1주일 전",
+              status: "구매완료",
+              statusColor: CupertinoColors.systemGrey,
+            );
+          }),
         ),
       ),
     );
