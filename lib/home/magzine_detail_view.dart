@@ -211,7 +211,7 @@ class MagazineDetailView extends StatelessWidget {
                                     itemCount: content.records.length,
                                     itemBuilder: (context, index) {
                                       return Padding(
-                                        padding: const EdgeInsets.only(right: 16),
+                                        padding: const EdgeInsets.only(right: 16, bottom: 8),
                                         child: RecordCard(
                                             record: content.records[index]),
                                       );
