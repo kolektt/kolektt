@@ -43,10 +43,12 @@ class DiscogsApiService {
     }
   }
 
-  Future<DiscogsRecord> getRecordDetails(int id) async {
-    try {
-      final uri = Uri.parse('$baseUrl/releases/$id?key=$apiKey&secret=$apiSecret');
+  Future<DiscogsRecord> getReleaseById(int releaseId) async {
+    final uri = Uri.parse('$baseUrl/releases/$releaseId'
+        '?key=$apiKey&secret=$apiSecret');
+    debugPrint('Fetching Discogs Release: $uri');
 
+    try {
       final response = await http.get(
         uri,
         headers: {
@@ -56,14 +58,17 @@ class DiscogsApiService {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = jsonDecode(response.body);
         return DiscogsRecord.fromJson(data);
       } else {
-        throw Exception('Failed to load record details: ${response.statusCode}');
+        debugPrint(
+          'Failed to load release: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception('Release 조회 실패 (Status: ${response.statusCode})');
       }
     } catch (e) {
-      debugPrint('Error getting record details: $e');
-      throw Exception('레코드 정보를 불러오는데 실패했습니다.');
+      debugPrint('Error fetching release: $e');
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }
 }
