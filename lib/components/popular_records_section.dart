@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../home_view.dart';
+import '../view/home_view.dart';
 import '../model/popular_record.dart';
 
 class PopularRecordsSection extends StatelessWidget {

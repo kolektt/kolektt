@@ -1,11 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kolektt/record_detail_view.dart';
+import 'package:kolektt/view/record_detail_view.dart';
 
-import 'analytics_section/analytics_section.dart';
+import '../analytics_section/analytics_section.dart';
+import '../model/collection_analytics.dart';
 import 'collection_view.dart';
-import 'model/record.dart';
+import '../model/record.dart';
 
 
 

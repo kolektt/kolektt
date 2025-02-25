@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'model/record.dart';
+import '../model/record.dart';
 
 class CollectionRecordDetailView extends StatefulWidget {
   final Record record;

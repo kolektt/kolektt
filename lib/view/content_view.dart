@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'home/home_view.dart';
-import 'home_view.dart';
-import 'package:kolektt/collection_view.dart' as coll;
+import '../home/home_view.dart';
 
-const Color primaryColor = Color(0xFF0036FF);
+import '../main.dart';
+import 'collection_view.dart' as coll;
+import 'home_view.dart';
+
 
 class ContentView extends StatelessWidget {
   const ContentView({super.key});

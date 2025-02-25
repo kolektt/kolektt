@@ -1,4 +1,4 @@
-import '../collection_view.dart';
+import '../view/collection_view.dart';
 
 class CollectionAnalytics {
   final int totalRecords;

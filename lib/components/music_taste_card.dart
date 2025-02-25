@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../record_detail_view.dart';
+import '../view/record_detail_view.dart';
 import '../view_models/home_vm.dart';
 
 class MusicTasteCard extends StatelessWidget {

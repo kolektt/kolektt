@@ -3,14 +3,14 @@ import 'package:kolektt/view_models/home_vm.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'SearchView.dart';
-import 'components/dj_pick_section.dart';
-import 'components/leaderboard_view.dart';
-import 'components/music_taste_card.dart';
-import 'components/popular_records_section.dart';
-import 'home/magzine_detail_view.dart' show MagazineDetailView;
-import 'model/popular_record.dart';
-import 'model/record.dart';
-import 'notification.dart';
+import '../components/dj_pick_section.dart';
+import '../components/leaderboard_view.dart';
+import '../components/music_taste_card.dart';
+import '../components/popular_records_section.dart';
+import '../home/magzine_detail_view.dart' show MagazineDetailView;
+import '../model/popular_record.dart';
+import '../model/record.dart';
+import '../notification.dart';
 import 'record_detail_view.dart';
 
 

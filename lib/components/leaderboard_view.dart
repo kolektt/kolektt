@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 class LeaderboardData {
   final List<LeaderboardUser> sellers;
   final List<LeaderboardUser> buyers;
@@ -65,7 +67,6 @@ class UserProfileView extends StatelessWidget {
 class _LeaderboardViewState extends State<LeaderboardView> {
   int selectedTab = 0;
   final List<String> tabs = ["판매자 순위", "구매자 순위"];
-  final Color primaryColor = const Color(0xFF0036FF);
 
   @override
   Widget build(BuildContext context) {

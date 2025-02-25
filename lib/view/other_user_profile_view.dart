@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../main.dart';
 import 'collection_record_detail_view.dart';
-import 'components/build_status_column.dart';
-import 'home/home_view.dart';
-import 'model/record.dart';
+import '../components/build_status_column.dart';
+import '../home/home_view.dart';
+import '../model/record.dart';
 
 class OtherUserProfileView extends StatefulWidget {
   const OtherUserProfileView({super.key});

@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view_models/collection_vm.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
-import 'collection_view.dart';
-import 'content_view.dart';
+
+
+// 기본 색상 (hex 코드 0036FF)
+final Color primaryColor = Color(0xFF0036FF);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +34,7 @@ class KolekttApp extends StatelessWidget {
       ],
       child: CupertinoApp(
         title: 'Kolektt',
-        theme: const CupertinoThemeData(
+        theme: CupertinoThemeData(
           primaryColor: primaryColor,
         ),
         home: const ContentView(),

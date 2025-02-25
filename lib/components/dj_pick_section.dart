@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../home/djs_pick_detail_view.dart';
 import '../home/home_view.dart';
-import '../home_view.dart';
+import '../view/home_view.dart';
 import '../model/record.dart';
 import '../view_models/home_vm.dart';
 

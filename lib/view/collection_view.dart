@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kolektt/profile_view.dart';
-import 'package:kolektt/record_detail_view.dart';
+import 'package:kolektt/view/profile_view.dart';
+import 'package:kolektt/view/record_detail_view.dart';
 
-import 'analytics_section/analytics_section.dart';
-import 'model/record.dart';
+import '../analytics_section/analytics_section.dart';
+import '../model/collection_analytics.dart';
+import '../model/record.dart';
 
 // ===== Models =====
 
@@ -19,26 +20,6 @@ class DecadeAnalytics {
   final String decade;
   final int count;
   DecadeAnalytics({required this.decade, required this.count});
-}
-
-class CollectionAnalytics {
-  int totalRecords;
-  String mostCollectedGenre;
-  String mostCollectedArtist;
-  int oldestRecord;
-  int newestRecord;
-  List<GenreAnalytics> genres;
-  List<DecadeAnalytics> decades;
-
-  CollectionAnalytics({
-    required this.totalRecords,
-    required this.mostCollectedGenre,
-    required this.mostCollectedArtist,
-    required this.oldestRecord,
-    required this.newestRecord,
-    required this.genres,
-    required this.decades,
-  });
 }
 
 // ===== Enum for Sort Option =====

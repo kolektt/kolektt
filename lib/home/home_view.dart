@@ -2,15 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/home/home_view.dart' as homeView;
 
-import '../collection_record_detail_view.dart';
+import '../main.dart';
+import '../view/collection_record_detail_view.dart';
 import '../components/build_status_column.dart';
-import '../home_view.dart';
+import '../view/home_view.dart';
 import '../model/popular_record.dart';
 import '../model/record.dart';
-import '../other_user_profile_view.dart';
+import '../view/other_user_profile_view.dart';
 
-// 기본 색상 (hex 코드 0036FF)
-final Color primaryColor = Color(0xFF0036FF);
 
 // 데이터 모델 (간략한 예제)
 

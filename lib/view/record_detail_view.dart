@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:kolektt/sellers_list_view.dart';
+import 'package:kolektt/view/sellers_list_view.dart';
 
-import 'model/record.dart';
+import '../model/record.dart';
 
 // AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
 class AudioPlayerService {

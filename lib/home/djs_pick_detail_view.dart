@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../home_view.dart';
+import '../view/home_view.dart';
 import '../model/record.dart';
-import '../record_detail_view.dart';
+import '../view/record_detail_view.dart';
 import 'home_view.dart';
 import 'magzine_detail_view.dart';
 

@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../collection_view.dart';
-import '../profile_view.dart';
+import '../model/collection_analytics.dart';
+import '../view/collection_view.dart';
+import '../view/profile_view.dart';
 
 // AnalyticsSection
 class AnalyticsSection extends StatefulWidget {
