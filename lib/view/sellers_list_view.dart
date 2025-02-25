@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/model/discogs_record.dart';
 import 'package:kolektt/view/record_detail_view.dart';
 
 import '../components/seller_row.dart';
 import '../model/record.dart';
 
 class SellersListView extends StatelessWidget {
-  final Record record;
+  final DiscogsRecord record;
 
   const SellersListView({Key? key, required this.record}) : super(key: key);
 

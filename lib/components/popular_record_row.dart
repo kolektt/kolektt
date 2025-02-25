@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
 import '../model/popular_record.dart';
-import '../model/record.dart';
-import '../view/record_detail_view.dart';
 
 class PopularRecordRow extends StatelessWidget {
   final PopularRecord record;

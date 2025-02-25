@@ -9,6 +9,9 @@ class DiscogsRecord {
   final List<String>? genre;
   final List<String>? style;
   final Community? community;
+  final String? notes;
+  final List<dynamic>? formats;
+  final List<dynamic>? tracklist;
 
   DiscogsRecord({
     required this.id,
@@ -21,6 +24,9 @@ class DiscogsRecord {
     this.genre,
     this.style,
     this.community,
+    this.notes,
+    this.formats,
+    this.tracklist,
   });
 
   factory DiscogsRecord.fromJson(Map<String, dynamic> json) {
@@ -35,6 +41,9 @@ class DiscogsRecord {
       genre: json['genre'] != null ? List<String>.from(json['genre']) : null,
       style: json['style'] != null ? List<String>.from(json['style']) : null,
       community: json['community'] != null ? Community.fromJson(json['community']) : null,
+      notes: json['notes'] as String?,
+      formats: json['formats'] != null ? List<dynamic>.from(json['formats']) : null,
+      tracklist: json['tracklist'] != null ? List<dynamic>.from(json['tracklist']) : null,
     );
   }
 }

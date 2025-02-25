@@ -6,9 +6,9 @@ import '../model/discogs_record.dart';
 class DiscogsApiService {
   static const String baseUrl = 'https://api.discogs.com';
 
-  // TODO: 실제 API 키로 교체하세요
-  static const String apiKey = 'YOUR_DISCOGS_API_KEY';
-  static const String apiSecret = 'YOUR_DISCOGS_API_SECRET';
+  // TODO: .env 파일로 이동
+  static const String apiKey = 'AKbXcCERIpZjuzCiOBLt';
+  static const String apiSecret = 'BUDuGFBBkChCYYCiRbyWvVxEPlEbqVkX';
 
   Future<List<DiscogsRecord>> searchDiscogs(String query) async {
     if (query.isEmpty) {
