@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import '../model/discogs_record.dart';
 import '../services/discogs_api_service.dart';
 import '../services/recent_search_db.dart';
+import '../view/record_detail_view.dart';
 
 enum SortOption { latest, popularity, priceLow, priceHigh }
 
@@ -215,11 +216,10 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   void onRecordSelected(DiscogsRecord record, BuildContext context) {
-    // TODO: 레코드 상세 페이지로 이동하는 로직 구현
-    // 예: Navigator.of(context).push(
-    //   CupertinoPageRoute(
-    //     builder: (context) => RecordDetailView(record: record),
-    //   ),
-    // );
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => RecordDetailView(record: record),
+      ),
+    );
   }
 }

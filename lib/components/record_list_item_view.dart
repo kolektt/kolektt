@@ -13,10 +13,10 @@ class RecordListItemView extends StatelessWidget {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(builder: (context) => RecordDetailView(record: record)),
-        );
+        // Navigator.push(
+        //   context,
+        //   CupertinoPageRoute(builder: (context) => RecordDetailView(record: record)),
+        // );
       },
       child: Row(
         children: [

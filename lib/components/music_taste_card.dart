@@ -14,12 +14,12 @@ class MusicTasteCard extends StatelessWidget {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (_) => RecordDetailView(record: musicTaste.record!),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   CupertinoPageRoute(
+        //     builder: (_) => RecordDetailView(record: musicTaste.record!),
+        //   ),
+        // );
       },
       child: Container(
         width: width,

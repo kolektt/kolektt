@@ -13,24 +13,24 @@ class PopularRecordRow extends StatelessWidget {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (_) => RecordDetailView(
-              record: Record(
-                id: record.id,
-                title: record.title,
-                artist: record.artist,
-                releaseYear: 2024,
-                genre: "Jazz",
-                coverImageURL: record.imageUrl,
-                notes: "",
-                price: record.price,
-                trending: record.trending,
-              ),
-            ),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   CupertinoPageRoute(
+        //     builder: (_) => RecordDetailView(
+        //       record: Record(
+        //         id: record.id,
+        //         title: record.title,
+        //         artist: record.artist,
+        //         releaseYear: 2024,
+        //         genre: "Jazz",
+        //         coverImageURL: record.imageUrl,
+        //         notes: "",
+        //         price: record.price,
+        //         trending: record.trending,
+        //       ),
+        //     ),
+        //   ),
+        // );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),

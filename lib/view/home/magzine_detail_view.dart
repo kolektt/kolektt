@@ -244,12 +244,12 @@ class RecordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => RecordDetailView(record: record),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   CupertinoPageRoute(
+        //     builder: (context) => RecordDetailView(record: record),
+        //   ),
+        // );
       },
       child: Container(
         width: 150,

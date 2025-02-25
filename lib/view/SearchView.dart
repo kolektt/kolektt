@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../view_models/search_vm.dart';
@@ -257,9 +256,9 @@ class SearchView extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 4),
                         child: GestureDetector(
-onTap: () {
-  model.removeSearchTerm(term);
-},
+                          onTap: () {
+                            model.removeSearchTerm(term);
+                            },
                           child: Icon(CupertinoIcons.clear_circled, size: 16),
                         ),
                       ),

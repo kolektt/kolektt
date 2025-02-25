@@ -251,12 +251,12 @@ class _CollectionViewState extends State<CollectionView> {
                     Record record = filteredRecords[index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => RecordDetailView(record: record),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   CupertinoPageRoute(
+                        //     builder: (context) => RecordDetailView(record: record),
+                        //   ),
+                        // );
                       },
                       child: RecordCardView(record: record),
                     );

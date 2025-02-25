@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
-
-import '../model/record.dart';
+import 'package:kolektt/model/discogs_record.dart';
 
 class PurchaseView extends StatelessWidget {
-  final Record record;
+  final DiscogsRecord record;
 
   const PurchaseView({Key? key, required this.record}) : super(key: key);
 

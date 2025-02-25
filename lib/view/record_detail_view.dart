@@ -4,7 +4,7 @@ import 'package:kolektt/view/sellers_list_view.dart';
 
 import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
-import '../model/record.dart';
+import '../model/discogs_record.dart';
 
 // AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
 class AudioPlayerService {
@@ -31,9 +31,10 @@ class AudioPlayerService {
   }
 }
 
-// RecordDetailView: SwiftUI의 RecordDetailView와 유사한 화면입니다.
+// RecordDetailView: 이제 DiscogsRecord를 사용하며,
+// previewUrl와 sellersCount가 없으므로 미리듣기 및 매물 수 표시를 제외합니다.
 class RecordDetailView extends StatefulWidget {
-  final Record record;
+  final DiscogsRecord record;
 
   const RecordDetailView({Key? key, required this.record}) : super(key: key);
 
@@ -44,7 +45,6 @@ class RecordDetailView extends StatefulWidget {
 class _RecordDetailViewState extends State<RecordDetailView> {
   final AudioPlayerService audioPlayer = AudioPlayerService();
   bool isPlaying = false;
-  bool showingPurchaseSheet = false;
 
   @override
   void dispose() {
@@ -54,6 +54,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    // DiscogsRecord에서는 cover 이미지로 thumb를 사용한다고 가정합니다.
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(widget.record.title),
@@ -68,9 +69,9 @@ class _RecordDetailViewState extends State<RecordDetailView> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.width,
-                child: widget.record.coverImageURL != null
+                child: widget.record.thumb.isNotEmpty
                     ? Image.network(
-                  widget.record.coverImageURL!,
+                  widget.record.thumb,
                   fit: BoxFit.cover,
                 )
                     : Container(
@@ -97,93 +98,21 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.record.artist,
+                      widget.record.artist ?? '알 수 없음',
                       style: const TextStyle(
                         fontSize: 20,
                         color: CupertinoColors.systemGrey,
                       ),
                     ),
-                    if (widget.record.recordDescription != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        widget.record.recordDescription!,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
                     const SizedBox(height: 16),
-                    // 미리듣기 플레이어 (previewUrl이 존재할 경우)
-                    if (widget.record.previewUrl != null)
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: CupertinoColors.systemGrey5,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            CupertinoButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {
-                                if (isPlaying) {
-                                  audioPlayer.pause();
-                                } else {
-                                  audioPlayer.play(widget.record.previewUrl!);
-                                }
-                                setState(() {
-                                  isPlaying = !isPlaying;
-                                });
-                              },
-                              child: Icon(
-                                isPlaying
-                                    ? CupertinoIcons.pause_circle_fill
-                                    : CupertinoIcons.play_circle_fill,
-                                size: 44,
-                                color: CupertinoColors.activeBlue,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  '미리듣기',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  '30초',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: CupertinoColors.systemGrey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    const SizedBox(height: 16),
+                    // 미리듣기 플레이어는 API에 previewUrl이 없으므로 제외합니다.
                     // 판매자 목록
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '판매자 목록',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${widget.record.sellersCount}개의 매물',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: CupertinoColors.systemGrey,
-                          ),
-                        ),
-                      ],
+                    const Text(
+                      '판매자 목록',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Column(
@@ -208,13 +137,13 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                         color: CupertinoColors.activeBlue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) =>
-                                  SellersListView(record: widget.record),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   CupertinoPageRoute(
+                          //     builder: (context) =>
+                          //         SellersListView(record: widget.record),
+                          //   ),
+                          // );
                         },
                         child: const Text(
                           '전체 판매자 보기',
@@ -229,8 +158,6 @@ class _RecordDetailViewState extends State<RecordDetailView> {
           ),
         ),
       ),
-      // 화면 떠날 때 미리듣기 정지
-      // (didChangeDependencies 혹은 onDisappear와 유사한 역할)
     );
   }
 

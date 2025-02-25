@@ -14,12 +14,12 @@ class DJRecordCard extends StatelessWidget {
       padding: EdgeInsets.zero,
       onPressed: () {
         // RecordDetailView로 네비게이션 (미리 구현되어 있다고 가정)
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => RecordDetailView(record: record),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   CupertinoPageRoute(
+        //     builder: (context) => RecordDetailView(record: record),
+        //   ),
+        // );
       },
       child: Container(
         width: 200,
