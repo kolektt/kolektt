@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../view_models/search_vm.dart';
 
@@ -152,16 +153,24 @@ class SearchView extends StatelessWidget {
           leading: record.thumb.isNotEmpty
               ? ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: Image.network(
-              record.thumb,
+            child: FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage, // 투명한 1px GIF를 플레이스홀더로 사용
+              image: record.thumb,
               width: 50,
               height: 50,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
+              fadeInDuration: const Duration(milliseconds: 300), // 페이드 효과 지속 시간
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Container(
                   width: 50,
                   height: 50,
                   color: CupertinoColors.systemGrey5,
-                  child: Icon(CupertinoIcons.music_note)),
+                  child: const Icon(
+                    CupertinoIcons.music_note,
+                    color: CupertinoColors.systemGrey2,
+                  ),
+                );
+              },
             ),
           )
               : Container(

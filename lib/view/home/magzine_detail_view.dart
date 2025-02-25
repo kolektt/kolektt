@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../../model/article.dart';
 import '../../model/article_content_type.dart';
@@ -271,12 +272,23 @@ class RecordCard extends StatelessWidget {
               child: SizedBox(
                 width: 150,
                 height: 150,
-                child: Image.network(
-                  record.coverImageURL!,
+                child: FadeInImage.memoryNetwork(
+                  // Flutter pub.dev에서 transparent_image 패키지를 추가 후 import
+                  placeholder: kTransparentImage, // 투명 placeholder (1px GIF)
+                  image: record.coverImageURL!,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: CupertinoColors.systemGrey4,
-                  ),
+                  // fadeInDuration 등으로 애니메이션 속도 조절
+                  fadeInDuration: const Duration(milliseconds: 300),
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    // 이미지 로딩 실패 시 표시할 위젯
+                    return Container(
+                      color: CupertinoColors.systemGrey4,
+                      child: const Icon(
+                        CupertinoIcons.photo_fill,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
