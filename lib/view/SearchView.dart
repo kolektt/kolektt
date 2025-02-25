@@ -1,231 +1,305 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../main.dart';
+import '../view_models/search_vm.dart';
 
-final List<String> genres = ["전체", "House", "Techno", "Disco", "Jazz", "Hip-Hop"];
-
-enum SortOption { latest, popularity, priceLow, priceHigh }
-
-class SearchView extends StatefulWidget {
-  @override
-  _SearchViewState createState() => _SearchViewState();
-}
-
-class _SearchViewState extends State<SearchView> {
-  String searchText = '';
-  String selectedGenre = '전체';
-  SortOption sortOption = SortOption.latest;
+class SearchView extends StatelessWidget {
+  const SearchView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text("검색"),
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Text("취소"),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: CupertinoTextField(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                placeholder: '레코드 검색',
-                onChanged: (value) {
-                  setState(() {
-                    searchText = value;
-                  });
-                },
-                decoration: BoxDecoration(
-                  color: CupertinoColors.systemGrey6,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                prefix: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(CupertinoIcons.search, color: CupertinoColors.inactiveGray),
-                ),
-              ),
+    return Consumer<SearchViewModel>(
+      builder: (context, model, child) {
+        return CupertinoPageScaffold(
+          navigationBar: CupertinoNavigationBar(
+            middle: Text('검색'),
+            leading: CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: Text("취소"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-
-            // Genre Filter
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: CupertinoScrollbar(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: genres.map((genre) {
-                      return CupertinoButton(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        color: selectedGenre == genre ? primaryColor : CupertinoColors.systemGrey5,
-                        borderRadius: BorderRadius.circular(20),
-                        onPressed: () {
-                          setState(() {
-                            selectedGenre = genre;
-                          });
-                        },
-                        child: Text(
-                          genre,
-                          style: TextStyle(
-                            color: selectedGenre == genre ? CupertinoColors.white : CupertinoColors.black,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ),
-
-            // Sort Options
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Spacer(),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () async {
-                      final SortOption? option = await showCupertinoModalPopup<SortOption>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return CupertinoActionSheet(
-                            title: Text("정렬 옵션"),
-                            actions: [
-                              for (SortOption option in SortOption.values)
-                                CupertinoActionSheetAction(
-                                  onPressed: () {
-                                    Navigator.pop(context, option);
-                                  },
-                                  child: Text(option.toString().split('.').last),
-                                ),
-                            ],
-                          );
-                        },
-                      );
-                      if (option != null) {
-                        setState(() {
-                          sortOption = option;
-                        });
-                      }
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // 검색 입력 필드
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: CupertinoSearchTextField(
+                    controller: model.searchController,
+                    placeholder: '레코드 검색',
+                    onChanged: (value) {
+                      model.updateSearchText(value);
                     },
-                    child: Row(
-                      children: [
-                        Text(
-                          sortOption.toString().split('.').last,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(CupertinoIcons.chevron_down),
-                      ],
+                    onSubmitted: (_) {
+                      model.search();
+                    },
+                  ),
+                ),
+
+                // 장르 필터
+                SizedBox(
+                  height: 50,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: genres.length,
+                      itemBuilder: (context, index) {
+                        final genre = genres[index];
+                        final isSelected = model.selectedGenre == genre;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: CupertinoButton(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            color: isSelected
+                                ? CupertinoColors.activeBlue
+                                : CupertinoColors.systemGrey5,
+                            borderRadius: BorderRadius.circular(20),
+                            onPressed: () {
+                              model.updateSelectedGenre(genre);
+                            },
+                            child: Text(
+                              genre,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+                ),
 
-            // Search Results or Suggestions
-            if (searchText.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: 10, // Replace with actual data length
-                  itemBuilder: (context, index) {
-                    return CupertinoListTile(
-                      leading: CircleAvatar(child: Icon(CupertinoIcons.music_note)),
-                      title: Text('Record Title $index'),
-                      subtitle: Text('Artist $index'),
-                      onTap: () {
-                        // Navigate to record details page
-                      },
-                    );
-                  },
-                ),
-              )
-            else
-              Expanded(
-                child: ListView(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Text("최근 검색어", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          ),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                for (String term in ["Bicep", "Burial", "Four Tet", "Jamie xx"])
-                                  CupertinoButton(
-                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    color: CupertinoColors.systemGrey5,
-                                    borderRadius: BorderRadius.circular(16),
-                                    onPressed: () {
-                                      setState(() {
-                                        searchText = term;
-                                      });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Text(term),
-                                        Icon(CupertinoIcons.clear, size: 16),
-                                      ],
-                                    ),
-                                  ),
-                              ],
+                // 정렬 옵션 선택
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => _showSortOptions(context, model),
+                        child: Row(
+                          children: [
+                            Text(
+                              model.getSortOptionDisplayName(),
+                              style: TextStyle(fontSize: 14),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Icon(CupertinoIcons.chevron_down),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Text("추천 검색어", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          ),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                for (String term in ["Aphex Twin", "Boards of Canada", "Autechre", "Squarepusher"])
-                                  CupertinoButton(
-                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    color: CupertinoColors.systemGrey5,
-                                    borderRadius: BorderRadius.circular(16),
-                                    onPressed: () {
-                                      setState(() {
-                                        searchText = term;
-                                      });
-                                    },
-                                    child: Text(term),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+
+                // 검색 결과 또는 최근/추천 검색어 표시
+                Expanded(
+                  child: _buildContent(context, model),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, SearchViewModel model) {
+    if (model.isLoading) {
+      return Center(child: CupertinoActivityIndicator());
+    }
+
+    if (model.errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(CupertinoIcons.exclamationmark_circle, size: 48, color: CupertinoColors.systemRed),
+            const SizedBox(height: 16),
+            Text('Error: ${model.errorMessage}', textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            CupertinoButton(
+              onPressed: () => model.search(),
+              child: Text('다시 시도'),
+            ),
           ],
         ),
+      );
+    }
+
+    if (model.results.isNotEmpty) {
+      return _buildResultsList(model);
+    }
+
+    return _buildSuggestionsView(context, model);
+  }
+
+  Widget _buildResultsList(SearchViewModel model) {
+    return ListView.builder(
+      itemCount: model.results.length,
+      itemBuilder: (context, index) {
+        final record = model.results[index];
+        return CupertinoListTile(
+          leading: record.thumb.isNotEmpty
+              ? ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Image.network(
+              record.thumb,
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(
+                      width: 50,
+                      height: 50,
+                      color: CupertinoColors.systemGrey5,
+                      child: Icon(CupertinoIcons.music_note)
+                  ),
+            ),
+          )
+              : Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: CupertinoColors.systemGrey5,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Icon(CupertinoIcons.music_note)
+          ),
+          title: Text(record.title),
+          subtitle: record.artist != null ? Text(record.artist!) : null,
+          trailing: Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey),
+          onTap: () {
+            model.onRecordSelected(record, context);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSuggestionsView(BuildContext context, SearchViewModel model) {
+    return ListView(
+      children: [
+        // 최근 검색어 표시
+        if (model.recentSearchTerms.isNotEmpty)
+          _buildSearchTermsSection(
+            title: "최근 검색어",
+            terms: model.recentSearchTerms,
+            model: model,
+            showClearButton: true,
+          ),
+
+        // 추천 검색어 표시
+        _buildSearchTermsSection(
+          title: "추천 검색어",
+          terms: model.suggestedSearchTerms,
+          model: model,
+          showClearButton: false,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchTermsSection({
+    required String title,
+    required List<String> terms,
+    required SearchViewModel model,
+    required bool showClearButton,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              if (showClearButton && terms.isNotEmpty)
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: Text("모두 지우기"),
+                  onPressed: () => model.clearRecentSearches(),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: terms.map((term) {
+              return CupertinoButton(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                color: CupertinoColors.systemGrey5,
+                borderRadius: BorderRadius.circular(16),
+                onPressed: () {
+                  model.updateSearchText(term);
+                  model.search();
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(term),
+                    if (showClearButton)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: GestureDetector(
+onTap: () {
+  model.removeSearchTerm(term);
+},
+                          child: Icon(CupertinoIcons.clear_circled, size: 16),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
+  }
+
+  Future<void> _showSortOptions(BuildContext context, SearchViewModel model) async {
+    final selectedOption = await showCupertinoModalPopup<SortOption>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: Text("정렬 옵션"),
+          actions: SortOption.values.map((option) =>
+              CupertinoActionSheetAction(
+                isDefaultAction: model.sortOption == option,
+                onPressed: () {
+                  Navigator.pop(context, option);
+                },
+                child: Text(model.getSortOptionDisplayName(option)),
+              )
+          ).toList(),
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("취소"),
+          ),
+        );
+      },
+    );
+
+    if (selectedOption != null) {
+      model.updateSortOption(selectedOption);
+    }
   }
 }

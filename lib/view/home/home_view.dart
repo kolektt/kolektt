@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:kolektt/view_models/home_vm.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../components/dj_pick_section.dart';
 import '../../components/home_toolbar.dart';

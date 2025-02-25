@@ -1,7 +1,6 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../model/article.dart';
 import '../model/article_content.dart';
