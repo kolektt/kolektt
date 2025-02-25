@@ -1,4 +1,5 @@
-import '../view/collection_view.dart';
+import 'decade_analytics.dart';
+import 'genre_analytics.dart';
 
 class CollectionAnalytics {
   final int totalRecords;

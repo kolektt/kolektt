@@ -3,9 +3,12 @@ import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../model/record.dart';
-import '../view/record_detail_view.dart';
-import '../view_models/home_vm.dart';
+import '../../model/article.dart';
+import '../../model/article_content_type.dart';
+import '../../model/record.dart';
+import '../../view_models/home_vm.dart';
+import '../record_detail_view.dart';
+
 
 class MagazineDetailView extends StatelessWidget {
   final Article article;

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/view/record_detail_view.dart';
 
+import '../components/seller_row.dart';
 import '../model/record.dart';
 
 class SellersListView extends StatelessWidget {

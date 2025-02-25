@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import '../home/home_view.dart';
 
 import '../main.dart';
 import 'collection_view.dart' as coll;
-import 'home_view.dart';
-
+import 'home/home_view.dart';
+import 'profile_vew.dart';
 
 class ContentView extends StatelessWidget {
   const ContentView({super.key});

@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 
-import '../home/djs_pick_detail_view.dart';
-import '../home/home_view.dart';
-import '../view/home_view.dart';
+import '../model/dj.dart';
+import '../model/dj_pick.dart';
+import '../model/interview_content.dart';
+import '../model/interview_content_type.dart';
+import '../view/djs_pick_list_view.dart';
+import '../view/home/djs_pick_detail_view.dart';
 import '../model/record.dart';
-import '../view_models/home_vm.dart';
+import 'dj_pick_card.dart';
 
 class DJPickSection extends StatelessWidget {
   final List<DJPick> djPicks;

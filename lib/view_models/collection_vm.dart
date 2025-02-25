@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kolektt/model/recognition.dart';
 import 'dart:io';
 import '../model/collection_analytics.dart';
+import '../model/decade_analytics.dart';
+import '../model/genre_analytics.dart';
 import '../model/record.dart';
-import '../view/collection_view.dart';
 
 class CollectionViewModel extends ChangeNotifier {
   File? selectedImage;

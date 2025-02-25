@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/components/section_header.dart';
 
-import '../view/home_view.dart';
 import '../model/popular_record.dart';
+import '../view/records_list.dart';
+import 'genre_scroll_view.dart';
 
 class PopularRecordsSection extends StatelessWidget {
   final List<String> genres;

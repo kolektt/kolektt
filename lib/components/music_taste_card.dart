@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../model/music_taste.dart';
 import '../view/record_detail_view.dart';
 import '../view_models/home_vm.dart';
 

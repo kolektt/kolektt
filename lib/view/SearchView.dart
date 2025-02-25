@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 final List<String> genres = ["전체", "House", "Techno", "Disco", "Jazz", "Hip-Hop"];
 
 enum SortOption { latest, popularity, priceLow, priceHigh }
-
-final primaryColor = Color(0xFF0036FF);
 
 class SearchView extends StatefulWidget {
   @override

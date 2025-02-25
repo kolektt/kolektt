@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../components/activity_card.dart';
+import '../components/instagram_style_record_card.dart';
 import '../main.dart';
+import '../model/activity_type.dart';
 import 'collection_record_detail_view.dart';
 import '../components/build_status_column.dart';
-import '../home/home_view.dart';
 import '../model/record.dart';
 
 class OtherUserProfileView extends StatefulWidget {
