@@ -157,13 +157,11 @@ class SearchView extends StatelessWidget {
               width: 50,
               height: 50,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Container(
-                      width: 50,
-                      height: 50,
-                      color: CupertinoColors.systemGrey5,
-                      child: Icon(CupertinoIcons.music_note)
-                  ),
+              errorBuilder: (context, error, stackTrace) => Container(
+                  width: 50,
+                  height: 50,
+                  color: CupertinoColors.systemGrey5,
+                  child: Icon(CupertinoIcons.music_note)),
             ),
           )
               : Container(
@@ -173,11 +171,14 @@ class SearchView extends StatelessWidget {
                 color: CupertinoColors.systemGrey5,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Icon(CupertinoIcons.music_note)
-          ),
+              child: Icon(CupertinoIcons.music_note)),
           title: Text(record.title),
-          subtitle: record.artist != null ? Text(record.artist!) : null,
-          trailing: Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey),
+          // artists 리스트가 비어있지 않은 경우에만 첫번째 artist의 이름을 표시
+          subtitle: record.artists.isNotEmpty && record.artists[0].name != null
+              ? Text(record.artists[0].name!)
+              : null,
+          trailing:
+          Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey),
           onTap: () {
             model.onRecordSelected(record, context);
           },

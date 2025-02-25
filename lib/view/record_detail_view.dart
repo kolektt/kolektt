@@ -98,7 +98,9 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.record.artist ?? '알 수 없음',
+                      widget.record.artists.isNotEmpty
+                          ? widget.record.artists.join(', ')
+                          : '알 수 없음',
                       style: const TextStyle(
                         fontSize: 20,
                         color: CupertinoColors.systemGrey,

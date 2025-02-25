@@ -17,6 +17,7 @@ class DiscogsApiService {
 
     try {
       final uri = Uri.parse('$baseUrl/database/search?q=$query&key=$apiKey&secret=$apiSecret');
+      debugPrint('Searching Discogs: $uri');
 
       final response = await http.get(
         uri,

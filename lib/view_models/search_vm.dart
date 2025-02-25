@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/discogs_record.dart';
 import '../services/discogs_api_service.dart';
 import '../services/recent_search_db.dart';
@@ -18,6 +19,7 @@ class SearchViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
   List<String> recentSearchTerms = [];
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   // 추천 검색어
   final List<String> suggestedSearchTerms = [
@@ -76,35 +78,52 @@ class SearchViewModel extends ChangeNotifier {
       return;
     }
 
+    // 로딩 시작
     isLoading = true;
-    errorMessage = null;
     notifyListeners();
 
     try {
-      // 검색어를 내부 DB에 저장
-      await _searchDb.insertSearchTerm(searchText);
-      await loadRecentSearches();
-
-      // API 검색 수행
+      // (1) API로부터 결과를 가져옴
       results = await _apiService.searchDiscogs(searchText);
 
-      // 장르 필터 적용
-      if (selectedGenre != '전체') {
-        results = results.where((record) =>
-        record.genre?.contains(selectedGenre) ?? false
-        ).toList();
-      }
-
-      // 정렬 적용
+      // (2) UI 업데이트
+      //     - 장르 필터, 정렬 등
+      // _applyGenreFilter();
       _applySorting();
 
+      // (3) 로딩 끝
+      isLoading = false;
+      notifyListeners();
+
+      // (4) Supabase DB 업서트를 비동기로 호출만 하고, 굳이 `await`하지 않음
+      //     => DB 작업이 끝날 때까지 기다리지 않고 즉시 함수 종료
+      updateAllRecordsAsync(results);
+
     } catch (e) {
+      // 에러 처리
       errorMessage = e.toString();
       results = [];
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
+  void updateAllRecordsAsync(List<DiscogsRecord> records) {
+    final supabase = Supabase.instance.client;
+
+    // 병렬 실행을 위한 Future 리스트
+    final futures = <Future>[];
+
+    for (final r in records) {
+      futures.add(
+          supabase.from('records').upsert(r.toJson(), onConflict: 'discogs_id')
+      );
     }
 
-    isLoading = false;
-    notifyListeners();
+    Future.wait(futures)
+        .then((_) => debugPrint('All upserts completed.'))
+        .catchError((error) => debugPrint('Some upsert failed: $error'));
   }
 
   void updateSearchText(String text) {
@@ -135,7 +154,7 @@ class SearchViewModel extends ChangeNotifier {
       if (results.isNotEmpty) {
         if (genre != '전체') {
           final filteredResults = results.where((record) =>
-          record.genre?.contains(genre) ?? false
+          record.genres[0].contains(genre) ?? false
           ).toList();
 
           // 필터링 후 정렬 적용
@@ -170,7 +189,7 @@ class SearchViewModel extends ChangeNotifier {
         results.sort((a, b) => (b.year ?? 0).compareTo(a.year ?? 0));
         break;
       case SortOption.popularity:
-        results.sort((a, b) => (b.community?.have ?? 0).compareTo(a.community?.have ?? 0));
+        results.sort((a, b) => (b.community.have ?? 0).compareTo(a.community.have ?? 0));
         break;
       case SortOption.priceLow:
         results.sort((a, b) => (a.lowestPrice ?? 0).compareTo(b.lowestPrice ?? 0));
