@@ -32,6 +32,7 @@ class DiscogsRecord {
   final List<Artist> extraartists;
   final List<ImageInfo> images;
   final String thumb;
+  final String cover_image;
   final int estimatedWeight;
   final bool blockedFromSale;
 
@@ -69,6 +70,7 @@ class DiscogsRecord {
     required this.extraartists,
     required this.images,
     required this.thumb,
+    required this.cover_image,
     required this.estimatedWeight,
     required this.blockedFromSale,
   });
@@ -159,6 +161,7 @@ class DiscogsRecord {
           ? json['estimated_weight']
           : int.tryParse(json['estimated_weight'].toString()) ?? 0,
       blockedFromSale: json['blocked_from_sale'] ?? false,
+      cover_image: json['cover_image'] ?? '',
     );
   }
 
@@ -170,7 +173,7 @@ class DiscogsRecord {
       'artist': artists.isNotEmpty ? artists[0].name : '',
       'release_year': year,        // ==> release_year
       'genre': genres.isNotEmpty ? genres.join(', ') : '',
-      'cover_image': thumb,        // ==> cover_image
+      'cover_image': cover_image, // ==> cover_image
       'catalog_number': labels.isNotEmpty ? labels[0].catno : '',
       'label': labels.isNotEmpty ? labels[0].name : '',
       'format': formats.isNotEmpty ? formats[0].text : '',

@@ -54,7 +54,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    // DiscogsRecord에서는 cover 이미지로 thumb를 사용한다고 가정합니다.
+    // DiscogsRecord에서는 cover 이미지로 cover_image를 사용한다고 가정합니다.
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(widget.record.title),
@@ -69,9 +69,9 @@ class _RecordDetailViewState extends State<RecordDetailView> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.width,
-                child: widget.record.thumb.isNotEmpty
+                child: widget.record.cover_image.isNotEmpty
                     ? Image.network(
-                  widget.record.thumb,
+                  widget.record.cover_image,
                   fit: BoxFit.cover,
                 )
                     : Container(
