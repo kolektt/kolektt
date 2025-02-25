@@ -10,13 +10,24 @@ class DiscogsApiService {
   static const String apiKey = 'AKbXcCERIpZjuzCiOBLt';
   static const String apiSecret = 'BUDuGFBBkChCYYCiRbyWvVxEPlEbqVkX';
 
-  Future<List<DiscogsRecord>> searchDiscogs(String query) async {
+  Future<List<DiscogsRecord>> searchDiscogs(String query, {String? type}) async {
     if (query.isEmpty) {
       return [];
     }
 
     try {
-      final uri = Uri.parse('$baseUrl/database/search?q=$query&key=$apiKey&secret=$apiSecret');
+      String url = '$baseUrl/database/search';
+      if (type == 'artist') {
+        url += '?type=artist';
+      } else if (type == 'label') {
+        url += '?type=label';
+      } else if (type == 'release') {
+        url += '?type=release';
+      } else if (type == 'master') {
+        url += '?type=master';
+      }
+      url += '&q=$query&key=$apiKey&secret=$apiSecret';
+      final uri = Uri.parse(url);
       debugPrint('Searching Discogs: $uri');
 
       final response = await http.get(

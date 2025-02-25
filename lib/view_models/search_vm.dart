@@ -84,7 +84,7 @@ class SearchViewModel extends ChangeNotifier {
 
     try {
       // (1) API로부터 결과를 가져옴
-      results = await _apiService.searchDiscogs(searchText);
+      results = await _apiService.searchDiscogs(searchText, type: 'release');
 
       // (2) UI 업데이트
       //     - 장르 필터, 정렬 등
