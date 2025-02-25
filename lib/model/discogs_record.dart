@@ -32,7 +32,7 @@ class DiscogsRecord {
   final List<Artist> extraartists;
   final List<ImageInfo> images;
   final String thumb;
-  final String cover_image;
+  final String coverImage;
   final int estimatedWeight;
   final bool blockedFromSale;
 
@@ -70,7 +70,7 @@ class DiscogsRecord {
     required this.extraartists,
     required this.images,
     required this.thumb,
-    required this.cover_image,
+    required this.coverImage,
     required this.estimatedWeight,
     required this.blockedFromSale,
   });
@@ -87,22 +87,22 @@ class DiscogsRecord {
       resourceUrl: json['resource_url'] ?? '',
       uri: json['uri'] ?? '',
       artists: (json['artists'] as List<dynamic>?)
-              ?.map((e) => Artist.fromJson(e))
-              .toList() ??
+          ?.map((e) => Artist.fromJson(e))
+          .toList() ??
           [],
       artistsSort: json['artists_sort'] ?? '',
       labels: (json['labels'] as List<dynamic>?)
-              ?.map((e) => Label.fromJson(e))
-              .toList() ??
+          ?.map((e) => Label.fromJson(e))
+          .toList() ??
           [],
       series: json['series'] as List<dynamic>? ?? [],
       companies: (json['companies'] as List<dynamic>?)
-              ?.map((e) => Company.fromJson(e))
-              .toList() ??
+          ?.map((e) => Company.fromJson(e))
+          .toList() ??
           [],
       formats: (json['formats'] as List<dynamic>?)
-              ?.map((e) => Format.fromJson(e))
-              .toList() ??
+          ?.map((e) => Format.fromJson(e))
+          .toList() ??
           [],
       dataQuality: json['data_quality'] ?? '',
       community: json['community'] != null
@@ -129,60 +129,64 @@ class DiscogsRecord {
       notes: json['notes'] ?? '',
       releasedFormatted: json['released_formatted'] ?? '',
       identifiers: (json['identifiers'] as List<dynamic>?)
-              ?.map((e) => Identifier.fromJson(e))
-              .toList() ??
+          ?.map((e) => Identifier.fromJson(e))
+          .toList() ??
           [],
       videos: (json['videos'] as List<dynamic>?)
-              ?.map((e) => Video.fromJson(e))
-              .toList() ??
+          ?.map((e) => Video.fromJson(e))
+          .toList() ??
           [],
       genres: (json['genres'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
+          ?.map((e) => e.toString())
+          .toList() ??
           [],
       styles: (json['styles'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
+          ?.map((e) => e.toString())
+          .toList() ??
           [],
       tracklist: (json['tracklist'] as List<dynamic>?)
-              ?.map((e) => Track.fromJson(e))
-              .toList() ??
+          ?.map((e) => Track.fromJson(e))
+          .toList() ??
           [],
       extraartists: (json['extraartists'] as List<dynamic>?)
-              ?.map((e) => Artist.fromJson(e))
-              .toList() ??
+          ?.map((e) => Artist.fromJson(e))
+          .toList() ??
           [],
       images: (json['images'] as List<dynamic>?)
-              ?.map((e) => ImageInfo.fromJson(e))
-              .toList() ??
+          ?.map((e) => ImageInfo.fromJson(e))
+          .toList() ??
           [],
       thumb: json['thumb'] ?? '',
+      coverImage: json['cover_image'] ?? '',
       estimatedWeight: json['estimated_weight'] is int
           ? json['estimated_weight']
           : int.tryParse(json['estimated_weight'].toString()) ?? 0,
       blockedFromSale: json['blocked_from_sale'] ?? false,
-      cover_image: json['cover_image'] ?? '',
     );
   }
 
+  /// Supabase나 PostgreSQL에 insert할 때 사용하려는 가정 하에,
+  /// `records` 테이블 컬럼에 맞춰 key를 구성합니다.
   Map<String, dynamic> toJson() {
     return {
-      // 질문에 주어진 'records' 테이블 스키마
-      'discogs_id': id,            // ==> discogs_id
-      'title': title,              // ==> title
+      // PostgreSQL `records` 테이블 구조에 맞춤
+      'discogs_id': id,  // 테이블에서는 TEXT 형식이므로 필요에 따라 toString() 처리 가능
+      'title': title,
       'artist': artists.isNotEmpty ? artists[0].name : '',
-      'release_year': year,        // ==> release_year
+      'release_year': year,
       'genre': genres.isNotEmpty ? genres.join(', ') : '',
-      'cover_image': cover_image, // ==> cover_image
+      'cover_image': coverImage,
       'catalog_number': labels.isNotEmpty ? labels[0].catno : '',
       'label': labels.isNotEmpty ? labels[0].name : '',
       'format': formats.isNotEmpty ? formats[0].text : '',
       'country': country,
       'style': styles.isNotEmpty ? styles.join(', ') : '',
-      'condition': '',             // 필요시 채워주세요.
+      // condition / condition_notes 는 필요 시 직접 셋팅
+      'condition': '',
       'condition_notes': '',
-      'notes': notes,              // ==> notes
-      // 'search_vector': ''        // (TSVECTOR는 DB에서 자동으로 구성하거나 트리거 설정 가능)
+      'notes': notes,
+      // created_at, updated_at은 DB에서 DEFAULT나 TRIGGER를 통해 자동 처리
+      // 'search_vector' 역시 DB에서 자동 생성 혹은 트리거로 관리 가능
     };
   }
 }
