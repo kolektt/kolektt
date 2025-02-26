@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 // CollectionViewModel에서 recognizeAlbum() 사용 (Google Vision + Discogs)
 import '../view_models/collection_vm.dart';
+import 'add_to_collection_view.dart';
 
 class AutoAlbumDetectionScreen extends StatefulWidget {
   const AutoAlbumDetectionScreen({Key? key}) : super(key: key);
@@ -75,8 +76,8 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
   }
 
   /// 검색 결과 리스트 빌드
+  @override
   Widget _buildResultsList(BuildContext context, CollectionViewModel vm) {
-    // 검색 결과가 없다면 안내 텍스트
     if (!vm.isLoading && vm.errorMessage == null && vm.searchResults.isEmpty) {
       return const Center(
         child: Text('인식된 앨범이 없습니다.\n사진 촬영 후 결과가 여기 표시됩니다.',
@@ -92,8 +93,13 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
         return CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
-            // TODO: 선택 시 컬렉션에 추가하거나 상세 화면으로 이동
-            // vm.addToCollection(record);
+            // AddToCollectionScreen으로 이동
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (_) => AddToCollectionScreen(record: record),
+              ),
+            );
           },
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -104,7 +110,6 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
             ),
             child: Row(
               children: [
-                // 썸네일
                 if (record.thumb.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
@@ -126,7 +131,6 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
                     child: const Icon(CupertinoIcons.music_note),
                   ),
                 const SizedBox(width: 12),
-                // 앨범 정보
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,6 +150,7 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
       },
     );
   }
+
 
   /// 카메라를 실행하고 사진을 촬영한 후 앨범 인식(= Google Vision + Discogs 검색)
   Future<void> _takePhotoAndDetect() async {

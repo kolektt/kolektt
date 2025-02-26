@@ -28,7 +28,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'Bearer ya29.a0AeXRPp6vf2j2uxW2XxfElEQTR6zP9bf82E8dc9F7j0zowgZ5hl47wJQCan8vSiVfPHHNtpoby9rR8JfKnk6waPLVQFqP5URrSZYKhV66rz_zKGSg4ReEbr9TqI26Eg4LwBAWNofj8YBD4X4Xh-hY11bflFVz-0L3RUQSGMIVncq21waCgYKAf4SARESFQHGX2Mi2bwYhn5S-Nr6WFkDrzV3nw0181';
+      'Bearer ya29.a0AeXRPp7CFNZtTW3GwrW64-BFcO1vwbhNxXTNTwD1-ohEp9SUuousHMJ4OpWRj4RHkFkDv6zjTFaZAkehGpIQVw2StBFYKzVhKMkQxx2jzl7TPGYoTOqVZbw6g7RU-DM3demALz3ACA63RmpVdZuAFKLFqa24t4qF1IVwv4oSDiovUwaCgYKATkSARESFQHGX2MiJ191rYHE4G92fSAA20b-8Q0181';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -108,35 +108,49 @@ class CollectionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addToCollection(DiscogsRecord record) async {
+  Future<void> addToCollection(
+    DiscogsRecord record,
+    String condition,
+    String conditionNotes,
+    double purchasePrice,
+  ) async {
     _isAdding = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final response = await supabase.from('user_collections').insert({
-        'record_id': record.id.toString(),
-        'title': record.title,
-        'artist': record.artists.isNotEmpty ? record.artists[0].name : '',
-        'release_year': record.year,
-        'cover_image': record.coverImage,
-        'catalog_number':
-            record.labels.isNotEmpty ? record.labels[0].catno : '',
-        'label': record.labels.isNotEmpty ? record.labels[0].name : '',
-        'format': record.formats.isNotEmpty ? record.formats[0].text : '',
-        'country': record.country,
-        'style': record.styles.isNotEmpty ? record.styles.join(', ') : '',
-        'notes': record.notes,
-      });
-
-      if (response.error != null) {
-        throw Exception(response.error!.message);
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('로그인이 필요합니다.');
       }
 
-      notifyListeners();
+      // user_collections 테이블 구조에 맞춰 insert
+      final insertData = {
+        'record_id': record.id.toInt(),
+        'condition': condition,
+        'condition_notes': conditionNotes,
+        'purchase_price': purchasePrice,
+        'notes': record.notes ?? '', // DiscogsRecord notes
+      };
+
+      try {
+        await addDiscogsRecordToDB(record);
+      } catch (e) {
+        print('Error adding Discogs record: $e');
+      }
+
+      // 추가로 purchase_date 같은 게 필요하다면, 아래처럼:
+      // insertData['purchase_date'] = DateTime.now().toIso8601String();
+
+      final response = await supabase
+          .from('user_collections')
+          .insert(insertData)
+          .maybeSingle(); // v1.x API
+
+      // response가 null이면 row가 없거나, 에러면 예외 발생
+      // supabase_flutter >=1.0은 에러 발생 시 바로 예외 throw
     } catch (e) {
       _errorMessage = '컬렉션 추가 실패: $e';
-      notifyListeners();
     } finally {
       _isAdding = false;
       notifyListeners();
@@ -209,9 +223,46 @@ class CollectionViewModel extends ChangeNotifier {
     try {
       final discogsApi = DiscogsApiService();
       final results = await discogsApi.searchDiscogs(query, type: 'release');
+      await updateAllRecordsAsync(results);
       _searchResults = results;
     } catch (e) {
       _errorMessage = 'Discogs 검색 오류: $e';
     }
+  }
+
+  Future<void> addDiscogsRecordToDB(DiscogsRecord record) async {
+    try {
+      // Supabase insert
+      final response = await supabase
+          .from('records')
+          .insert(record.toJson())
+          .single(); // single() → 단일 row 반환
+
+      // v1.x 버전에서는 에러 시 예외 발생
+      // 성공 시 response에 삽입된 row가 들어옴
+
+      print('Record inserted successfully: $response');
+    } catch (e) {
+      print('Error inserting record: $e');
+      rethrow; // 필요하면 에러를 상위로 던짐
+    }
+  }
+
+  // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
+  Future<void> updateAllRecordsAsync(List<DiscogsRecord> records) async {
+    final supabase = Supabase.instance.client;
+
+    // 병렬 실행을 위한 Future 리스트
+    final futures = <Future>[];
+
+    for (final r in records) {
+      futures.add(supabase
+          .from('records')
+          .upsert(r.toJson(), onConflict: 'discogs_id'));
+    }
+
+    await Future.wait(futures)
+        .then((_) => debugPrint('All upserts completed.'))
+        .catchError((error) => debugPrint('Some upsert failed: $error'));
   }
 }
