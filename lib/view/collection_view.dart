@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kolektt/view/record_detail_view.dart';
+import 'package:kolektt/view/auto_album_detection_view.dart';
 
 import '../components/analytics_section.dart';
 import '../components/record_card_view.dart';
@@ -153,7 +153,14 @@ class _CollectionViewState extends State<CollectionView> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => AutoAlbumDetectionScreen(),
+                  ),
+                );
+              },
               icon: Icon(
                 CupertinoIcons.add_circled_solid,
                 size: 32,

@@ -17,7 +17,8 @@ class DiscogsApiService {
 
     try {
       String url = '$baseUrl/database/search';
-      if (type == 'artist') {
+      if(type == null || type.isEmpty) {
+      } else if (type == 'artist') {
         url += '?type=artist';
       } else if (type == 'label') {
         url += '?type=label';
