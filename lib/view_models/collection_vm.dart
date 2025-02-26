@@ -28,7 +28,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'Bearer ya29.a0AeXRPp7CFNZtTW3GwrW64-BFcO1vwbhNxXTNTwD1-ohEp9SUuousHMJ4OpWRj4RHkFkDv6zjTFaZAkehGpIQVw2StBFYKzVhKMkQxx2jzl7TPGYoTOqVZbw6g7RU-DM3demALz3ACA63RmpVdZuAFKLFqa24t4qF1IVwv4oSDiovUwaCgYKATkSARESFQHGX2MiJ191rYHE4G92fSAA20b-8Q0181';
+      'ya29.a0AeXRPp70-oPhNN1lxbfOwM4zMWIoMClWTmq04NfKudIAIY4fha8JnOOPV02UmDx4KBKeCQojHutWoWoxdR2tPsW0d5gMkn8DXJT_b7bQ4tmJ5ai5RfCWWsKPc6GytDRwItjBCorsoqDbahSoqkx5rIcWxaNxU3jcCi725Fdv8bybrRUaCgYKAYwSARESFQHGX2MienJKq7RH4Scfz3vj4xgjtg0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -184,7 +184,7 @@ class CollectionViewModel extends ChangeNotifier {
       final response = await http.post(
         url,
         headers: {
-          'Authorization': _googleVisionApiKey,
+          'Authorization': "Bearer " + _googleVisionApiKey,
           'x-goog-user-project': 'kolektt',
           'Content-Type': 'application/json; charset=utf-8'
         },
