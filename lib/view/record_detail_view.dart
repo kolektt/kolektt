@@ -126,9 +126,11 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                               const SizedBox(height: 8),
                               Text(
                                 model.detailedRecord!.artists.isNotEmpty
-                                    ? model.detailedRecord!.artists.join(', ')
-                                    : '알 수 없음',
-                                style: const TextStyle(
+                                          ? model.detailedRecord!.artists
+                                              .map((artist) => artist.name)
+                                              .join(', ')
+                                          : '알 수 없음',
+                                      style: const TextStyle(
                                   fontSize: 20,
                                   color: CupertinoColors.systemGrey,
                                 ),

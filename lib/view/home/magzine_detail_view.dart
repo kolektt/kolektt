@@ -7,8 +7,6 @@ import 'package:transparent_image/transparent_image.dart';
 import '../../model/article.dart';
 import '../../model/article_content_type.dart';
 import '../../model/record.dart';
-import '../../view_models/home_vm.dart';
-import '../record_detail_view.dart';
 
 
 class MagazineDetailView extends StatelessWidget {

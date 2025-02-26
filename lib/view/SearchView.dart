@@ -184,7 +184,7 @@ class SearchView extends StatelessWidget {
           title: Text(record.title),
           // artists 리스트가 비어있지 않은 경우에만 첫번째 artist의 이름을 표시
           subtitle: record.artists.isNotEmpty && record.artists[0].name != null
-              ? Text(record.artists[0].name!)
+              ? Text(record.artists[0].name)
               : null,
           trailing:
           Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey),
