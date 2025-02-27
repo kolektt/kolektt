@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -28,7 +29,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp5jE1xfpfb_n4XQ4rR53QU5GQk1TohM1o_NMN8XUSzwm_L6-xJ38dZlkjNrVClz4oflWtuFWk-LJX-XFFZYZO4d7wDqZ3mT607ZIrJ-VO2dBuLm-XLgtIm9GgAwDtpZE3udrOll071zaLVZ4UuRRK6uJmM5ZT07O_Lrg99i2eEaCgYKAUUSARESFQHGX2MiogQdaJrqpbIL20J5qsAXvw0182';
+      'ya29.a0AeXRPp5fJT8XciBEx_G3AhRsXrC7n5xya-wIWUI6tTMuo3AKZueqijTHXsNFMPAT1mruBs2vPzpogmr_JThpfOj3dJMIZk5VSIwnM-c1kE6IvcZNFFD4N4QFFYKar-Mzjm6WwHpNITP64W3Xjbd0Tw6iMzdOcPIqgJemP6ua5DCPaXoaCgYKAQoSARESFQHGX2MiD81xecwv73su48WKYyGLhg0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -44,27 +45,15 @@ class CollectionViewModel extends ChangeNotifier {
   List<DiscogsRecord> get searchResults => _searchResults;
 
   // Private backing field
-  List<DiscogsRecord> _collectionRecords = [];
+  List<CollectionRecord> _collectionRecords = [];
 
   // Public getter
-  List<DiscogsRecord> get collectionRecords => _collectionRecords;
+  List<CollectionRecord> get collectionRecords => _collectionRecords;
 
   // Public setter (옵션에 따라 필요 시 정의)
-  set collectionRecords(List<DiscogsRecord> records) {
+  set collectionRecords(List<CollectionRecord> records) {
     _collectionRecords = records;
     notifyListeners();
-  }
-
-  Future<void> processBarcode(File image) async {
-    // 바코드 처리 로직 구현 필요
-  }
-
-  Future<void> searchBarcode(String barcode) async {
-    // 바코드 검색 로직 구현 필요
-  }
-
-  Future<void> searchCatNo(String catNo) async {
-    // CatNo 검색 로직 구현 필요
   }
 
   void updateAnalytics(List<Record> records) {
@@ -154,18 +143,30 @@ class CollectionViewModel extends ChangeNotifier {
       // 추가로 purchase_date 같은 게 필요하다면, 아래처럼:
       // insertData['purchase_date'] = DateTime.now().toIso8601String();
 
-      final response = await supabase
-          .from('user_collections')
-          .insert(insertData)
-          .maybeSingle(); // v1.x API
-
-      // response가 null이면 row가 없거나, 에러면 예외 발생
-      // supabase_flutter >=1.0은 에러 발생 시 바로 예외 throw
+      await supabase.from('user_collections').insert(insertData).maybeSingle();
     } catch (e) {
       _errorMessage = '컬렉션 추가 실패: $e';
     } finally {
       _isAdding = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> removeRecord(CollectionRecord record) async {
+    try {
+      final response =
+          await supabase.from('user_collections').delete().eq('id', record.id);
+
+      if (response.error == null) {
+        // 로컬 컬렉션에서도 제거
+        _collectionRecords.removeWhere((r) => r.id == record.id);
+        notifyListeners();
+        debugPrint('Record removed successfully.');
+      } else {
+        debugPrint('Error removing record: ${response.error!.message}');
+      }
+    } catch (e) {
+      debugPrint('Error in removeRecord: $e');
     }
   }
 
@@ -259,17 +260,13 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
   Future<void> updateAllRecordsAsync(List<DiscogsRecord> records) async {
-    final supabase = Supabase.instance.client;
-
-    // 병렬 실행을 위한 Future 리스트
     final futures = <Future>[];
-
     for (final r in records) {
-      futures.add(
-          supabase.from('records').upsert(r.toJson(), onConflict: 'record_id')
-      );
+      futures.add(supabase.from('records').upsert(
+            r.toJson(),
+            onConflict: 'record_id',
+          ));
     }
-
     await Future.wait(futures)
         .then((_) => debugPrint('All upserts completed.'))
         .catchError((error) => debugPrint('Some upsert failed: $error'));
@@ -281,29 +278,39 @@ class CollectionViewModel extends ChangeNotifier {
 
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) {
-      print('User is not logged in.');
+      debugPrint('User is not logged in.');
+      _isLoading = false;
       return;
     }
 
+    // user_collections와 연결된 records 테이블의 모든 필드를 함께 조회
     final response = await supabase
         .from('user_collections')
         .select('*, records(*)')
         .eq('user_id', userId.toString());
 
-    debugPrint("response: $response");
+    debugPrint("DB response: $response");
 
-    // collectionRecords setter를 통해 데이터 할당
-    collectionRecords = response.map<DiscogsRecord>((item) {
+    // response가 List<dynamic>라고 가정
+    collectionRecords = (response as List).map<CollectionRecord>((item) {
+      final id = item['id'];
+      // user_collections 테이블에 저장된 record_id
+      final recordId = item['record_id'];
+      // records 테이블 데이터 (null일 수 있음)
       final recordJson = item['records'] as Map<String, dynamic>?;
-      // record_id를 id로 변경
-      recordJson?['id'] = item['record_id'];
       if (recordJson != null) {
-        return DiscogsRecord.fromJson(recordJson);
+        // user_collections의 record_id를 DiscogsRecord의 id로 매핑
+        recordJson['id'] = recordId;
+        // 예) 추가로 필요한 다른 매핑 작업이 있다면 여기서 수행
+        return CollectionRecord(
+            id: id, record: DiscogsRecord.fromJson(recordJson));
       } else {
         debugPrint('Record not found for item: $item');
-        return DiscogsRecord. sampleData[0];
+        // 없을 경우 sampleData에서 첫번째 항목 반환 (또는 적절히 처리)
+        return CollectionRecord.sampleData[0];
       }
     }).toList();
+
     _isLoading = false;
     notifyListeners();
   }
@@ -315,8 +322,8 @@ class CollectionViewModel extends ChangeNotifier {
     // 1. 장르별 집계 (예: 각 레코드의 첫 번째 장르 기준)
     Map<String, int> genreCounts = {};
     for (final record in records) {
-      if (record.genres.isNotEmpty) {
-        String genre = record.genres[0];
+      if (record.record.genres.isNotEmpty) {
+        String genre = record.record.genres[0];
         genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
       }
     }
@@ -327,8 +334,8 @@ class CollectionViewModel extends ChangeNotifier {
     // 2. 아티스트별 집계 (예: 각 레코드의 첫 번째 아티스트 기준)
     Map<String, int> artistCounts = {};
     for (final record in records) {
-      if (record.artists.isNotEmpty) {
-        String artistName = record.artists[0].name;
+      if (record.record.artists.isNotEmpty) {
+        String artistName = record.record.artists[0].name;
         artistCounts[artistName] = (artistCounts[artistName] ?? 0) + 1;
       }
     }
@@ -339,8 +346,8 @@ class CollectionViewModel extends ChangeNotifier {
     // 3. 연대별 집계 (releaseYear 값 기준)
     Map<String, int> decadeCounts = {};
     for (final record in records) {
-      if (record.year > 0) {
-        int decadeStart = (record.year ~/ 10) * 10;
+      if (record.record.year > 0) {
+        int decadeStart = (record.record.year ~/ 10) * 10;
         String decadeLabel = "${decadeStart}'s";
         decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
       }
@@ -348,10 +355,10 @@ class CollectionViewModel extends ChangeNotifier {
 
     // 4. 가장 오래된/최신 연도 계산
     int oldestRecord = records.isNotEmpty
-        ? records.map((r) => r.year ?? 0).reduce((a, b) => a < b ? a : b)
+        ? records.map((r) => r.record.year ?? 0).reduce((a, b) => a < b ? a : b)
         : 0;
     int newestRecord = records.isNotEmpty
-        ? records.map((r) => r.year ?? 0).reduce((a, b) => a > b ? a : b)
+        ? records.map((r) => r.record.year ?? 0).reduce((a, b) => a > b ? a : b)
         : 0;
 
     // 5. CollectionAnalytics 객체 생성 (모델 생성자는 상황에 맞게 정의)

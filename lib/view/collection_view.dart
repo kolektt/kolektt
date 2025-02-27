@@ -79,13 +79,47 @@ class _CollectionViewState extends State<CollectionView> {
                     itemCount: model.collectionRecords.length,
                     itemBuilder: (context, index) {
                       final record = model.collectionRecords[index];
-                      record.resourceUrl =
-                          "https://api.discogs.com/releases/${record.id}";
+                      record.record.resourceUrl = "https://api.discogs.com/releases/${record.record.id}";
+
                       return GestureDetector(
                         onTap: () {
-                          debugPrint("Record tapped: ${record.toJson()}");
-                          // RecordDetailView로 이동 (필요 시 구현)
-                          Navigator.push(context, CupertinoPageRoute(builder: (_) => RecordDetailView(record: record)));
+                          debugPrint("Record tapped: ${record.record.toJson()}");
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (_) => RecordDetailView(record: record.record),
+                            ),
+                          );
+                        },
+                        onLongPress: () async {
+                          // 삭제 확인 다이얼로그 표시
+                          final confirmed = await showCupertinoDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return CupertinoAlertDialog(
+                                title: Text("삭제 확인"),
+                                content: Text("이 컬렉션 아이템을 삭제하시겠습니까?"),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: Text("취소"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                  ),
+                                  CupertinoDialogAction(
+                                    child: Text("삭제"),
+                                    isDestructiveAction: true,
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          if (confirmed == true) {
+                            await Provider.of<CollectionViewModel>(context, listen: false).removeRecord(record);
+                          }
                         },
                         child: Card(
                           elevation: 2,
@@ -94,24 +128,22 @@ class _CollectionViewState extends State<CollectionView> {
                             children: [
                               // 앨범 커버 이미지: URL이 없으면 placeholder 처리
                               Expanded(
-                                child: record.coverImage.isNotEmpty
+                                child: record.record.coverImage.isNotEmpty
                                     ? FadeInImage.memoryNetwork(
-                                        placeholder: kTransparentImage,
-                                        image: record.coverImage,
-                                        fit: BoxFit.cover,
+                                  placeholder: kTransparentImage,
+                                  image: record.record.coverImage,
+                                  fit: BoxFit.cover,
                                   width: double.infinity,
-                                        imageErrorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            width: 50,
-                                            height: 50,
-                                            color: CupertinoColors.systemGrey5,
-                                            child: const Icon(
-                                              CupertinoIcons.music_note,
-                                              color:
-                                                  CupertinoColors.systemGrey2,
-                                            ),
-                                          );
+                                  imageErrorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 50,
+                                      height: 50,
+                                      color: CupertinoColors.systemGrey5,
+                                      child: const Icon(
+                                        CupertinoIcons.music_note,
+                                        color: CupertinoColors.systemGrey2,
+                                      ),
+                                    );
                                   },
                                 )
                                     : Container(
@@ -122,7 +154,7 @@ class _CollectionViewState extends State<CollectionView> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  record.title,
+                                  record.record.title,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -134,7 +166,7 @@ class _CollectionViewState extends State<CollectionView> {
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Text(
-                                  record.year.toString(),
+                                  record.record.year.toString(),
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),

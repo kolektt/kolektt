@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/model/local/collection_record.dart';
 
 import '../model/collection_analytics.dart';
 import '../model/decade_analytics.dart';
@@ -12,7 +13,7 @@ import 'decade_distribution_view.dart';
 
 class AnalyticsSection extends StatefulWidget {
   // 컬렉션의 DiscogsRecord 리스트를 입력받습니다.
-  final List<DiscogsRecord> records;
+  final List<CollectionRecord> records;
 
   const AnalyticsSection({Key? key, required this.records}) : super(key: key);
 
@@ -38,8 +39,8 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
     // 1. 장르별 집계 (각 레코드의 첫번째 장르 기준)
     Map<String, int> genreCounts = {};
     for (final record in records) {
-      if (record.genres.isNotEmpty) {
-        String genre = record.genres[0];
+      if (record.record.genres.isNotEmpty) {
+        String genre = record.record.genres[0];
         genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
       }
     }
@@ -50,8 +51,8 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
     // 2. 아티스트별 집계 (각 레코드의 첫번째 아티스트 기준)
     Map<String, int> artistCounts = {};
     for (final record in records) {
-      if (record.artists.isNotEmpty) {
-        String artist = record.artists[0].name;
+      if (record.record.artists.isNotEmpty) {
+        String artist = record.record.artists[0].name;
         artistCounts[artist] = (artistCounts[artist] ?? 0) + 1;
       }
     }
@@ -62,8 +63,8 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
     // 3. 연대별 집계 (record.year 기준)
     Map<String, int> decadeCounts = {};
     for (final record in records) {
-      if (record.year > 0) {
-        int decadeStart = (record.year ~/ 10) * 10;
+      if (record.record.year > 0) {
+        int decadeStart = (record.record.year ~/ 10) * 10;
         String decadeLabel = "${decadeStart}'s";
         decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
       }
@@ -71,10 +72,10 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
 
     // 4. 가장 오래된/최신 레코드 연도 계산
     int oldestRecord = records.isNotEmpty
-        ? records.map((r) => r.year).reduce((a, b) => a < b ? a : b)
+        ? records.map((r) => r.record.year).reduce((a, b) => a < b ? a : b)
         : 0;
     int newestRecord = records.isNotEmpty
-        ? records.map((r) => r.year).reduce((a, b) => a > b ? a : b)
+        ? records.map((r) => r.record.year).reduce((a, b) => a > b ? a : b)
         : 0;
 
     // 5. CollectionAnalytics 객체 생성
