@@ -49,15 +49,23 @@ class RecordDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> updateRecordToDb() async {
-    // records table의 artist, genre, catalog_number, label, style 업데이트
     final supabase = Supabase.instance.client;
 
     if (detailedRecord == null) return;
+    // 전체 JSON 생성
     final detailRecordJson = detailedRecord!.toJson();
-    debugPrint('Updating record: $detailRecordJson');
-    final response = await supabase.from('records').update(
-      detailRecordJson,
-    ).eq('record_id', baseRecord.id);
-    debugPrint('Record updated: ${response.data}');
+
+    // cover_image와 format 키 제거
+    detailRecordJson.remove('cover_image');
+    detailRecordJson.remove('format');
+
+    debugPrint('Updating record (without cover_image and format): $detailRecordJson');
+
+    final response = await supabase
+        .from('records')
+        .update(detailRecordJson)
+        .eq('record_id', baseRecord.id);
+
+    debugPrint('Record updated: $response');
   }
 }
