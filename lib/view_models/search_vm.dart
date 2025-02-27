@@ -85,6 +85,7 @@ class SearchViewModel extends ChangeNotifier {
     try {
       // (1) API로부터 결과를 가져옴
       results = await _apiService.searchDiscogs(searchText, type: 'release');
+      debugPrint('Search results: ${results}');
 
       // (2) UI 업데이트
       //     - 장르 필터, 정렬 등
@@ -110,14 +111,12 @@ class SearchViewModel extends ChangeNotifier {
 
   // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
   Future<void> updateAllRecordsAsync(List<DiscogsRecord> records) async {
-    final supabase = Supabase.instance.client;
-
     // 병렬 실행을 위한 Future 리스트
     final futures = <Future>[];
 
     for (final r in records) {
       futures.add(
-          supabase.from('records').upsert(r.toJson())
+          _supabase.from('records').upsert(r.toJson())
       );
     }
 

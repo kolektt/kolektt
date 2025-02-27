@@ -2,7 +2,7 @@ class DiscogsRecord {
   final int id;
   final String status;
   final int year;
-  final String resourceUrl;
+  String resourceUrl;
   final String uri;
   final List<Artist> artists;
   final String artistsSort;

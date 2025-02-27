@@ -250,9 +250,6 @@ class CollectionViewModel extends ChangeNotifier {
           .insert(record.toJson())
           .single(); // single() → 단일 row 반환
 
-      // v1.x 버전에서는 에러 시 예외 발생
-      // 성공 시 response에 삽입된 row가 들어옴
-
       print('Record inserted successfully: $response');
     } catch (e) {
       print('Error inserting record: $e');
@@ -298,6 +295,8 @@ class CollectionViewModel extends ChangeNotifier {
     // collectionRecords setter를 통해 데이터 할당
     collectionRecords = response.map<DiscogsRecord>((item) {
       final recordJson = item['records'] as Map<String, dynamic>?;
+      // record_id를 id로 변경
+      recordJson?['id'] = item['record_id'];
       if (recordJson != null) {
         return DiscogsRecord.fromJson(recordJson);
       } else {

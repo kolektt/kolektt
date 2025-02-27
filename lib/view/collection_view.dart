@@ -78,6 +78,8 @@ class _CollectionViewState extends State<CollectionView> {
                     itemCount: model.collectionRecords.length,
                     itemBuilder: (context, index) {
                       final record = model.collectionRecords[index];
+                      record.resourceUrl =
+                          "https://api.discogs.com/releases/${record.id}";
                       return GestureDetector(
                         onTap: () {
                           debugPrint("Record tapped: ${record.toJson()}");
