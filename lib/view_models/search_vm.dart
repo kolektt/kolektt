@@ -116,7 +116,7 @@ class SearchViewModel extends ChangeNotifier {
 
     for (final r in records) {
       futures.add(
-          _supabase.from('records').upsert(r.toJson())
+          _supabase.from('records').upsert(r.toJson(), onConflict: 'record_id')
       );
     }
 

@@ -28,7 +28,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp5xyrJu9wc9Bt6E5Z_wPdoHVCnL9IOIg7SdGAANp8ORNg68tRRc5QieVjwuGQxtKMFoXPX-LGNO_fklFMMQJV9W9JCBcoa1k0xFMEh7fwyUykDF8DdN-V5k0z445XhatBNs0EjNx9ueQymWGvXkB9t-rSlHOWY5XbNcfUOBQn0aCgYKAUISARESFQHGX2MibKUaAMpW9VsPmt6-II38Pg0182';
+      'ya29.a0AeXRPp5jE1xfpfb_n4XQ4rR53QU5GQk1TohM1o_NMN8XUSzwm_L6-xJ38dZlkjNrVClz4oflWtuFWk-LJX-XFFZYZO4d7wDqZ3mT607ZIrJ-VO2dBuLm-XLgtIm9GgAwDtpZE3udrOll071zaLVZ4UuRRK6uJmM5ZT07O_Lrg99i2eEaCgYKAUUSARESFQHGX2MiogQdaJrqpbIL20J5qsAXvw0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -266,7 +266,7 @@ class CollectionViewModel extends ChangeNotifier {
 
     for (final r in records) {
       futures.add(
-          supabase.from('records').upsert(r.toJson())
+          supabase.from('records').upsert(r.toJson(), onConflict: 'record_id')
       );
     }
 
@@ -301,7 +301,7 @@ class CollectionViewModel extends ChangeNotifier {
         return DiscogsRecord.fromJson(recordJson);
       } else {
         debugPrint('Record not found for item: $item');
-        return DiscogsRecord.sampleData[0];
+        return DiscogsRecord. sampleData[0];
       }
     }).toList();
     _isLoading = false;

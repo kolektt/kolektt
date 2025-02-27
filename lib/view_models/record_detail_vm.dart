@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/discogs_record.dart';
 import '../services/discogs_api_service.dart';
 
@@ -14,7 +15,10 @@ class RecordDetailViewModel extends ChangeNotifier {
   String? errorMessage;
 
   RecordDetailViewModel({required this.baseRecord}) {
-    fetchRecordDetails();
+    fetchRecordDetails().then((_) {
+      updateRecordToDb();
+      notifyListeners();
+    });
   }
 
   Future<void> fetchRecordDetails() async {
@@ -42,5 +46,18 @@ class RecordDetailViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> updateRecordToDb() async {
+    // records table의 artist, genre, catalog_number, label, style 업데이트
+    final supabase = Supabase.instance.client;
+
+    if (detailedRecord == null) return;
+    final detailRecordJson = detailedRecord!.toJson();
+    debugPrint('Updating record: $detailRecordJson');
+    final response = await supabase.from('records').update(
+      detailRecordJson,
+    ).eq('record_id', baseRecord.id);
+    debugPrint('Record updated: ${response.data}');
   }
 }

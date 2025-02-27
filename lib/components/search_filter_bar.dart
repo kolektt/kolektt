@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../view/collection_view.dart';
+import '../view_models/search_vm.dart';
 
 class SearchFilterBar extends StatelessWidget {
   final String searchText;
@@ -56,7 +56,7 @@ class SearchFilterBar extends StatelessWidget {
                 items: SortOption.values
                     .map((option) => DropdownMenuItem(
                   value: option,
-                  child: Text(option.displayName),
+                  child: Text(option.name),
                 ))
                     .toList(),
                 onChanged: (value) {
