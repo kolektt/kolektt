@@ -16,8 +16,8 @@ class RecordDetailViewModel extends ChangeNotifier {
 
   RecordDetailViewModel({required this.baseRecord}) {
     fetchRecordDetails().then((_) {
-      updateRecordToDb();
       notifyListeners();
+      updateRecordToDb();
     });
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/view/record_detail_view.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../components/analytics_section.dart';
 import '../view_models/collection_vm.dart';
@@ -94,16 +95,23 @@ class _CollectionViewState extends State<CollectionView> {
                               // 앨범 커버 이미지: URL이 없으면 placeholder 처리
                               Expanded(
                                 child: record.coverImage.isNotEmpty
-                                    ? Image.network(
-                                  record.coverImage,
-                                  fit: BoxFit.cover,
+                                    ? FadeInImage.memoryNetwork(
+                                        placeholder: kTransparentImage,
+                                        image: record.coverImage,
+                                        fit: BoxFit.cover,
                                   width: double.infinity,
-                                  errorBuilder:
-                                      (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey,
-                                      child: Icon(Icons.error),
-                                    );
+                                        imageErrorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            width: 50,
+                                            height: 50,
+                                            color: CupertinoColors.systemGrey5,
+                                            child: const Icon(
+                                              CupertinoIcons.music_note,
+                                              color:
+                                                  CupertinoColors.systemGrey2,
+                                            ),
+                                          );
                                   },
                                 )
                                     : Container(
