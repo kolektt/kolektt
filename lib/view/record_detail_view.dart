@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/view/sellers_list_view.dart';
 import 'package:provider/provider.dart';
 
 import '../components/purchase_view.dart';
@@ -85,100 +86,108 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                   : CupertinoPageScaffold(
                 key: const ValueKey('loadedPage'),
                 navigationBar: CupertinoNavigationBar(
-                  middle: Text(model.detailedRecord?.title ?? '상세정보'),
+                  middle: Text(model.detailedRecord!.title),
                 ),
                 child: SafeArea(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 앨범 커버 이미지
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.width,
-                          child: (model.detailedRecord?.images.isNotEmpty ?? false)
-                              ? Image.network(
-                            model.detailedRecord!.images.first.uri,
-                            fit: BoxFit.cover,
-                          )
-                              : Container(
-                            color: CupertinoColors.systemGrey6,
-                            child: const Icon(
-                              CupertinoIcons.music_note,
-                              size: 64,
-                              color: CupertinoColors.systemGrey,
-                            ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 앨범 커버 이미지
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width,
+                        child: (model.detailedRecord?.images.isNotEmpty ?? false)
+                            ? Image.network(
+                          model.detailedRecord!.images.first.uri,
+                          fit: BoxFit.cover,
+                        )
+                            : Container(
+                          color: CupertinoColors.systemGrey6,
+                          child: const Icon(
+                            CupertinoIcons.music_note,
+                            size: 64,
+                            color: CupertinoColors.systemGrey,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 앨범 정보
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 앨범 정보
+                            Text(
+                              model.detailedRecord?.title ?? '알 수 없음',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (model.detailedRecord != null &&  model.detailedRecord!.artists.isNotEmpty)
                               Text(
-                                model.detailedRecord?.title ?? '알 수 없음',
+                                model.detailedRecord!.artists.first.name,
                                 style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              if (model.detailedRecord != null &&  model.detailedRecord!.artists.isNotEmpty)
-                                Text(
-                                  model.detailedRecord!.artists.first.name,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: CupertinoColors.systemGrey,
-                                  ),
-                                ),
-                              const SizedBox(height: 16),
-                              // 판매자 목록
-                              const Text(
-                                '판매자 목록',
-                                style: TextStyle(
                                   fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                  color: CupertinoColors.systemGrey,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Column(
-                                children: List.generate(3, (index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: SellerRow(
-                                      sellerName: 'DJ Name ${index + 1}',
-                                      price: 50000 + (index * 5000),
-                                      condition: 'VG+',
-                                      onPurchase: () {
-                                        _showPurchaseSheet();
+                            const SizedBox(height: 16),
+                            // 판매자 목록
+                            const Text(
+                              '판매자 목록',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Column(
+                                    children: List.generate(
+                                      model.salesListing!.length,
+                                      (index) {
+                                        return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: SellerRow(
+                                    sellerName: 'DJ Name ${index + 1}',
+                                    price: 50000 + (index * 5000),
+                                    condition: 'VG+',
+                                    onPurchase: () {
+                                      _showPurchaseSheet();
+                                    },
+                                  ),
+                                );
                                       },
                                     ),
-                                  );
-                                }),
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                child: CupertinoButton(
-                                  color: CupertinoColors.activeBlue.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  onPressed: () {
-                                    // 전체 판매자 목록 화면으로 이동
-                                  },
-                                  child: const Text(
-                                    '전체 판매자 보기',
-                                    style: TextStyle(
-                                      color: CupertinoColors.activeBlue,
-                                    ),
+                                  ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: CupertinoButton(
+                                      color: CupertinoColors.activeBlue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                onPressed: () {
+                                  // 전체 판매자 목록 화면으로 이동
+                                        Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                                builder: (context) =>
+                                                    SellersListView(
+                                                        record: model
+                                                            .detailedRecord!)));
+                                      },
+                                      child: const Text(
+                                  '전체 판매자 보기',
+                                  style: TextStyle(
+                                    color: CupertinoColors.activeBlue,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

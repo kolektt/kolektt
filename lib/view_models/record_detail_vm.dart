@@ -3,21 +3,30 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../model/discogs/discogs_record.dart';
-import '../services/discogs_api_service.dart';
+import '../model/supabase/sales_listings.dart';
 
 class RecordDetailViewModel extends ChangeNotifier {
   final DiscogsRecord baseRecord;
-  final DiscogsApiService _apiService = DiscogsApiService();
 
   DiscogsRecord? detailedRecord;
   bool isLoading = true;
   String? errorMessage;
 
+  bool _fetchingSellers = true;
+
+  bool get fetchingSellers => _fetchingSellers;
+
+  List<SalesListing>? _salesListing = [];
+
+  List<SalesListing>? get salesListing => _salesListing;
+
   RecordDetailViewModel({required this.baseRecord}) {
     fetchRecordDetails().then((_) {
       notifyListeners();
       updateRecordToDb();
+      getSellers();
     });
   }
 
@@ -67,5 +76,27 @@ class RecordDetailViewModel extends ChangeNotifier {
         .eq('record_id', baseRecord.id);
 
     debugPrint('Record updated: $response');
+  }
+
+  Future<void> getSellers() async {
+    if (detailedRecord == null) return;
+    try {
+      _fetchingSellers = true;
+      notifyListeners();
+
+      final supabase = Supabase.instance.client;
+      final sellers = await supabase
+          .from('sales_listings')
+          .select()
+          .eq('record_id', detailedRecord!.id);
+
+      _salesListing = sellers.map((e) => SalesListing.fromJson(e)).toList();
+      debugPrint('Sellers: $_salesListing');
+    } catch (e) {
+      debugPrint('Error getting sellers: $e');
+    } finally {
+      _fetchingSellers = false;
+      notifyListeners();
+    }
   }
 }
