@@ -279,6 +279,9 @@ class CollectionViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchUserCollectionsWithRecords() async {
+    _isLoading = true;
+    notifyListeners();
+
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) {
       print('User is not logged in.');
@@ -301,6 +304,8 @@ class CollectionViewModel extends ChangeNotifier {
           return DiscogsRecord.sampleData[0];
         }
       }).toList();
+      _isLoading = false;
+      notifyListeners();
     } else {
       print('Unexpected response format: $response');
     }

@@ -49,90 +49,100 @@ class _CollectionViewState extends State<CollectionView> {
       child: SafeArea(
         child: Consumer<CollectionViewModel>(
           builder: (context, model, child) {
-            if (model.collectionRecords.isEmpty) {
-              return Center(child: Text("컬렉션이 없습니다."));
-            }
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 컬렉션 현황 부분: analytics 데이터를 기반으로 통계 정보 표시
-                  AnalyticsSection(records: model.collectionRecords),
-                  // 일정 간격 추가
-                  SizedBox(height: 16),
-                  // 레코드 목록 (GridView)
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.75,
-                    ),
-                    itemCount: model.collectionRecords.length,
-                    itemBuilder: (context, index) {
-                      final record = model.collectionRecords[index];
-                      return GestureDetector(
-                        onTap: () {
-                          // RecordDetailView로 이동 (필요 시 구현)
-                          // Navigator.push(context, CupertinoPageRoute(builder: (_) => RecordDetailView(record: record)));
-                        },
-                        child: Card(
-                          elevation: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 앨범 커버 이미지: URL이 없으면 placeholder 처리
-                              Expanded(
-                                child: record.coverImage.isNotEmpty
-                                    ? Image.network(
-                                        record.coverImage,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey,
-                                            child: Icon(Icons.error),
-                                          );
-                                        },
-                                      )
-                                    : Container(
-                                        color: Colors.grey,
-                                        child: Icon(Icons.image),
-                                      ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  record.title,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Text(
-                                  record.year.toString(),
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                            ],
-                          ),
+            return AnimatedCrossFade(
+              firstChild: Center(child: CupertinoActivityIndicator()),
+              secondChild: AnimatedCrossFade(
+                firstChild: Center(child: Text("컬렉션이 없습니다.")),
+                secondChild: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 컬렉션 현황 부분: analytics 데이터를 기반으로 통계 정보 표시
+                      AnalyticsSection(records: model.collectionRecords),
+                      // 일정 간격 추가
+                      SizedBox(height: 16),
+                      // 레코드 목록 (GridView)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.75,
                         ),
-                      );
-                    },
+                        itemCount: model.collectionRecords.length,
+                        itemBuilder: (context, index) {
+                          final record = model.collectionRecords[index];
+                          return GestureDetector(
+                            onTap: () {
+                              // RecordDetailView로 이동 (필요 시 구현)
+                              // Navigator.push(context, CupertinoPageRoute(builder: (_) => RecordDetailView(record: record)));
+                            },
+                            child: Card(
+                              elevation: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // 앨범 커버 이미지: URL이 없으면 placeholder 처리
+                                  Expanded(
+                                    child: record.coverImage.isNotEmpty
+                                        ? Image.network(
+                                            record.coverImage,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                color: Colors.grey,
+                                                child: Icon(Icons.error),
+                                              );
+                                            },
+                                          )
+                                        : Container(
+                                            color: Colors.grey,
+                                            child: Icon(Icons.image),
+                                          ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      record.title,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text(
+                                      record.year.toString(),
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                crossFadeState: model.collectionRecords.isEmpty
+                    ? CrossFadeState.showFirst
+                    : CrossFadeState.showSecond,
+                duration: Duration(milliseconds: 300),
               ),
+              crossFadeState: model.isLoading
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: Duration(milliseconds: 300),
             );
           },
         ),
