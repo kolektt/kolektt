@@ -161,8 +161,7 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
             }),
           ),
         ],
-      )
-          : AnalyticCard(
+      ) : AnalyticCard(
         title: "컬렉션 분석",
         width: cardWidth,
         height: cardHeight,

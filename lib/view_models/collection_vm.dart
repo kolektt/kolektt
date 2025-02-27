@@ -293,23 +293,19 @@ class CollectionViewModel extends ChangeNotifier {
         .select('*, records(*)')
         .eq('user_id', userId.toString());
 
-    if (response is List) {
-      // collectionRecords setter를 통해 데이터 할당
-      collectionRecords = response.map<DiscogsRecord>((item) {
-        final recordJson = item['records'] as Map<String, dynamic>?;
-        if (recordJson != null) {
-          return DiscogsRecord.fromJson(recordJson);
-        } else {
-          debugPrint('Record not found for item: $item');
-          return DiscogsRecord.sampleData[0];
-        }
-      }).toList();
-      _isLoading = false;
-      notifyListeners();
-    } else {
-      print('Unexpected response format: $response');
+    // collectionRecords setter를 통해 데이터 할당
+    collectionRecords = response.map<DiscogsRecord>((item) {
+      final recordJson = item['records'] as Map<String, dynamic>?;
+      if (recordJson != null) {
+        return DiscogsRecord.fromJson(recordJson);
+      } else {
+        debugPrint('Record not found for item: $item');
+        return DiscogsRecord.sampleData[0];
+      }
+    }).toList();
+    _isLoading = false;
+    notifyListeners();
     }
-  }
 
   void analyzeCollection() {
     final records = _collectionRecords;
