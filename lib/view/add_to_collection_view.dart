@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/discogs_record.dart';
+import '../model/discogs/discogs_record.dart';
 import '../view_models/collection_vm.dart';
 
 class AddToCollectionScreen extends StatefulWidget {

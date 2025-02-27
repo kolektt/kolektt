@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../model/discogs_record.dart';
+import '../model/discogs/discogs_record.dart';
 import '../services/discogs_api_service.dart';
 import '../services/recent_search_db.dart';
 import '../view/record_detail_view.dart';

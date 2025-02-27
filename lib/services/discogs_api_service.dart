@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import '../model/discogs_record.dart';
+import '../model/discogs/discogs_record.dart';
 
 class DiscogsApiService {
   static const String baseUrl = 'https://api.discogs.com';

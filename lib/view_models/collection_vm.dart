@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/collection_analytics.dart';
 import '../model/decade_analytics.dart';
-import '../model/discogs_record.dart';
+import '../model/discogs/discogs_record.dart';
 import '../model/genre_analytics.dart';
 import '../model/record.dart';
 import '../services/discogs_api_service.dart';

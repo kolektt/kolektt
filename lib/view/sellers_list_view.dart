@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:kolektt/model/discogs_record.dart';
+import 'package:kolektt/model/discogs/discogs_record.dart';
 import 'package:kolektt/view/record_detail_view.dart';
 
 import '../components/seller_row.dart';

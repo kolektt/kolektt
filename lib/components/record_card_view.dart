@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../model/discogs_record.dart';
+import '../model/discogs/discogs_record.dart';
 
 class RecordCardView extends StatelessWidget {
   final DiscogsRecord record;

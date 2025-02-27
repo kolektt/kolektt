@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
-import '../model/discogs_record.dart';
+import '../model/discogs/discogs_record.dart';
 import '../view_models/record_detail_vm.dart';
 
 // AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
