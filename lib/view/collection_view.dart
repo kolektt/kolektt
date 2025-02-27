@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/view/record_detail_view.dart';
 import 'package:provider/provider.dart';
 
 import '../components/analytics_section.dart';
@@ -79,8 +80,9 @@ class _CollectionViewState extends State<CollectionView> {
                       final record = model.collectionRecords[index];
                       return GestureDetector(
                         onTap: () {
+                          debugPrint("Record tapped: ${record.toJson()}");
                           // RecordDetailView로 이동 (필요 시 구현)
-                          // Navigator.push(context, CupertinoPageRoute(builder: (_) => RecordDetailView(record: record)));
+                          Navigator.push(context, CupertinoPageRoute(builder: (_) => RecordDetailView(record: record)));
                         },
                         child: Card(
                           elevation: 2,

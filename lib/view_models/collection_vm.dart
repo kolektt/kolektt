@@ -293,6 +293,8 @@ class CollectionViewModel extends ChangeNotifier {
         .select('*, records(*)')
         .eq('user_id', userId.toString());
 
+    debugPrint("response: $response");
+
     // collectionRecords setter를 통해 데이터 할당
     collectionRecords = response.map<DiscogsRecord>((item) {
       final recordJson = item['records'] as Map<String, dynamic>?;
@@ -305,7 +307,7 @@ class CollectionViewModel extends ChangeNotifier {
     }).toList();
     _isLoading = false;
     notifyListeners();
-    }
+  }
 
   void analyzeCollection() {
     final records = _collectionRecords;
@@ -338,7 +340,7 @@ class CollectionViewModel extends ChangeNotifier {
     // 3. 연대별 집계 (releaseYear 값 기준)
     Map<String, int> decadeCounts = {};
     for (final record in records) {
-      if (record.year != null && record.year > 0) {
+      if (record.year > 0) {
         int decadeStart = (record.year ~/ 10) * 10;
         String decadeLabel = "${decadeStart}'s";
         decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;

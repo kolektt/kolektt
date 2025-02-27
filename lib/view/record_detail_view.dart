@@ -117,24 +117,21 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                             children: [
                               // 앨범 정보
                               Text(
-                                model.detailedRecord!.title,
+                                model.detailedRecord?.title ?? '알 수 없음',
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Text(
-                                model.detailedRecord!.artists.isNotEmpty
-                                          ? model.detailedRecord!.artists
-                                              .map((artist) => artist.name)
-                                              .join(', ')
-                                          : '알 수 없음',
-                                      style: const TextStyle(
-                                  fontSize: 20,
-                                  color: CupertinoColors.systemGrey,
+                              if (model.detailedRecord != null &&  model.detailedRecord!.artists.isNotEmpty)
+                                Text(
+                                  model.detailedRecord!.artists.first.name,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: CupertinoColors.systemGrey,
+                                  ),
                                 ),
-                              ),
                               const SizedBox(height: 16),
                               // 판매자 목록
                               const Text(
