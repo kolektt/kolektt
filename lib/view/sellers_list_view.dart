@@ -24,8 +24,10 @@ class SellersListView extends StatelessWidget {
             child: SafeArea(
               child: AnimatedCrossFade(
                 firstChild: Center(child: CupertinoActivityIndicator()),
-                secondChild: ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                secondChild: model.salesListing?.length == 0
+                    ? Center(child: Text("판매자가 없어요."))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
                   itemCount: model.salesListing?.length ?? 0,
                   itemBuilder: (context, index) {
                     return Padding(
