@@ -97,7 +97,7 @@ class SearchViewModel extends ChangeNotifier {
 
       // (4) Supabase DB 업서트를 비동기로 호출만 하고, 굳이 `await`하지 않음
       //     => DB 작업이 끝날 때까지 기다리지 않고 즉시 함수 종료
-      updateAllRecordsAsync(results);
+      await updateAllRecordsAsync(results);
 
     } catch (e) {
       // 에러 처리
@@ -109,7 +109,7 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
-  void updateAllRecordsAsync(List<DiscogsRecord> records) {
+  Future<void> updateAllRecordsAsync(List<DiscogsRecord> records) async {
     final supabase = Supabase.instance.client;
 
     // 병렬 실행을 위한 Future 리스트
@@ -117,7 +117,7 @@ class SearchViewModel extends ChangeNotifier {
 
     for (final r in records) {
       futures.add(
-          supabase.from('records').upsert(r.toJson(), onConflict: 'discogs_id')
+          supabase.from('records').upsert(r.toJson())
       );
     }
 

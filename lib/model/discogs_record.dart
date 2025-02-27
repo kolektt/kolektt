@@ -170,9 +170,9 @@ class DiscogsRecord {
   Map<String, dynamic> toJson() {
     return {
       // PostgreSQL `records` 테이블 구조에 맞춤
-      'id': id,  // 테이블에서는 TEXT 형식이므로 필요에 따라 toString() 처리 가능
+      'record_id': id,  // 테이블에서는 TEXT 형식이므로 필요에 따라 toString() 처리 가능
       'title': title,
-      'artist': artists.isNotEmpty ? artists[0].name : '',
+      'artist': artists.isNotEmpty ? artists.join(', ') : '',
       'release_year': year,
       'genre': genres.isNotEmpty ? genres.join(', ') : '',
       'cover_image': coverImage,

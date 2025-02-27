@@ -28,7 +28,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp7GtJWxzXGX1W6C0BWqYoWnKYCoXhs9vlKQNGS2fgE93jtd1x2ELJwyNRTDrgT8CV-uHV9OR146LzI1mMmKXuYs0x4OYjhArvD01rFdI3NDAoQNGw1y-lCQY7ZlyapoGvwAigKo1sstuOGmjDPo1LVQ2hhQVMuv5komb8UyyRAaCgYKAe8SARESFQHGX2Mim1lU6opTR5ReKkWRPvz6cg0182';
+      'ya29.a0AeXRPp5xyrJu9wc9Bt6E5Z_wPdoHVCnL9IOIg7SdGAANp8ORNg68tRRc5QieVjwuGQxtKMFoXPX-LGNO_fklFMMQJV9W9JCBcoa1k0xFMEh7fwyUykDF8DdN-V5k0z445XhatBNs0EjNx9ueQymWGvXkB9t-rSlHOWY5XbNcfUOBQn0aCgYKAUISARESFQHGX2MibKUaAMpW9VsPmt6-II38Pg0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -235,7 +235,7 @@ class CollectionViewModel extends ChangeNotifier {
     try {
       final discogsApi = DiscogsApiService();
       final results = await discogsApi.searchDiscogs(query, type: 'release');
-      await updateAllRecordsAsync(results);
+      updateAllRecordsAsync(results);
       _searchResults = results;
     } catch (e) {
       _errorMessage = 'Discogs 검색 오류: $e';
@@ -268,9 +268,9 @@ class CollectionViewModel extends ChangeNotifier {
     final futures = <Future>[];
 
     for (final r in records) {
-      futures.add(supabase
-          .from('records')
-          .upsert(r.toJson(), onConflict: 'discogs_id'));
+      futures.add(
+          supabase.from('records').upsert(r.toJson())
+      );
     }
 
     await Future.wait(futures)

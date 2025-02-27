@@ -64,7 +64,6 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-
                 // 검색 결과
                 Expanded(child: _buildResultsList(context, vm)),
               ],
