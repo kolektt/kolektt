@@ -1,34 +1,111 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../components/analytic_card.dart';
-import '../components/genre_distribution_view.dart';
 import '../model/collection_analytics.dart';
+import '../model/decade_analytics.dart';
+import '../model/discogs_record.dart';
+import '../model/genre_analytics.dart';
+import '../components/analytic_card.dart';
 import '../view/collectino_summary_view.dart';
+import '../components/genre_distribution_view.dart';
 import 'decade_distribution_view.dart';
 
-// AnalyticsSection
 class AnalyticsSection extends StatefulWidget {
-  final CollectionAnalytics? analytics;
+  // 컬렉션의 DiscogsRecord 리스트를 입력받습니다.
+  final List<DiscogsRecord> records;
 
-  const AnalyticsSection({Key? key, this.analytics}) : super(key: key);
+  const AnalyticsSection({Key? key, required this.records}) : super(key: key);
 
   @override
   _AnalyticsSectionState createState() => _AnalyticsSectionState();
 }
 
 class _AnalyticsSectionState extends State<AnalyticsSection> {
+  late CollectionAnalytics analytics;
   int currentPage = 0;
+  bool hasData = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _analyzeCollection();
+  }
+
+  void _analyzeCollection() {
+    final records = widget.records;
+    int totalRecords = records.length;
+
+    // 1. 장르별 집계 (각 레코드의 첫번째 장르 기준)
+    Map<String, int> genreCounts = {};
+    for (final record in records) {
+      if (record.genres.isNotEmpty) {
+        String genre = record.genres[0];
+        genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
+      }
+    }
+    String mostCollectedGenre = genreCounts.isNotEmpty
+        ? genreCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        : '';
+
+    // 2. 아티스트별 집계 (각 레코드의 첫번째 아티스트 기준)
+    Map<String, int> artistCounts = {};
+    for (final record in records) {
+      if (record.artists.isNotEmpty) {
+        String artist = record.artists[0].name;
+        artistCounts[artist] = (artistCounts[artist] ?? 0) + 1;
+      }
+    }
+    String mostCollectedArtist = artistCounts.isNotEmpty
+        ? artistCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        : '';
+
+    // 3. 연대별 집계 (record.year 기준)
+    Map<String, int> decadeCounts = {};
+    for (final record in records) {
+      if (record.year > 0) {
+        int decadeStart = (record.year ~/ 10) * 10;
+        String decadeLabel = "${decadeStart}'s";
+        decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
+      }
+    }
+
+    // 4. 가장 오래된/최신 레코드 연도 계산
+    int oldestRecord = records.isNotEmpty
+        ? records.map((r) => r.year).reduce((a, b) => a < b ? a : b)
+        : 0;
+    int newestRecord = records.isNotEmpty
+        ? records.map((r) => r.year).reduce((a, b) => a > b ? a : b)
+        : 0;
+
+    // 5. CollectionAnalytics 객체 생성
+    analytics = CollectionAnalytics(
+      totalRecords: totalRecords,
+      mostCollectedGenre: mostCollectedGenre,
+      mostCollectedArtist: mostCollectedArtist,
+      oldestRecord: oldestRecord,
+      newestRecord: newestRecord,
+      genres: genreCounts.entries
+          .map((entry) => GenreAnalytics(name: entry.key, count: entry.value))
+          .toList(),
+      decades: decadeCounts.entries
+          .map((entry) => DecadeAnalytics(decade: entry.key, count: entry.value))
+          .toList(),
+    );
+
+    setState(() {
+      hasData = totalRecords > 0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // 카드의 너비는 화면 너비에서 좌우 여백(16+16)을 뺀 값
+    // 카드 너비: 화면 너비에서 좌우 여백(16*2)을 뺀 값
     final double cardWidth = MediaQuery.of(context).size.width - 32;
     const double cardHeight = 340;
 
     return Padding(
       padding: const EdgeInsets.only(top: 4),
-      child: widget.analytics != null
+      child: hasData
           ? Column(
         children: [
           SizedBox(
@@ -45,21 +122,21 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                   title: "컬렉션 현황",
                   width: cardWidth,
                   height: cardHeight,
-                  content: CollectionSummaryView(analytics: widget.analytics!),
+                  content: CollectionSummaryView(analytics: analytics),
                 ),
-                // 장르 분포 카드
+                // 장르별 분포 카드
                 AnalyticCard(
                   title: "장르별 분포",
                   width: cardWidth,
                   height: cardHeight,
-                  content: GenreDistributionView(genres: widget.analytics!.genres),
+                  content: GenreDistributionView(genres: analytics.genres),
                 ),
                 // 연도별 분포 카드
                 AnalyticCard(
                   title: "연도별 분포",
                   width: cardWidth,
                   height: cardHeight,
-                  content: DecadeDistributionView(decades: widget.analytics!.decades),
+                  content: DecadeDistributionView(decades: analytics.decades),
                 ),
               ],
             ),

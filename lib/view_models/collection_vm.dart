@@ -28,7 +28,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp70-oPhNN1lxbfOwM4zMWIoMClWTmq04NfKudIAIY4fha8JnOOPV02UmDx4KBKeCQojHutWoWoxdR2tPsW0d5gMkn8DXJT_b7bQ4tmJ5ai5RfCWWsKPc6GytDRwItjBCorsoqDbahSoqkx5rIcWxaNxU3jcCi725Fdv8bybrRUaCgYKAYwSARESFQHGX2MienJKq7RH4Scfz3vj4xgjtg0182';
+      'ya29.a0AeXRPp7GtJWxzXGX1W6C0BWqYoWnKYCoXhs9vlKQNGS2fgE93jtd1x2ELJwyNRTDrgT8CV-uHV9OR146LzI1mMmKXuYs0x4OYjhArvD01rFdI3NDAoQNGw1y-lCQY7ZlyapoGvwAigKo1sstuOGmjDPo1LVQ2hhQVMuv5komb8UyyRAaCgYKAe8SARESFQHGX2Mim1lU6opTR5ReKkWRPvz6cg0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -42,6 +42,18 @@ class CollectionViewModel extends ChangeNotifier {
   List<DiscogsRecord> _searchResults = [];
 
   List<DiscogsRecord> get searchResults => _searchResults;
+
+  // Private backing field
+  List<DiscogsRecord> _collectionRecords = [];
+
+  // Public getter
+  List<DiscogsRecord> get collectionRecords => _collectionRecords;
+
+  // Public setter (옵션에 따라 필요 시 정의)
+  set collectionRecords(List<DiscogsRecord> records) {
+    _collectionRecords = records;
+    notifyListeners();
+  }
 
   Future<void> processBarcode(File image) async {
     // 바코드 처리 로직 구현 필요
@@ -264,5 +276,96 @@ class CollectionViewModel extends ChangeNotifier {
     await Future.wait(futures)
         .then((_) => debugPrint('All upserts completed.'))
         .catchError((error) => debugPrint('Some upsert failed: $error'));
+  }
+
+  Future<void> fetchUserCollectionsWithRecords() async {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) {
+      print('User is not logged in.');
+      return;
+    }
+
+    final response = await supabase
+        .from('user_collections')
+        .select('*, records(*)')
+        .eq('user_id', userId.toString());
+
+    if (response is List) {
+      // collectionRecords setter를 통해 데이터 할당
+      collectionRecords = response.map<DiscogsRecord>((item) {
+        final recordJson = item['records'] as Map<String, dynamic>?;
+        if (recordJson != null) {
+          return DiscogsRecord.fromJson(recordJson);
+        } else {
+          debugPrint('Record not found for item: $item');
+          return DiscogsRecord.sampleData[0];
+        }
+      }).toList();
+    } else {
+      print('Unexpected response format: $response');
+    }
+  }
+
+  void analyzeCollection() {
+    final records = _collectionRecords;
+    int totalRecords = records.length;
+
+    // 1. 장르별 집계 (예: 각 레코드의 첫 번째 장르 기준)
+    Map<String, int> genreCounts = {};
+    for (final record in records) {
+      if (record.genres.isNotEmpty) {
+        String genre = record.genres[0];
+        genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
+      }
+    }
+    String mostCollectedGenre = genreCounts.isNotEmpty
+        ? genreCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        : '';
+
+    // 2. 아티스트별 집계 (예: 각 레코드의 첫 번째 아티스트 기준)
+    Map<String, int> artistCounts = {};
+    for (final record in records) {
+      if (record.artists.isNotEmpty) {
+        String artistName = record.artists[0].name;
+        artistCounts[artistName] = (artistCounts[artistName] ?? 0) + 1;
+      }
+    }
+    String mostCollectedArtist = artistCounts.isNotEmpty
+        ? artistCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        : '';
+
+    // 3. 연대별 집계 (releaseYear 값 기준)
+    Map<String, int> decadeCounts = {};
+    for (final record in records) {
+      if (record.year != null && record.year > 0) {
+        int decadeStart = (record.year ~/ 10) * 10;
+        String decadeLabel = "${decadeStart}'s";
+        decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
+      }
+    }
+
+    // 4. 가장 오래된/최신 연도 계산
+    int oldestRecord = records.isNotEmpty
+        ? records.map((r) => r.year ?? 0).reduce((a, b) => a < b ? a : b)
+        : 0;
+    int newestRecord = records.isNotEmpty
+        ? records.map((r) => r.year ?? 0).reduce((a, b) => a > b ? a : b)
+        : 0;
+
+    // 5. CollectionAnalytics 객체 생성 (모델 생성자는 상황에 맞게 정의)
+    analytics = CollectionAnalytics(
+      totalRecords: totalRecords,
+      mostCollectedGenre: mostCollectedGenre,
+      mostCollectedArtist: mostCollectedArtist,
+      oldestRecord: oldestRecord,
+      newestRecord: newestRecord,
+      genres: genreCounts.entries
+          .map((entry) => GenreAnalytics(name: entry.key, count: entry.value))
+          .toList(),
+      decades: decadeCounts.entries
+          .map((entry) => DecadeAnalytics(decade: entry.key, count: entry.value))
+          .toList(),
+    );
+    notifyListeners();
   }
 }

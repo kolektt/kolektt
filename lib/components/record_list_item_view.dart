@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
-import '../model/record.dart';
-import '../view/record_detail_view.dart';
+import '../model/discogs_record.dart';
 
 class RecordListItemView extends StatelessWidget {
-  final Record record;
+  final DiscogsRecord record;
   RecordListItemView({required this.record});
 
   @override
@@ -21,7 +20,7 @@ class RecordListItemView extends StatelessWidget {
       child: Row(
         children: [
           Image.network(
-            record.coverImageURL ?? "https://via.placeholder.com/60",
+            record.images[0].uri,
             width: 60,
             height: 60,
             fit: BoxFit.cover,
@@ -35,19 +34,19 @@ class RecordListItemView extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
-                Text(record.artist,
+                Text(record.artists[0].name,
                     style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
-                Text("₩${record.price}",
-                    style: TextStyle(fontSize: 14)),
+                // Text("₩${record[0].price}",
+                //     style: TextStyle(fontSize: 14)),
               ],
             ),
           ),
-          Icon(
-            record.trending ? CupertinoIcons.arrow_up : CupertinoIcons.arrow_down,
-            color: record.trending ? CupertinoColors.activeGreen : CupertinoColors.destructiveRed,
-          ),
+          // Icon(
+          //   record.trending ? CupertinoIcons.arrow_up : CupertinoIcons.arrow_down,
+          //   color: record.trending ? CupertinoColors.activeGreen : CupertinoColors.destructiveRed,
+          // ),
         ],
       ),
     );
