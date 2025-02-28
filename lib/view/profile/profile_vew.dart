@@ -202,18 +202,16 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
               },
             ),
             SliverToBoxAdapter(
-              child: SafeArea(
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: _isRefreshing ? 0.5 : 1.0,
-                  child: Column(
-                    children: [
-                      _buildProfileHeader(),
-                      _buildStatCards(),
-                      _buildTabMenu(),
-                      _buildTabContent(),
-                    ],
-                  ),
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: _isRefreshing ? 0.5 : 1.0,
+                child: Column(
+                  children: [
+                    _buildProfileHeader(),
+                    _buildStatCards(),
+                    _buildTabMenu(),
+                    _buildTabContent(),
+                  ],
                 ),
               ),
             ),
