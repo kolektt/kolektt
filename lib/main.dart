@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/repository/sale_repository.dart';
 import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view_models/auth_vm.dart';
 import 'package:kolektt/view_models/collection_vm.dart';
 import 'package:kolektt/view_models/home_vm.dart';
+import 'package:kolektt/view_models/sale_vm.dart';
 import 'package:kolektt/view_models/search_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -41,6 +43,7 @@ class KolekttApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
         ChangeNotifierProvider(create: (_) => SearchViewModel()),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => SaleViewModel(saleRepository: SaleRepository())),
       ],
       child: CupertinoApp(
         title: 'Kolektt',

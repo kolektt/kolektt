@@ -67,7 +67,6 @@ class SalesListing {
       'price': price,
       'condition': condition,
       'status': status,
-      // DateTime -> ISO8601 문자열 변환
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'record_id': recordId,

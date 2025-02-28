@@ -8,6 +8,7 @@ import 'package:transparent_image/transparent_image.dart';
 
 import '../../model/local/collection_record.dart';
 import '../../model/supabase/user_collection.dart';
+import '../sale_view.dart';
 
 class CollectionEditPage extends StatefulWidget {
   final CollectionRecord collection;
@@ -240,6 +241,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
             ),
           const SizedBox(height: 16),
           _buildRecordDetailButton(),
+          _buildGoSaleButton(),
         ],
       ),
     );
@@ -289,6 +291,22 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGoSaleButton() {
+    return Center(
+      child: CupertinoButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => SalesView(recordId: widget.collection.record.id),
+            ),
+          );
+        },
+        child: const Text("판매하러가기"),
       ),
     );
   }
