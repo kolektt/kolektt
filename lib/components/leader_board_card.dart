@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../model/leader_board_user.dart';
-import '../view/user_profile_vew.dart';
+import '../view/profile/user_profile_vew.dart';
 
 class LeaderboardCard extends StatelessWidget {
   final LeaderboardUser user;

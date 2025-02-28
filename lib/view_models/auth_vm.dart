@@ -3,8 +3,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../model/supabase/profile.dart';
+
 class AuthViewModel with ChangeNotifier {
   final SupabaseClient supabase = Supabase.instance.client;
+
+  Profiles? _profiles = null;
+  get profiles => _profiles;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -73,6 +78,67 @@ class AuthViewModel with ChangeNotifier {
       await supabase.auth.signOut();
     } catch (e) {
       _errorMessage = '로그아웃 오류: $e';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchProfile() async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // user_id로 프로필 조회
+      final response = await supabase
+          .from('profiles')
+          .select("")
+          .eq('user_id', currentUser!.id)
+          .maybeSingle();
+
+      if (response == null) {
+        throw Exception('프로필 조회 실패: 사용자 정보를 찾을 수 없습니다.');
+      }
+      _profiles = Profiles.fromJson(response);
+      notifyListeners();
+
+      // 프로필 조회 성공
+    } catch (e) {
+      _errorMessage = '프로필 조회 오류: $e';
+      debugPrint('프로필 조회 오류: $e');
+    } finally {
+      debugPrint('프로필 조회 완료');
+      _setLoading(false);
+    }
+  }
+
+  /// 프로필 업데이트 메서드 추가
+  Future<void> updateProfile({String? displayName, String? genre}) async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final userId = currentUser!.id;
+      final updates = {
+        'display_name': displayName,
+        'genre': genre,
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+
+      final response = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('user_id', userId);
+
+      if (response.error != null) {
+        throw Exception(response.error!.message);
+      }
+
+      // 업데이트 후 최신 프로필 정보 다시 불러오기
+      await fetchProfile();
+    } catch (e) {
+      _errorMessage = '프로필 업데이트 오류: $e';
     } finally {
       _setLoading(false);
     }

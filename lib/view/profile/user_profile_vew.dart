@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../model/leader_board_user.dart';
+import '../../model/leader_board_user.dart';
 
 class UserProfileView extends StatelessWidget {
   final LeaderboardUser user;
