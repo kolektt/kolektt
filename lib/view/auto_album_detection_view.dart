@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 // CollectionViewModel에서 recognizeAlbum() 사용 (Google Vision + Discogs)
 import '../view_models/collection_vm.dart';
@@ -112,8 +113,9 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
                 if (record.thumb.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      record.thumb,
+                    child: FadeInImage.memoryNetwork(
+                      placeholder: kTransparentImage, // 투명한 1px GIF를 플레이스홀더로 사용
+                      image: record.thumb,
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
