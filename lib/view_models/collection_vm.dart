@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
+import 'package:kolektt/model/supabase/user_collection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/collection_analytics.dart';
@@ -29,7 +30,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp5fJT8XciBEx_G3AhRsXrC7n5xya-wIWUI6tTMuo3AKZueqijTHXsNFMPAT1mruBs2vPzpogmr_JThpfOj3dJMIZk5VSIwnM-c1kE6IvcZNFFD4N4QFFYKar-Mzjm6WwHpNITP64W3Xjbd0Tw6iMzdOcPIqgJemP6ua5DCPaXoaCgYKAQoSARESFQHGX2MiD81xecwv73su48WKYyGLhg0182';
+      'ya29.a0AeXRPp7RZacHnbj2ORthTijmJy7Skr_zE-YrM7Qn1qUxTduXvbgDOXQ0XuzNHxtgpAFV8OI5wUqUwE8LWCHmJYpwEVsrRGK-UEpHgmWY8mVX58Q3qyNRwiYggLYDTT-Isvf19Crh72vQj9HpVJ_cmcsGZHI1LqrO-I7loce313wf18waCgYKAbASARESFQHGX2MibR2EjAObcFiMNxNCdW39Ig0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -155,11 +156,11 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> removeRecord(CollectionRecord record) async {
     try {
       final response =
-          await supabase.from('user_collections').delete().eq('id', record.id);
+          await supabase.from('user_collections').delete().eq('id', record.user_collection.id);
 
       if (response.error == null) {
         // 로컬 컬렉션에서도 제거
-        _collectionRecords.removeWhere((r) => r.id == record.id);
+        _collectionRecords.removeWhere((r) => r.user_collection.id == record.user_collection.id);
         notifyListeners();
         debugPrint('Record removed successfully.');
       } else {
@@ -167,6 +168,20 @@ class CollectionViewModel extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error in removeRecord: $e');
+    }
+  }
+
+  Future<void> updateRecord(UserCollection record) async {
+    try {
+      final response = await supabase
+          .from('user_collections')
+          .update(record.toJson())
+          .eq('id', record.id)
+          .single();
+
+      debugPrint('Record updated successfully: $response');
+    } catch (e) {
+      debugPrint('Error in updateRecord: $e');
     }
   }
 
@@ -289,7 +304,7 @@ class CollectionViewModel extends ChangeNotifier {
         .select('*, records(*)')
         .eq('user_id', userId.toString());
 
-    debugPrint("DB response: $response");
+    debugPrint("DB response: ${response}");
 
     // response가 List<dynamic>라고 가정
     collectionRecords = (response as List).map<CollectionRecord>((item) {
@@ -303,7 +318,8 @@ class CollectionViewModel extends ChangeNotifier {
         recordJson['id'] = recordId;
         // 예) 추가로 필요한 다른 매핑 작업이 있다면 여기서 수행
         return CollectionRecord(
-            id: id, record: DiscogsRecord.fromJson(recordJson));
+            record: DiscogsRecord.fromJson(recordJson),
+            user_collection: UserCollection.fromJson(item));
       } else {
         debugPrint('Record not found for item: $item');
         // 없을 경우 sampleData에서 첫번째 항목 반환 (또는 적절히 처리)

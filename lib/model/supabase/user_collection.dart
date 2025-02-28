@@ -1,11 +1,11 @@
 class UserCollection {
-  final int id; // 고유 id 추가
+  final String id; // 고유 id 추가
   final String user_id;
   final int record_id;
   final String? condition;
   final String? condition_note;
   final DateTime? purchase_date;
-  final int purchase_price;
+  final double purchase_price;
   final String? notes;
 
   UserCollection({
@@ -34,9 +34,22 @@ class UserCollection {
     );
   }
 
+  toJson() {
+    return {
+      'id': id,
+      'user_id': user_id,
+      'record_id': record_id,
+      'condition': condition,
+      'condition_notes': condition_note,
+      'purchase_date': purchase_date?.toIso8601String(),
+      'purchase_price': purchase_price,
+      'notes': notes,
+    };
+  }
+
   static List<UserCollection> sampleData = [
     UserCollection(
-      id: 1,
+      id: "1",
       user_id: "1",
       record_id: 1,
       condition: "Good",
@@ -46,7 +59,7 @@ class UserCollection {
       notes: "This is a note",
     ),
     UserCollection(
-      id: 2,
+      id: "2",
       user_id: "1",
       record_id: 2,
       condition: "Fair",
@@ -56,7 +69,7 @@ class UserCollection {
       notes: "This is a note",
     ),
     UserCollection(
-      id: 3,
+      id: "3",
       user_id: "1",
       record_id: 3,
       condition: "Poor",

@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kolektt/view/record_detail_view.dart';
+import 'package:kolektt/view/collection/collection_edit_page.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import '../components/analytics_section.dart';
-import '../view_models/collection_vm.dart';
-import 'auto_album_detection_view.dart';
+import '../../components/analytics_section.dart';
+import '../../view_models/collection_vm.dart';
+import '../auto_album_detection_view.dart';
 
 class CollectionView extends StatefulWidget {
   @override
@@ -87,7 +87,15 @@ class _CollectionViewState extends State<CollectionView> {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
-                              builder: (_) => RecordDetailView(record: record.record),
+                              builder: (_) => CollectionEditPage(
+                                collection: record,
+                                onSave: (editedCollection) {
+                                  model.updateRecord(editedCollection).then((_) {
+                                    model.fetchUserCollectionsWithRecords();
+                                    Navigator.pop(context);
+                                  });
+                                },
+                              ),
                             ),
                           );
                         },
@@ -119,6 +127,7 @@ class _CollectionViewState extends State<CollectionView> {
                           );
                           if (confirmed == true) {
                             await Provider.of<CollectionViewModel>(context, listen: false).removeRecord(record);
+                            await Provider.of<CollectionViewModel>(context, listen: false).fetchUserCollectionsWithRecords();
                           }
                         },
                         child: Card(
@@ -166,7 +175,7 @@ class _CollectionViewState extends State<CollectionView> {
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Text(
-                                  record.record.year.toString(),
+                                  "₩ ${record.user_collection.purchase_price.toInt()}",
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),

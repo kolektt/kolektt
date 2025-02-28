@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
-import 'collection_view.dart' as coll;
+import 'collection/collection_view.dart' as coll;
 import 'home/home_view.dart';
 import 'profile_vew.dart';
 

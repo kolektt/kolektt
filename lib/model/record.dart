@@ -48,6 +48,29 @@ class Record {
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
+  factory Record.fromJson(Map<String, dynamic> json) {
+    return Record(
+      id: json['id'],
+      title: json['title'],
+      artist: json['artist'],
+      releaseYear: json['release_year'],
+      genre: json['genre'],
+      coverImageURL: json['coverImage'],
+      catalogNumber: json['catalog_number'],
+      label: json['label'],
+      format: json['format'],
+      country: json['country'],
+      style: json['style'],
+      condition: json['condition'],
+      conditionNotes: json['condition_notes'],
+      notes: json['notes'],
+      price: json['price'],
+      trending: json['trending'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
   static List<Record> sampleData = [
     Record(
       id: "1",

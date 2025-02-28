@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
-import '../components/album_image_view.dart';
-import '../components/metadata_row.dart';
-import '../components/preview_slide_view.dart';
-import '../model/record.dart';
+import '../../components/album_image_view.dart';
+import '../../components/metadata_row.dart';
+import '../../components/preview_slide_view.dart';
+import '../../model/record.dart';
 
 class CollectionRecordDetailView extends StatefulWidget {
   final Record record;

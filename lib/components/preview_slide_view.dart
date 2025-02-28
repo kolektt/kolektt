@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/components/preview_player_view.dart';
 
-import '../view/collection_record_detail_view.dart';
+import '../view/collection/collection_record_detail_view.dart';
 
 class PreviewSlideView extends StatelessWidget {
   final String? url;

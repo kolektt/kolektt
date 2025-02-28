@@ -17,7 +17,6 @@ class AddToCollectionScreen extends StatefulWidget {
 }
 
 class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
-  final TextEditingController _conditionController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
 
@@ -38,49 +37,25 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          height: 250,
-          color: CupertinoColors.systemBackground,
-          child: Column(
-            children: [
-              Container(
-                height: 50,
-                color: CupertinoColors.systemGrey6,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CupertinoButton(
-                      child: Text('취소'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    CupertinoButton(
-                      child: Text('확인'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: CupertinoPicker(
-                  itemExtent: 40,
-                  onSelectedItemChanged: (int index) {
-                    setState(() {
-                      _selectedCondition = _conditionOptions[index];
-                    });
-                  },
-                  children: _conditionOptions.map((condition) {
-                    return Center(
-                      child: Text(
-                        condition,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
+        return CupertinoActionSheet(
+          title: Text('상태 선택'),
+          message: Text('원하는 상태를 선택해주세요.'),
+          actions: _conditionOptions.map((option) {
+            return CupertinoActionSheetAction(
+              child: Text(option),
+              onPressed: () {
+                setState(() {
+                  _selectedCondition = option;
+                });
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+          cancelButton: CupertinoActionSheetAction(
+            child: Text('취소'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
         );
       },
@@ -218,22 +193,62 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
                   height: 50,
                   child: collectionVM.isAdding
                       ? Center(child: CupertinoActivityIndicator())
-                      : CupertinoButton.filled(
+                      : // 추가 버튼 onPressed 부분 수정
+                  CupertinoButton.filled(
                     onPressed: () async {
-                      final condition = _conditionController.text.trim();
+                      final condition = _selectedCondition;
                       final notes = _notesController.text.trim();
-                      final price = double.tryParse(
-                          _priceController.text.trim()) ??
-                          0.0;
+                      final priceText = _priceController.text.trim();
+
+                      // 모든 항목(노트, 가격)이 입력되었는지 확인
+                      if (notes.isEmpty || priceText.isEmpty) {
+                        showCupertinoDialog(
+                          context: context,
+                          builder: (context) {
+                            return CupertinoAlertDialog(
+                              title: Text('입력 오류'),
+                              content: Text('모든 항목을 작성해주세요.'),
+                              actions: [
+                                CupertinoDialogAction(
+                                  child: Text('확인'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        return;
+                      }
+
+                      final price = double.tryParse(priceText) ?? 0.0;
+                      if (price == 0.0) {
+                        showCupertinoDialog(
+                          context: context,
+                          builder: (context) {
+                            return CupertinoAlertDialog(
+                              title: Text('입력 오류'),
+                              content: Text('유효한 가격을 입력해주세요.'),
+                              actions: [
+                                CupertinoDialogAction(
+                                  child: Text('확인'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        return;
+                      }
 
                       await collectionVM.addToCollection(
-                        widget.record,
-                        condition,
-                        notes,
-                        price,
+                        widget.record,  // id
+                        condition,      // condition
+                        notes,          // condition_note
+                        price,          // purchase_price
                       );
 
                       if (collectionVM.errorMessage == null) {
+                        collectionVM.fetchUserCollectionsWithRecords();
                         Navigator.pop(context);
                       }
                     },
@@ -307,7 +322,7 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
                 ),
               SizedBox(height: 4),
               Text(
-                '년도: ${record.year}',
+                '${record.year}년',
                 style: TextStyle(
                   color: CupertinoColors.systemGrey,
                   fontSize: 14,
