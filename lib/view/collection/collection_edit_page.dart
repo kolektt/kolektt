@@ -23,32 +23,30 @@ class CollectionEditPage extends StatefulWidget {
   _CollectionEditPageState createState() => _CollectionEditPageState();
 }
 
-class _CollectionEditPageState extends State<CollectionEditPage>
-    with SingleTickerProviderStateMixin {
+class _CollectionEditPageState extends State<CollectionEditPage> {
   late TextEditingController _conditionNoteController;
   late TextEditingController _purchasePriceController;
   late TextEditingController _notesController;
+
   late String _condition;
   late DateTime? _purchaseDate;
   late bool _isEditing;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
 
   final List<String> _conditionOptions = [
     'Mint',
     'Near Mint',
     'Good',
     'Fair',
-    'Poor'
+    'Poor',
   ];
 
-  // 상태에 따른 색상 매핑
+  /// Color mapping for each condition
   final Map<String, Color> _conditionColors = {
-    'Mint': const Color(0xFF4CAF50), // 녹색
-    'Near Mint': const Color(0xFF8BC34A), // 라이트 그린
-    'Good': const Color(0xFFFFC107), // 노란색
-    'Fair': const Color(0xFFFF9800), // 주황색
-    'Poor': const Color(0xFFF44336), // 빨간색
+    'Mint': Color(0xFF4CAF50),
+    'Near Mint': Color(0xFF8BC34A),
+    'Good': Color(0xFFFFC107),
+    'Fair': Color(0xFFFF9800),
+    'Poor': Color(0xFFF44336),
   };
 
   @override
@@ -58,22 +56,15 @@ class _CollectionEditPageState extends State<CollectionEditPage>
     _condition =
         widget.collection.user_collection.condition ?? _conditionOptions[0];
     _purchaseDate = widget.collection.user_collection.purchase_date;
+
     _conditionNoteController = TextEditingController(
-        text: widget.collection.user_collection.condition_note ?? '');
-    _purchasePriceController = TextEditingController(
-        text: widget.collection.user_collection.purchase_price.toString());
-    _notesController = TextEditingController(
-        text: widget.collection.user_collection.notes ?? '');
-
-    // 애니메이션 컨트롤러 초기화
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
+      text: widget.collection.user_collection.condition_note ?? '',
     );
-
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
+    _purchasePriceController = TextEditingController(
+      text: widget.collection.user_collection.purchase_price?.toString() ?? '',
+    );
+    _notesController = TextEditingController(
+      text: widget.collection.user_collection.notes ?? '',
     );
   }
 
@@ -82,18 +73,12 @@ class _CollectionEditPageState extends State<CollectionEditPage>
     _conditionNoteController.dispose();
     _purchasePriceController.dispose();
     _notesController.dispose();
-    _animationController.dispose();
     super.dispose();
   }
 
   void _toggleEdit() {
     setState(() {
       _isEditing = !_isEditing;
-      if (_isEditing) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
     });
   }
 
@@ -138,30 +123,28 @@ class _CollectionEditPageState extends State<CollectionEditPage>
                       ? const Color(0xFF1E1E1E)
                       : CupertinoColors.systemBackground.color,
                   borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
-                      child: Text('취소',
-                          style: TextStyle(
-                              color: isDark
-                                  ? const Color(0xFFE57373)
-                                  : Colors.red)),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: isDark ? Color(0xFFE57373) : Colors.red,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                     CupertinoButton(
-                      child: Text('확인',
-                          style: TextStyle(
-                              color: isDark
-                                  ? const Color(0xFF64B5F6)
-                                  : Colors.blue)),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      child: Text(
+                        '확인',
+                        style: TextStyle(
+                          color: isDark ? Color(0xFF64B5F6) : Colors.blue,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
@@ -185,10 +168,15 @@ class _CollectionEditPageState extends State<CollectionEditPage>
     );
   }
 
+  // --------------------
+  //   VIEW MODE WIDGETS
+  // --------------------
+
   Widget _buildViewMode() {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     final dateFormat = DateFormat('yyyy년 MM월 dd일');
     final currencyFormat = NumberFormat.currency(symbol: '₩', decimalDigits: 0);
+    final userCollection = widget.collection.user_collection;
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -209,17 +197,16 @@ class _CollectionEditPageState extends State<CollectionEditPage>
           _buildInfoSection(
             title: '레코드 정보',
             children: [
-              _buildInfoItem(
-                  '레코드 ID',
-                  '${widget.collection.user_collection.record_id}',
+              _buildInfoItem('레코드 ID', '${userCollection.record_id}',
                   Icons.perm_identity),
               _buildConditionInfoItem(_condition),
-              if (widget.collection.user_collection.condition_note != null &&
-                  widget.collection.user_collection.condition_note!.isNotEmpty)
+              if (userCollection.condition_note != null &&
+                  userCollection.condition_note!.isNotEmpty)
                 _buildInfoItem(
-                    '상태 참고사항',
-                    widget.collection.user_collection.condition_note!,
-                    Icons.notes),
+                  '상태 참고사항',
+                  userCollection.condition_note!,
+                  Icons.notes,
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -227,86 +214,89 @@ class _CollectionEditPageState extends State<CollectionEditPage>
             title: '구매 정보',
             children: [
               _buildInfoItem(
-                  '구매가',
-                  currencyFormat
-                      .format(widget.collection.user_collection.purchase_price),
-                  Icons.attach_money),
-              if (widget.collection.user_collection.purchase_date != null)
+                '구매가',
+                currencyFormat.format(userCollection.purchase_price),
+                Icons.attach_money,
+              ),
+              if (userCollection.purchase_date != null)
                 _buildInfoItem(
-                    '구매일',
-                    dateFormat.format(
-                        widget.collection.user_collection.purchase_date!),
-                    Icons.calendar_today),
+                  '구매일',
+                  dateFormat.format(userCollection.purchase_date!),
+                  Icons.calendar_today,
+                ),
             ],
           ),
-          if (widget.collection.user_collection.notes != null &&
-              widget.collection.user_collection.notes!.isNotEmpty)
+          if (userCollection.notes != null && userCollection.notes!.isNotEmpty)
             Column(
               children: [
                 const SizedBox(height: 16),
                 _buildInfoSection(
                   title: '메모',
                   children: [
-                    _buildNoteItem(widget.collection.user_collection.notes!),
+                    _buildNoteItem(userCollection.notes!),
                   ],
                 ),
               ],
             ),
-
-          // 레코드 상세 정보 페이지로 이동하는 버튼
-          // 레코드 상세 정보 페이지로 이동하는 버튼 (수정된 부분)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    builder: (context) => RecordDetailView(
-                      record: widget.collection.record,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [const Color(0xFF4A4A4A), const Color(0xFF2A2A2A)]
-                        : [Colors.blueAccent, Colors.lightBlueAccent],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    '레코드 상세 정보 보기',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(height: 16),
+          _buildRecordDetailButton(),
         ],
       ),
     );
   }
 
-  Widget _buildInfoSection(
-      {required String title, required List<Widget> children}) {
+  Widget _buildRecordDetailButton() {
+    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => RecordDetailView(
+              record: widget.collection.record,
+            ),
+          ),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [const Color(0xFF4A4A4A), const Color(0xFF2A2A2A)]
+                  : [Colors.blueAccent, Colors.lightBlueAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              '레코드 상세 정보 보기',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection({
+    required String title,
+    required List<Widget> children,
+  }) {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return Column(
@@ -369,7 +359,7 @@ class _CollectionEditPageState extends State<CollectionEditPage>
 
   Widget _buildConditionInfoItem(String condition) {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-    final Color conditionColor = _conditionColors[condition] ?? Colors.grey;
+    final conditionColor = _conditionColors[condition] ?? Colors.grey;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -427,8 +417,9 @@ class _CollectionEditPageState extends State<CollectionEditPage>
           color: isDark ? const Color(0xFF333333) : Colors.grey[100],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-              color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
-              width: 1),
+            color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
+            width: 1,
+          ),
         ),
         child: Text(
           note,
@@ -440,6 +431,10 @@ class _CollectionEditPageState extends State<CollectionEditPage>
       ),
     );
   }
+
+  // --------------------
+  //   EDIT MODE WIDGETS
+  // --------------------
 
   Widget _buildEditMode() {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
@@ -456,18 +451,16 @@ class _CollectionEditPageState extends State<CollectionEditPage>
             title: '레코드 상태',
             icon: Icons.check_circle,
             child: GestureDetector(
-              onTap: () {
-                _showConditionPicker();
-              },
+              onTap: _showConditionPicker,
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF333333) : Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                      color:
-                          isDark ? const Color(0xFF424242) : Colors.grey[300]!),
+                    color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -486,7 +479,8 @@ class _CollectionEditPageState extends State<CollectionEditPage>
                         Text(
                           _condition,
                           style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black),
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
                         ),
                       ],
                     ),
@@ -515,10 +509,13 @@ class _CollectionEditPageState extends State<CollectionEditPage>
               controller: _purchasePriceController,
               placeholder: '구매 가격',
               keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              prefix: Text('₩',
-                  style: TextStyle(
-                      color: isDark ? const Color(0xFF9E9E9E) : Colors.grey)),
+              const TextInputType.numberWithOptions(decimal: true),
+              prefix: Text(
+                '₩',
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
+                ),
+              ),
             ),
           ),
           _buildFormSection(
@@ -528,13 +525,13 @@ class _CollectionEditPageState extends State<CollectionEditPage>
               onTap: _showDatePicker,
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF333333) : Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                      color:
-                          isDark ? const Color(0xFF424242) : Colors.grey[300]!),
+                    color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -578,23 +575,19 @@ class _CollectionEditPageState extends State<CollectionEditPage>
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          title: Text('상태 선택'),
+          title: const Text('상태 선택'),
           actions: _conditionOptions.map((option) {
             return CupertinoActionSheetAction(
               child: Text(option),
               onPressed: () {
-                setState(() {
-                  _condition = option;
-                });
+                setState(() => _condition = option);
                 Navigator.pop(context);
               },
             );
           }).toList(),
           cancelButton: CupertinoActionSheetAction(
-            child: Text('취소'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            child: const Text('취소'),
+            onPressed: () => Navigator.pop(context),
           ),
         );
       },
@@ -614,7 +607,7 @@ class _CollectionEditPageState extends State<CollectionEditPage>
       controller: controller,
       placeholder: placeholder,
       placeholderStyle:
-          TextStyle(color: isDark ? const Color(0xFF9E9E9E) : Colors.grey),
+      TextStyle(color: isDark ? const Color(0xFF9E9E9E) : Colors.grey),
       style: TextStyle(color: isDark ? Colors.white : Colors.black),
       keyboardType: keyboardType,
       maxLines: maxLines,
@@ -624,7 +617,8 @@ class _CollectionEditPageState extends State<CollectionEditPage>
         color: isDark ? const Color(0xFF333333) : Colors.grey[100],
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-            color: isDark ? const Color(0xFF424242) : Colors.grey[300]!),
+          color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
+        ),
       ),
     );
   }
@@ -641,33 +635,35 @@ class _CollectionEditPageState extends State<CollectionEditPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                if (icon != null) ...[
-                  Icon(
-                    icon,
-                    size: 18,
-                    color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[600],
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[700],
-                    fontSize: 14,
-                  ),
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[600],
                 ),
+                const SizedBox(width: 6),
               ],
-            ),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[700],
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 8),
           child,
         ],
       ),
     );
   }
+
+  // --------------
+  //   PAGE BUILD
+  // --------------
 
   @override
   Widget build(BuildContext context) {
@@ -678,21 +674,21 @@ class _CollectionEditPageState extends State<CollectionEditPage>
     return Theme(
       data: isDark
           ? ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: const Color(0xFF121212),
-              primaryColor: primaryColor,
-              colorScheme: ColorScheme.dark(
-                primary: primaryColor,
-                secondary: secondaryColor,
-              ),
-            )
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        primaryColor: primaryColor,
+        colorScheme: ColorScheme.dark(
+          primary: primaryColor,
+          secondary: secondaryColor,
+        ),
+      )
           : ThemeData.light().copyWith(
-              scaffoldBackgroundColor: Colors.white,
-              primaryColor: primaryColor,
-              colorScheme: ColorScheme.light(
-                primary: primaryColor,
-                secondary: secondaryColor,
-              ),
-            ),
+        scaffoldBackgroundColor: Colors.white,
+        primaryColor: primaryColor,
+        colorScheme: ColorScheme.light(
+          primary: primaryColor,
+          secondary: secondaryColor,
+        ),
+      ),
       child: CupertinoPageScaffold(
         backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
         navigationBar: CupertinoNavigationBar(
@@ -740,6 +736,7 @@ class _CollectionEditPageState extends State<CollectionEditPage>
           child: SingleChildScrollView(
             child: Column(
               children: [
+                // Cover and title area
                 Container(
                   width: MediaQuery.of(context).size.width,
                   height: 220,
@@ -747,16 +744,15 @@ class _CollectionEditPageState extends State<CollectionEditPage>
                   child: Stack(
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: isDark
                                 ? [
-                                    const Color(0xFF1E1E1E),
-                                    const Color(0xFF121212)
-                                  ]
+                              const Color(0xFF1E1E1E),
+                              const Color(0xFF121212)
+                            ]
                                 : [Colors.grey[100]!, Colors.white],
                           ),
                         ),
@@ -766,14 +762,13 @@ class _CollectionEditPageState extends State<CollectionEditPage>
                           width: 180,
                           height: 180,
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF2A2A2A)
-                                : Colors.grey[200],
+                            color:
+                            isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black
-                                    .withOpacity(isDark ? 0.5 : 0.1),
+                                color:
+                                Colors.black.withOpacity(isDark ? 0.5 : 0.1),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -817,15 +812,15 @@ class _CollectionEditPageState extends State<CollectionEditPage>
                                       .withOpacity(0.3),
                                   borderRadius: BorderRadius.circular(15),
                                   border: Border.all(
-                                    color:
-                                        (isDark ? Colors.white : Colors.black)
-                                            .withOpacity(0.1),
+                                    color: (isDark ? Colors.white : Colors.black)
+                                        .withOpacity(0.1),
                                   ),
                                 ),
                                 child: Text(
-                                  '${widget.collection.record.title}',
+                                  widget.collection.record.title,
                                   style: TextStyle(
-                                    color: isDark ? Colors.white : Colors.black,
+                                    color:
+                                    isDark ? Colors.white : Colors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -837,18 +832,14 @@ class _CollectionEditPageState extends State<CollectionEditPage>
                     ],
                   ),
                 ),
-                AnimatedBuilder(
-                  animation: _animation,
-                  builder: (context, child) {
-                    return AnimatedCrossFade(
-                      firstChild: _buildViewMode(),
-                      secondChild: _buildEditMode(),
-                      crossFadeState: _isEditing
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                      duration: const Duration(milliseconds: 300),
-                    );
-                  },
+                // Animated transition between view/edit modes
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 300),
+                  firstChild: _buildViewMode(),
+                  secondChild: _buildEditMode(),
+                  crossFadeState: _isEditing
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
                 ),
                 const SizedBox(height: 20),
               ],
