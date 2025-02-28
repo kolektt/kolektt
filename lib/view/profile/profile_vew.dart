@@ -144,79 +144,81 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
           ],
         ),
       ),
-      child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          CupertinoSliverRefreshControl(
-            key: _refreshKey,
-            onRefresh: _handleRefresh,
-            builder: (
-                BuildContext context,
-                RefreshIndicatorMode refreshState,
-                double pulledExtent,
-                double refreshTriggerPullDistance,
-                double refreshIndicatorExtent,
-                ) {
-              return Center(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    if (refreshState == RefreshIndicatorMode.refresh ||
-                        refreshState == RefreshIndicatorMode.armed)
-                      const CupertinoActivityIndicator(
-                        radius: 14.0,
-                        color: CupertinoColors.activeBlue,
-                      ),
-                    if (refreshState == RefreshIndicatorMode.drag)
-                      Transform.rotate(
-                        angle: (pulledExtent / refreshTriggerPullDistance) *
-                            2 *
-                            3.14159,
-                        child: Icon(
-                          CupertinoIcons.arrow_down,
-                          color: CupertinoColors.systemGrey.withOpacity(
-                            pulledExtent / refreshTriggerPullDistance,
-                          ),
-                          size: 24,
+      child: SafeArea(
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            CupertinoSliverRefreshControl(
+              key: _refreshKey,
+              onRefresh: _handleRefresh,
+              builder: (
+                  BuildContext context,
+                  RefreshIndicatorMode refreshState,
+                  double pulledExtent,
+                  double refreshTriggerPullDistance,
+                  double refreshIndicatorExtent,
+                  ) {
+                return Center(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (refreshState == RefreshIndicatorMode.refresh ||
+                          refreshState == RefreshIndicatorMode.armed)
+                        const CupertinoActivityIndicator(
+                          radius: 14.0,
+                          color: CupertinoColors.activeBlue,
                         ),
-                      ),
-                    if (refreshState == RefreshIndicatorMode.done)
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 1.0, end: 0.0),
-                        duration: const Duration(milliseconds: 300),
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value,
-                            child: const Icon(
-                              CupertinoIcons.check_mark,
-                              color: CupertinoColors.activeGreen,
-                              size: 24,
+                      if (refreshState == RefreshIndicatorMode.drag)
+                        Transform.rotate(
+                          angle: (pulledExtent / refreshTriggerPullDistance) *
+                              2 *
+                              3.14159,
+                          child: Icon(
+                            CupertinoIcons.arrow_down,
+                            color: CupertinoColors.systemGrey.withOpacity(
+                              pulledExtent / refreshTriggerPullDistance,
                             ),
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-          SliverToBoxAdapter(
-            child: SafeArea(
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: _isRefreshing ? 0.5 : 1.0,
-                child: Column(
-                  children: [
-                    _buildProfileHeader(),
-                    _buildStatCards(),
-                    _buildTabMenu(),
-                    _buildTabContent(),
-                  ],
+                            size: 24,
+                          ),
+                        ),
+                      if (refreshState == RefreshIndicatorMode.done)
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 1.0, end: 0.0),
+                          duration: const Duration(milliseconds: 300),
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: const Icon(
+                                CupertinoIcons.check_mark,
+                                color: CupertinoColors.activeGreen,
+                                size: 24,
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            SliverToBoxAdapter(
+              child: SafeArea(
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: _isRefreshing ? 0.5 : 1.0,
+                  child: Column(
+                    children: [
+                      _buildProfileHeader(),
+                      _buildStatCards(),
+                      _buildTabMenu(),
+                      _buildTabContent(),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
