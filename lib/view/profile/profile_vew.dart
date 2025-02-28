@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../main.dart';
 import '../../model/supabase/profile.dart';
+import '../../model/supabase/user_stats.dart';
 import '../../view_models/auth_vm.dart';
 import '../login_view.dart';
 import 'edit_profile_view.dart';
@@ -76,21 +77,16 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
         genre = profileData.genre ?? '장르 정보 없음';
       });
 
-      final statsData = await auth.supabase
-          .from('user_stats')
-          .select()
-          .eq('user_id', user.id)
-          .maybeSingle();
+      await auth.fetchUserStats();
+      UserStats statsData = auth.userStats;
 
-      if (statsData != null) {
-        setState(() {
-          recordCount = statsData['record_count'] ?? 0;
-          followingCount = statsData['following_count'] ?? 0;
-          followerCount = statsData['follower_count'] ?? 0;
-          totalRecords = statsData['total_records'] ?? 0;
-          totalSales = statsData['total_sales'] ?? 0;
-        });
-      }
+      setState(() {
+        recordCount = statsData.record_count;
+        followingCount = statsData.following_count;
+        followerCount = statsData.follower_count;
+        totalRecords = statsData.total_records;
+        totalSales = statsData.total_sales;
+      });
     } catch (e) {
       setState(() {
         errorMessage = '프로필 로드 오류: $e';

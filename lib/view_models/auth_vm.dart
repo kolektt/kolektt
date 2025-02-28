@@ -4,12 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/supabase/profile.dart';
+import '../model/supabase/user_stats.dart';
 
 class AuthViewModel with ChangeNotifier {
   final SupabaseClient supabase = Supabase.instance.client;
 
   Profiles? _profiles = null;
   get profiles => _profiles;
+
+  UserStats? _userStats = null;
+  get userStats => _userStats;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -83,6 +87,7 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
+  // 프로필 조회
   Future<void> fetchProfile() async {
     _setLoading(true);
     _errorMessage = null;
@@ -139,6 +144,31 @@ class AuthViewModel with ChangeNotifier {
       await fetchProfile();
     } catch (e) {
       _errorMessage = '프로필 업데이트 오류: $e';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchUserStats() async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await supabase
+          .from('user_stats')
+          .select()
+          .eq('user_id', currentUser!.id)
+          .maybeSingle();
+
+      if (response == null) {
+        throw Exception('사용자 통계 조회 실패: 사용자 정보를 찾을 수 없습니다.');
+      }
+      // 사용자 통계 조회 성공
+      _userStats = UserStats.fromJson(response);
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = '사용자 통계 조회 오류: $e';
     } finally {
       _setLoading(false);
     }
