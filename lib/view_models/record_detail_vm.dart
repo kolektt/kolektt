@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:kolektt/model/local/sales_listing_with_profile.dart';
+import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/discogs/discogs_record.dart';
@@ -9,8 +11,12 @@ import '../model/supabase/sales_listings.dart';
 import '../repository/sale_repository.dart';
 
 class RecordDetailViewModel extends ChangeNotifier {
-  final SaleRepository saleRepository = SaleRepository();
-  final DiscogsRecord baseRecord;
+  final SaleRepository _saleRepository = SaleRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
+
+  final DiscogsRecord _baseRecord;
+
+  get baseRecord => _baseRecord;
 
   DiscogsRecord? detailedRecord;
   bool isLoading = true;
@@ -20,25 +26,25 @@ class RecordDetailViewModel extends ChangeNotifier {
 
   bool get fetchingSellers => _fetchingSellers;
 
-  List<SalesListing>? _salesListing = [];
+  SalesListingWithProfile? _salesListingWithProfile =
+      SalesListingWithProfile(salesListing: [], profiles: []);
 
-  List<SalesListing>? get salesListing => _salesListing;
+  SalesListingWithProfile? get salesListingWithProfile => _salesListingWithProfile;
 
-  RecordDetailViewModel({required this.baseRecord}) {
+  RecordDetailViewModel({required DiscogsRecord baseRecord})
+      : _baseRecord = baseRecord {
     fetchRecordDetails().then((_) {
-      notifyListeners();
       updateRecordToDb();
+      notifyListeners();
+    }).then((_) {
       getSellers();
+      notifyListeners();
     });
   }
 
   Future<void> fetchRecordDetails() async {
     try {
-      // baseRecord의 id를 사용하여 상세 정보 불러오기
-      // final record = await _apiService.getRecordDetails(baseRecord.id);
-      // detailedRecord = record;
-
-      final uri = Uri.parse(baseRecord.resourceUrl);
+      final uri = Uri.parse(_baseRecord.resourceUrl);
       debugPrint('Fetching Discogs record details: $uri');
       final response = await http.get(
         uri,
@@ -75,7 +81,7 @@ class RecordDetailViewModel extends ChangeNotifier {
     final response = await supabase
         .from('records')
         .update(detailRecordJson)
-        .eq('record_id', baseRecord.id);
+        .eq('record_id', _baseRecord.id);
 
     debugPrint('Record updated: $response');
   }
@@ -86,8 +92,31 @@ class RecordDetailViewModel extends ChangeNotifier {
       _fetchingSellers = true;
       notifyListeners();
 
-      _salesListing = await saleRepository.getSaleByRecordId(detailedRecord!.id);
-      debugPrint('Sellers: $_salesListing');
+      List<SalesListing> _salesListing =
+          await _saleRepository.getSaleByRecordId(detailedRecord!.id);
+      debugPrint("SalesListing: $_salesListing");
+      debugPrint("detailedRecord!.id ${_salesListing[0]}");
+
+      if (_salesListing.isEmpty) {
+        _fetchingSellers = false;
+        notifyListeners();
+        return;
+      }
+
+      // ProfileRepository를 사용하여 판매자 정보 가져오기
+      final sellers_list = _salesListing.map((e) => e.userId).toList();
+      debugPrint("Sellers list: $sellers_list");
+      final sellers =
+          await _profileRepository.getProfilesByUserIds(sellers_list);
+
+      debugPrint("Sellers: $sellers");
+
+      // SalesListing에 판매자 정보 추가한 새 리스트 생성
+      _salesListingWithProfile!.salesListing = _salesListing;
+      _salesListingWithProfile!.profiles = sellers;
+      notifyListeners();
+
+      debugPrint('Sellers item: ${_salesListingWithProfile?.profiles.length}');
     } catch (e) {
       debugPrint('Error getting sellers: $e');
     } finally {

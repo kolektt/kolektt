@@ -149,14 +149,22 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                                 const SizedBox(height: 8),
                                 Column(
                                         children: List.generate(
-                                          model.salesListing!.length,
+                                          model.salesListingWithProfile!
+                                              .salesListing.length,
                                           (index) {
                                             return Padding(
                                       padding: const EdgeInsets.only(bottom: 8.0),
                                       child: SellerRow(
-                                        sellerName: 'DJ Name ${index + 1}',
-                                        price: 50000 + (index * 5000),
-                                        condition: 'VG+',
+                                          sellerName: model
+                                              .salesListingWithProfile!
+                                              .profiles[index]
+                                              .display_name
+                                              .toString(),
+                                          price: 50000 + (index * 5000),
+                                          condition: model
+                                              .salesListingWithProfile!
+                                              .salesListing[index].condition
+                                              .toString(),
                                         onPurchase: () {
                                           _showPurchaseSheet();
                                         },

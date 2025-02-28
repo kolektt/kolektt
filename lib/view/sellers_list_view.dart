@@ -24,18 +24,18 @@ class SellersListView extends StatelessWidget {
             child: SafeArea(
               child: AnimatedCrossFade(
                 firstChild: Center(child: CupertinoActivityIndicator()),
-                secondChild: model.salesListing?.length == 0
+                secondChild: model.salesListingWithProfile!.salesListing.length == 0
                     ? Center(child: Text("판매자가 없어요."))
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
-                  itemCount: model.salesListing?.length ?? 0,
+                  itemCount: model.salesListingWithProfile!.salesListing.length ?? 0,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: SellerRow(
                         sellerName: '판매자 $index',
-                        price: model.salesListing?[index].price.toInt() ?? 0,
-                        condition: model.salesListing![index].condition,
+                        price: model.salesListingWithProfile!.salesListing[index].price.toInt(),
+                        condition: model.salesListingWithProfile!.salesListing[index].condition,
                         onPurchase: () {},
                       ),
                     );

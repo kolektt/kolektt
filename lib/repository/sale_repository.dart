@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/supabase/sales_listings.dart';
@@ -18,6 +19,7 @@ class SaleRepository {
 
   Future<List<SalesListing>> getSaleByRecordId(int recordId) async {
     final response = await supabase.from(tableName).select().eq('record_id', recordId);
+    debugPrint('getSaleByRecordId: $response');
     return response.map((e) => SalesListing.fromJson(e)).toList();
   }
 

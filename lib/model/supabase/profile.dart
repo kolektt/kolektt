@@ -10,7 +10,6 @@ class Profiles {
     this.profile_image,
     this.genre,
   });
-
   factory Profiles.fromJson(Map<String, dynamic> json) {
     return Profiles(
       user_id: json['user_id'],

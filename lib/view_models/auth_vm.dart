@@ -5,9 +5,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/supabase/profile.dart';
 import '../model/supabase/user_stats.dart';
+import '../repository/profile_repository.dart';
 
 class AuthViewModel with ChangeNotifier {
   final SupabaseClient supabase = Supabase.instance.client;
+  final ProfileRepository profileRepository = ProfileRepository();
 
   Profiles? _profiles = null;
   get profiles => _profiles;
@@ -23,7 +25,7 @@ class AuthViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   /// 현재 로그인된 User
-  User? get currentUser => supabase.auth.currentUser;
+  get currentUser async => profileRepository.getCurrentUser();
 
   /// 이메일/비밀번호 로그인
   Future<void> signIn(String email, String password) async {
@@ -95,16 +97,11 @@ class AuthViewModel with ChangeNotifier {
 
     try {
       // user_id로 프로필 조회
-      final response = await supabase
-          .from('profiles')
-          .select("")
-          .eq('user_id', currentUser!.id)
-          .maybeSingle();
+      _profiles = await profileRepository.getCurrentProfile();
 
-      if (response == null) {
+      if (_profiles == null) {
         throw Exception('프로필 조회 실패: 사용자 정보를 찾을 수 없습니다.');
       }
-      _profiles = Profiles.fromJson(response);
       notifyListeners();
 
       // 프로필 조회 성공
@@ -155,17 +152,8 @@ class AuthViewModel with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await supabase
-          .from('user_stats')
-          .select()
-          .eq('user_id', currentUser!.id)
-          .maybeSingle();
-
-      if (response == null) {
-        throw Exception('사용자 통계 조회 실패: 사용자 정보를 찾을 수 없습니다.');
-      }
       // 사용자 통계 조회 성공
-      _userStats = UserStats.fromJson(response);
+      _userStats = await profileRepository.getCurrentUserStats();
       notifyListeners();
     } catch (e) {
       _errorMessage = '사용자 통계 조회 오류: $e';
