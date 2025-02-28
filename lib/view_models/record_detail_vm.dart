@@ -6,8 +6,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/discogs/discogs_record.dart';
 import '../model/supabase/sales_listings.dart';
+import '../repository/sale_repository.dart';
 
 class RecordDetailViewModel extends ChangeNotifier {
+  final SaleRepository saleRepository = SaleRepository();
   final DiscogsRecord baseRecord;
 
   DiscogsRecord? detailedRecord;
@@ -84,13 +86,7 @@ class RecordDetailViewModel extends ChangeNotifier {
       _fetchingSellers = true;
       notifyListeners();
 
-      final supabase = Supabase.instance.client;
-      final sellers = await supabase
-          .from('sales_listings')
-          .select()
-          .eq('record_id', detailedRecord!.id);
-
-      _salesListing = sellers.map((e) => SalesListing.fromJson(e)).toList();
+      _salesListing = await saleRepository.getSaleByRecordId(detailedRecord!.id);
       debugPrint('Sellers: $_salesListing');
     } catch (e) {
       debugPrint('Error getting sellers: $e');
