@@ -43,7 +43,7 @@ class _SalesViewState extends State<SalesView> {
   void _showConditionPicker() {
     showCupertinoModalPopup(
       context: context,
-      builder: (_) {
+      builder: (BuildContext modalContext) {
         return CupertinoActionSheet(
           title: const Text("상품 상태 선택"),
           actions: _conditionOptions.map((option) {
@@ -52,14 +52,14 @@ class _SalesViewState extends State<SalesView> {
                 setState(() {
                   _selectedCondition = option;
                 });
-                Navigator.pop(context);
+                Navigator.pop(modalContext); // modalContext 사용
               },
               child: Text(option),
             );
           }).toList(),
           cancelButton: CupertinoActionSheetAction(
             child: const Text("취소"),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(modalContext), // modalContext 사용
           ),
         );
       },
@@ -110,7 +110,7 @@ class _SalesViewState extends State<SalesView> {
     await saleViewModel.addSale(sale);
 
     // 아래는 성공 메시지 예시입니다.
-    showCupertinoDialog(
+    await showCupertinoDialog(
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
