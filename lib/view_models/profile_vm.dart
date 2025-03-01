@@ -4,16 +4,23 @@ import 'package:kolektt/repository/collection_repository.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:kolektt/repository/sale_repository.dart';
 
+import '../model/local/purhcase_with_profile.dart';
 import '../model/local/sales_listing_with_profile.dart';
+import '../repository/purcahse_respository.dart';
 
 class ProfileViweModel extends ChangeNotifier {
   ProfileRepository _profileRepository = ProfileRepository();
+  PurchaseRepository _purchaseRepository = PurchaseRepository();
   SaleRepository _saleRepository = SaleRepository();
   CollectionRepository _collectionRepository = CollectionRepository();
 
   List<CollectionRecord> _collectionRecords = [];
 
   get collectionRecords => _collectionRecords;
+
+  List<PurchaseWithProfile> _myPurchasesWithProfile = [];
+
+  List<PurchaseWithProfile> get myPurchases => _myPurchasesWithProfile;
 
   SalesListingWithProfile _mySales = SalesListingWithProfile(
     salesListing: [],
@@ -31,8 +38,15 @@ class ProfileViweModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   ProfileViweModel() {
-    fetchUserCollectionsWithRecords();
-    fetchMySales();
+    fetchAll().then((value) {});
+  }
+
+  Future<void> fetchAll() async {
+    await Future.wait([
+      fetchUserCollectionsWithRecords(),
+      fetchMySales(),
+      fetchMyPurchases(),
+    ]);
   }
 
   void setLoading(bool value) {
@@ -111,6 +125,30 @@ class ProfileViweModel extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> fetchMyPurchases() async {
+    setLoading(true);
+
+    try {
+      final userId = _profileRepository.getCurrentUserId();
+      final purchase_history =
+          await _purchaseRepository.getPurchaseByBuyerId(userId);
+      for (final purchase in purchase_history) {
+        final seller_profile =
+            await _profileRepository.getProfileById(purchase.seller_id);
+        final buyer_profile =
+            await _profileRepository.getProfileById(purchase.buyer_id);
+
+        _myPurchasesWithProfile
+            .add(PurchaseWithProfile(purchase, seller_profile, buyer_profile));
+      }
+    } catch (e) {
+      _errorMessage = '구매 목록을 불러오는 중 오류가 발생했습니다: $e';
+      debugPrint('Error fetching my purchases: $e');
+    } finally {
+      setLoading(false);
     }
   }
 }

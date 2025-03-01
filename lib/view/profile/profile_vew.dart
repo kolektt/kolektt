@@ -72,8 +72,8 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
       if (user == null) {
         throw Exception('로그인이 필요합니다.');
       }
+      await profile.fetchAll();
 
-      await auth.fetchProfile();
       final Profiles profileData = auth.profiles;
 
       setState(() {
@@ -81,7 +81,6 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
         genre = profileData.genre ?? '장르 정보 없음';
       });
 
-      await auth.fetchUserStats();
       UserStats statsData = auth.userStats;
 
       setState(() {
@@ -92,8 +91,6 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
         totalSales = statsData.total_sales;
       });
 
-      await profile.fetchUserCollectionsWithRecords();
-      await profile.fetchMySales();
     } catch (e) {
       setState(() {
         errorMessage = '프로필 로드 오류: $e';
@@ -446,9 +443,11 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
 
   Widget _buildTabContent() {
     if (tabs[selectedTab] == "컬렉션") {
-      return _buildCollectionTab();
+      return _buildWidget(_buildCollectionTab());
     } else if (tabs[selectedTab] == "판매중") {
-      return _buildSaleTab();
+      return _buildWidget(_buildSaleTab());
+    } else if (tabs[selectedTab] == "구매") {
+      return _buildWidget(_buildPurchaseTab());
     }
 
     return Container(
@@ -522,12 +521,12 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
           ),
         if (!profile.isLoading && mySales.salesListing.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: List.generate(
-                mySales.salesListing.length,
-                    (index) {
+                mySales.salesListing.length, (index) {
                   return GestureDetector(
+                    onTap: () {},
                     onLongPress: () {
                       _showDeleteDialog(mySales.salesListing[index].id);
                     },
@@ -536,11 +535,8 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                       child: SellerRow(
                         sellerName: mySales.profiles[index].display_name.toString(),
                         price: mySales.salesListing[index].price.toInt(),
-                        condition: mySales.salesListing[index].condition,
-                        onPurchase: () {
-                          // _showPurchaseSheet();
-                        }
-                      )
+                          condition: mySales.salesListing[index].condition,
+                          onPurchase: () {})
                     ),
                   );
                 },
@@ -548,6 +544,70 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildPurchaseTab() {
+    final profile = context.watch<ProfileViweModel>();
+    final myPurchases = profile.myPurchases;
+
+    if (profile.isLoading) {
+      return CupertinoActivityIndicator();
+    }
+
+    if (profile.errorMessage != null) {
+      return Container(
+        height: 300,
+        child: Center(
+          child: Text(
+            profile.errorMessage!,
+            style: const TextStyle(
+              color: CupertinoColors.systemRed,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (myPurchases.isEmpty) {
+      return Container(
+        height: 300,
+        child: Center(
+          child: Text(
+            "구매한 상품이 없어요.",
+            style: const TextStyle(
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: List.generate(myPurchases.length, (index) {
+        return Padding(
+            padding: const EdgeInsets.all(20),
+            child: SellerRow(
+              sellerName: myPurchases[index].seller_profile.display_name.toString(),
+              price: myPurchases[index].purchase.price,
+              condition: "",
+              onPurchase: () {},
+            ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildWidget(Widget child) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemGrey6,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Center(
+        child: child,
+      ),
     );
   }
 
