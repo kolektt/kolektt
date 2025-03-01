@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
 import 'package:kolektt/model/supabase/user_collection.dart';
+import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/collection_analytics.dart';
@@ -13,9 +14,13 @@ import '../model/decade_analytics.dart';
 import '../model/discogs/discogs_record.dart';
 import '../model/genre_analytics.dart';
 import '../model/record.dart';
+import '../repository/collection_repository.dart';
 import '../services/discogs_api_service.dart';
 
 class CollectionViewModel extends ChangeNotifier {
+  CollectionRepository _collectionRepository = CollectionRepository();
+  ProfileRepository _profileRepository = ProfileRepository();
+
   File? selectedImage;
   RecognitionResult? recognitionResult;
   CollectionAnalytics? analytics;
@@ -291,44 +296,18 @@ class CollectionViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final userId = supabase.auth.currentUser?.id;
-    if (userId == null) {
-      debugPrint('User is not logged in.');
+    try {
+      final userId = _profileRepository.getCurrentUserId();
+
+      collectionRecords =
+          await _collectionRepository.fetchUserCollection(userId);
+    } catch (e) {
+      _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
+      debugPrint('Error fetching user collection: $e');
+    } finally {
       _isLoading = false;
-      return;
+      notifyListeners();
     }
-
-    // user_collections와 연결된 records 테이블의 모든 필드를 함께 조회
-    final response = await supabase
-        .from('user_collections')
-        .select('*, records(*)')
-        .eq('user_id', userId.toString());
-
-    debugPrint("DB response: ${response}");
-
-    // response가 List<dynamic>라고 가정
-    collectionRecords = (response as List).map<CollectionRecord>((item) {
-      final id = item['id'];
-      // user_collections 테이블에 저장된 record_id
-      final recordId = item['record_id'];
-      // records 테이블 데이터 (null일 수 있음)
-      final recordJson = item['records'] as Map<String, dynamic>?;
-      if (recordJson != null) {
-        // user_collections의 record_id를 DiscogsRecord의 id로 매핑
-        recordJson['id'] = recordId;
-        // 예) 추가로 필요한 다른 매핑 작업이 있다면 여기서 수행
-        return CollectionRecord(
-            record: DiscogsRecord.fromJson(recordJson),
-            user_collection: UserCollection.fromJson(item));
-      } else {
-        debugPrint('Record not found for item: $item');
-        // 없을 경우 sampleData에서 첫번째 항목 반환 (또는 적절히 처리)
-        return CollectionRecord.sampleData[0];
-      }
-    }).toList();
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   void analyzeCollection() {

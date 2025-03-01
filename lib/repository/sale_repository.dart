@@ -23,11 +23,17 @@ class SaleRepository {
     return response.map((e) => SalesListing.fromJson(e)).toList();
   }
 
+  Future<List<SalesListing>> getSaleBySellerId(String sellerId) async {
+    final response = await supabase.from(tableName).select().eq('user_id', sellerId);
+    debugPrint('getSaleBySellerId: $response');
+    return response.map((e) => SalesListing.fromJson(e)).toList();
+  }
+
   Future<void> addSale(SalesListing sale) async {
     await supabase.from(tableName).upsert(sale.toJson());
   }
 
-  Future<void> deleteSale(int id) async {
+  Future<void> deleteSale(String id) async {
     await supabase.from(tableName).delete().eq('id', id);
   }
 }

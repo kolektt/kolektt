@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/components/seller_row.dart';
+import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:provider/provider.dart';
 
 import '../../main.dart';
@@ -64,6 +66,8 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
 
     try {
       final auth = context.read<AuthViewModel>();
+      final profile = context.read<ProfileViweModel>();
+
       final user = auth.currentUser;
       if (user == null) {
         throw Exception('로그인이 필요합니다.');
@@ -87,6 +91,9 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
         totalRecords = statsData.total_records;
         totalSales = statsData.total_sales;
       });
+
+      await profile.fetchUserCollectionsWithRecords();
+      await profile.fetchMySales();
     } catch (e) {
       setState(() {
         errorMessage = '프로필 로드 오류: $e';
@@ -409,16 +416,13 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                       ? CupertinoColors.white
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: isSelected
-                      ? [
+                  boxShadow: isSelected ? [
                     BoxShadow(
-                      color: CupertinoColors.systemGrey
-                          .withOpacity(0.1),
+                      color: CupertinoColors.systemGrey.withOpacity(0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
-                  ]
-                      : null,
+                  ] : null,
                 ),
                 child: Text(
                   tabs[index],
@@ -441,6 +445,12 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
   }
 
   Widget _buildTabContent() {
+    if (tabs[selectedTab] == "컬렉션") {
+      return _buildCollectionTab();
+    } else if (tabs[selectedTab] == "판매중") {
+      return _buildSaleTab();
+    }
+
     return Container(
       height: 300,
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -465,6 +475,105 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
       height: 30,
       width: 1,
       color: CupertinoColors.systemGrey4,
+    );
+  }
+
+  Widget _buildCollectionTab() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          const Text("컬렉션 탭"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSaleTab() {
+    final profile = context.watch<ProfileViweModel>();
+    final mySales = profile.mySales;
+
+    return Column(
+      children: [
+        if (profile.isLoading)
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: CupertinoActivityIndicator(),
+          ),
+        if (profile.errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              profile.errorMessage!,
+              style: const TextStyle(
+                color: CupertinoColors.systemRed,
+              ),
+            ),
+          ),
+        if (!profile.isLoading && mySales.salesListing.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              "판매중인 상품이 없습니다.",
+              style: const TextStyle(
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+          ),
+        if (!profile.isLoading && mySales.salesListing.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            child: Column(
+              children: List.generate(
+                mySales.salesListing.length,
+                    (index) {
+                  return GestureDetector(
+                    onLongPress: () {
+                      _showDeleteDialog(mySales.salesListing[index].id);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: SellerRow(
+                        sellerName: mySales.profiles[index].display_name.toString(),
+                        price: mySales.salesListing[index].price.toInt(),
+                        condition: mySales.salesListing[index].condition,
+                        onPurchase: () {
+                          // _showPurchaseSheet();
+                        }
+                      )
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _showDeleteDialog(String id) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text("판매 취소"),
+          content: const Text("판매를 취소하시겠습니까?"),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text("취소"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            CupertinoDialogAction(
+              child: const Text("취소하기"),
+              isDestructiveAction: true,
+              onPressed: () {
+                context.read<ProfileViweModel>().deleteSale(id);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

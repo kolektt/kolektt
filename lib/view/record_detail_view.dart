@@ -149,7 +149,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                                 const SizedBox(height: 8),
                                 Column(
                                         children: List.generate(
-                                          model.salesListingWithProfile!.salesListing.length,
+                                          model.salesListingWithProfile!.salesListing.length > 3 ? 3 : model.salesListingWithProfile!.salesListing.length,
                                           (index) {
                                             return Padding(
                                       padding: const EdgeInsets.only(bottom: 8.0),
