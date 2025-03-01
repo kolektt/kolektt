@@ -2,18 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:kolektt/model/discogs/discogs_record.dart';
 import 'package:provider/provider.dart';
 
+import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
 import '../view_models/record_detail_vm.dart';
 
-class SellersListView extends StatelessWidget {
+class SellersListView extends StatefulWidget {
   final DiscogsRecord record;
 
   const SellersListView({Key? key, required this.record}) : super(key: key);
 
   @override
+  State<SellersListView> createState() => _SellersListViewState();
+}
+
+class _SellersListViewState extends State<SellersListView> {
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => RecordDetailViewModel(baseRecord: record),
+      create: (_) => RecordDetailViewModel(baseRecord: widget.record),
       child: Consumer<RecordDetailViewModel>(
         builder: (context, model, Widget? child) {
           return CupertinoPageScaffold(
@@ -28,15 +34,24 @@ class SellersListView extends StatelessWidget {
                     ? Center(child: Text("판매자가 없어요."))
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
-                  itemCount: model.salesListingWithProfile!.salesListing.length ?? 0,
+                  itemCount: model.salesListingWithProfile!.salesListing.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: SellerRow(
-                        sellerName: '판매자 $index',
-                        price: model.salesListingWithProfile!.salesListing[index].price.toInt(),
-                        condition: model.salesListingWithProfile!.salesListing[index].condition,
-                        onPurchase: () {},
+                        sellerName: model
+                            .salesListingWithProfile!
+                            .profiles[index]
+                            .display_name
+                            .toString(),
+                        price: 50000 + (index * 5000),
+                        condition: model
+                            .salesListingWithProfile!
+                            .salesListing[index].condition
+                            .toString(),
+                        onPurchase: () {
+                          _showPurchaseSheet();
+                        },
                       ),
                     );
                   },
@@ -50,6 +65,13 @@ class SellersListView extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  void _showPurchaseSheet() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => PurchaseView(record: widget.record),
     );
   }
 }

@@ -30,7 +30,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp7ZWT6XwDudxLYifBkYJnn0oaOEJtnt1MQTtKHUISmt-aVd6r6MPPPDOzZmie99Xj24IjgMNXIJXhUISt11vYrDHgfU0XF30QcWGRAQGTZoeVF363ntYJGj-3HAQGrmaBxpYjNY7baKIIsifFEVVapjS6KVdBNw8c8MaRUVN9oaCgYKAdkSARESFQHGX2Mi3u7zj3XZI1l9W7FXr1LYwQ0182';
+      'ya29.a0AeXRPp4ymjyWboaRCY2aXbSXhGy__f_R06ftnYsJM_ngsq-5AyD3P1CZqjSU5nCOOX9PGJMzHO9JtLUfyLf6fCqnQRsOa7l0Y6ECq6u16Bs4CTosw3ER78zYLXQX6bjfaXcFIviFHjyNAyWmbJ4yNIzw5OzBcsMr7ZY1QSQnf5nY-rQaCgYKAeISARESFQHGX2Mi-_zRf0tgm0g72O4qeSN4ug0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
