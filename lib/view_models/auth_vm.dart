@@ -89,6 +89,7 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
+  /// 비밀번호 변경
   Future<void> changePassword(String newPassword) async {
     _setLoading(true);
     _errorMessage = null;
@@ -108,7 +109,38 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
-  // 프로필 조회
+  // 계정 삭제
+  Future<void> deleteAccount() async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      // 프로필 데이터 삭제
+      final response = await supabase
+          .from('profiles')
+          .delete()
+          .eq('user_id', userId);
+
+      if (response.error != null) {
+        throw Exception(response.error!.message);
+      }
+
+      // 주의: 클라이언트에서 auth user를 삭제하는 것은 보안상 불가합니다.
+      // 실제 계정 삭제는 서버 사이드에서 별도의 로직을 구현하거나,
+      // 사용자를 휴면 상태로 만드는 등의 방식으로 처리해야 합니다.
+      // 여기서는 간단하게 로그아웃 처리합니다.
+      await supabase.auth.signOut();
+    } catch (e) {
+      _errorMessage = '계정 삭제 오류: $e';
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+    // 프로필 조회
   Future<void> fetchProfile() async {
     _setLoading(true);
     _errorMessage = null;
@@ -140,7 +172,7 @@ class AuthViewModel with ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = currentUser!.id;
+      final userId = profileRepository.getCurrentUserId();
       final updates = {
         'display_name': displayName,
         'genre': genre,
@@ -160,6 +192,7 @@ class AuthViewModel with ChangeNotifier {
       await fetchProfile();
     } catch (e) {
       _errorMessage = '프로필 업데이트 오류: $e';
+      debugPrint('프로필 업데이트 오류: $e');
     } finally {
       _setLoading(false);
     }
