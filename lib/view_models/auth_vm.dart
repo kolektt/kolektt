@@ -1,5 +1,7 @@
 // auth_view_model.dart
 
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,7 +14,7 @@ class AuthViewModel with ChangeNotifier {
   final ProfileRepository profileRepository = ProfileRepository();
 
   Profiles? _profiles = null;
-  get profiles => _profiles;
+  Profiles? get profiles => _profiles;
 
   UserStats? _userStats = null;
   get userStats => _userStats;
@@ -195,6 +197,52 @@ class AuthViewModel with ChangeNotifier {
       debugPrint('프로필 업데이트 오류: $e');
     } finally {
       _setLoading(false);
+    }
+  }
+
+  /// 프로필 사진 업데이트 메서드 추가
+  Future<void> updateProfilePicture(File imageFile) async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final userId = profileRepository.getCurrentUserId();
+      final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.png';
+
+      // Supabase storage에 이미지 업로드 (버킷 이름은 'avatars'로 가정)
+      final String fullPath = await supabase.storage.from('avatars').upload(
+        fileName,
+        imageFile,
+        fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+      );
+      debugPrint('Uploaded file: $fullPath');
+
+      // 업로드한 파일의 공개 URL 가져오기
+      final publicUrl = supabase.storage.from('avatars').getPublicUrl(fileName);
+      debugPrint('Public URL: $publicUrl');
+
+      // 프로필 업데이트 (avatar_url 필드를 업데이트한다고 가정)
+      final updates = {
+        'profile_image': publicUrl,
+      };
+
+      final updateResponse = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('user_id', userId);
+      if (updateResponse.error != null) {
+        throw Exception(updateResponse.error!.message);
+      }
+
+      // 최신 프로필 정보 다시 불러오기
+      await fetchProfile();
+    } catch (e) {
+      _errorMessage = '프로필 사진 업데이트 오류: $e';
+      debugPrint(_errorMessage);
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
   }
 

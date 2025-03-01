@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
 import '../../view_models/auth_vm.dart';
 import 'chage_password_view.dart';
 import 'delete_account_view.dart';
@@ -60,6 +64,41 @@ class _EditProfileViewState extends State<EditProfileView> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  // 프로필 사진 선택 및 업데이트 로직
+  Future<void> _pickProfileImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      // 갤러리에서 이미지 선택
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        final File imageFile = File(image.path);
+        final auth = context.read<AuthViewModel>();
+        await auth.updateProfilePicture(imageFile);
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = '프로필 사진 업데이트 실패: $e';
+      });
+
+      // Show alert dialog with error message
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text("프로필 사진 업데이트 오류"),
+            content: const Text("프로필 사진을 업데이트하는 중 오류가 발생했습니다. 다시 시도해주세요."),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text("확인"),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -159,9 +198,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              onPressed: () {
-                                // 프로필 사진 변경 로직
-                              },
+                              onPressed: _pickProfileImage, // 이미지 선택 및 업데이트 호출
                             ),
                           ],
                         ),

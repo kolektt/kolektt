@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/components/seller_row.dart';
-import 'package:kolektt/view/collection/collection_view.dart';
 import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../../components/collection_grid_item.dart';
 import '../../main.dart';
@@ -78,7 +78,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
       }
       await profile.fetchAll();
 
-      final Profiles profileData = auth.profiles;
+      final Profiles profileData = auth.profiles!;
 
       setState(() {
         displayName = profileData.display_name ?? '익명';
@@ -230,6 +230,11 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
   }
 
   Widget _buildProfileHeader() {
+    final profile_image =
+        context
+            .watch<AuthViewModel>()
+            .profiles
+            ?.profile_image;
     return Container(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -253,7 +258,26 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
             ),
             child: CircleAvatar(
               backgroundColor: CupertinoColors.systemGrey.withOpacity(0.1),
-              child: Icon(
+              child: profile_image != null
+                  ? ClipOval(
+                child: FadeInImage.memoryNetwork(
+                  placeholder: kTransparentImage,
+                  image: profile_image,
+                  fit: BoxFit.cover,
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 50,
+                      height: 50,
+                      color: CupertinoColors.systemGrey5,
+                      child: const Icon(
+                        CupertinoIcons.person_alt_circle,
+                        color: CupertinoColors.systemGrey2,
+                      ),
+                    );
+                  },
+                ),
+              )
+                  : Icon(
                 CupertinoIcons.person_alt_circle,
                 size: 70,
                 color: primaryColor,
