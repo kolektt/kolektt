@@ -1,14 +1,14 @@
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kolektt/view/record_detail_view.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../../model/local/collection_record.dart';
 import '../../model/supabase/user_collection.dart';
+import '../record_detail_view.dart';
 import '../sale_view.dart';
+
 
 class CollectionEditPage extends StatefulWidget {
   final CollectionRecord collection;
@@ -28,10 +28,14 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
   late TextEditingController _conditionNoteController;
   late TextEditingController _purchasePriceController;
   late TextEditingController _notesController;
+  late TextEditingController _newTagController; // 새 태그 입력용 컨트롤러
 
   late String _condition;
   late DateTime? _purchaseDate;
   late bool _isEditing;
+
+  // 편집 시 태그 목록을 관리할 리스트
+  late List<String> _tagList;
 
   final List<String> _conditionOptions = [
     'Mint',
@@ -41,32 +45,34 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
     'Poor',
   ];
 
-  /// Color mapping for each condition
+  /// 각 상태에 따른 색상 매핑
   final Map<String, Color> _conditionColors = {
-    'Mint': Color(0xFF4CAF50),
-    'Near Mint': Color(0xFF8BC34A),
-    'Good': Color(0xFFFFC107),
-    'Fair': Color(0xFFFF9800),
-    'Poor': Color(0xFFF44336),
+    'Mint': const Color(0xFF4CAF50),
+    'Near Mint': const Color(0xFF8BC34A),
+    'Good': const Color(0xFFFFC107),
+    'Fair': const Color(0xFFFF9800),
+    'Poor': const Color(0xFFF44336),
   };
 
   @override
   void initState() {
     super.initState();
     _isEditing = false;
-    _condition =
-        widget.collection.user_collection.condition ?? _conditionOptions[0];
+    _condition = widget.collection.user_collection.condition ?? _conditionOptions[0];
     _purchaseDate = widget.collection.user_collection.purchase_date;
 
     _conditionNoteController = TextEditingController(
       text: widget.collection.user_collection.condition_note ?? '',
     );
     _purchasePriceController = TextEditingController(
-      text: widget.collection.user_collection.purchase_price?.toString() ?? '',
+      text: widget.collection.user_collection.purchase_price.toString(),
     );
     _notesController = TextEditingController(
       text: widget.collection.user_collection.notes ?? '',
     );
+    // 기존 tags를 복사 (null이면 빈 리스트)
+    _tagList = List<String>.from(widget.collection.user_collection.tags ?? []);
+    _newTagController = TextEditingController();
   }
 
   @override
@@ -74,6 +80,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
     _conditionNoteController.dispose();
     _purchasePriceController.dispose();
     _notesController.dispose();
+    _newTagController.dispose();
     super.dispose();
   }
 
@@ -96,6 +103,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
       purchase_price: double.tryParse(_purchasePriceController.text) ??
           widget.collection.user_collection.purchase_price,
       notes: _notesController.text.isEmpty ? "" : _notesController.text,
+      tags: _tagList,
     );
 
     widget.onSave(editedCollection);
@@ -133,7 +141,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
                       child: Text(
                         '취소',
                         style: TextStyle(
-                          color: isDark ? Color(0xFFE57373) : Colors.red,
+                          color: isDark ? const Color(0xFFE57373) : Colors.red,
                         ),
                       ),
                       onPressed: () => Navigator.of(context).pop(),
@@ -142,7 +150,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
                       child: Text(
                         '확인',
                         style: TextStyle(
-                          color: isDark ? Color(0xFF64B5F6) : Colors.blue,
+                          color: isDark ? const Color(0xFF64B5F6) : Colors.blue,
                         ),
                       ),
                       onPressed: () => Navigator.of(context).pop(),
@@ -170,9 +178,8 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
   }
 
   // --------------------
-  //   VIEW MODE WIDGETS
+  //   VIEW MODE 위젯
   // --------------------
-
   Widget _buildViewMode() {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     final dateFormat = DateFormat('yyyy년 MM월 dd일');
@@ -198,8 +205,8 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
           _buildInfoSection(
             title: '레코드 정보',
             children: [
-              _buildInfoItem('레코드 ID', '${userCollection.record_id}',
-                  Icons.perm_identity),
+              _buildInfoItem(
+                  '레코드 ID', '${userCollection.record_id}', Icons.perm_identity),
               _buildConditionInfoItem(_condition),
               if (userCollection.condition_note != null &&
                   userCollection.condition_note!.isNotEmpty)
@@ -239,6 +246,17 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
                 ),
               ],
             ),
+          // 태그가 있다면 Container로 표시
+          if (userCollection.tags != null && userCollection.tags!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Wrap(
+                spacing: 8,
+                children: userCollection.tags!.map((tag) {
+                  return _buildTagDisplay(tag);
+                }).toList(),
+              ),
+            ),
           const SizedBox(height: 16),
           _buildRecordDetailButton(),
           _buildGoSaleButton(),
@@ -247,66 +265,324 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
     );
   }
 
-  Widget _buildRecordDetailButton() {
+  // 태그를 보여주기 위한 위젯 (Chip 대신 Container 사용)
+  Widget _buildTagDisplay(String tag) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.shade200,
+      ),
+      child: Text(
+        tag,
+        style: const TextStyle(fontSize: 14),
+      ),
+    );
+  }
+
+  void _showConditionPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: const Text('상태 선택'),
+          actions: _conditionOptions.map((option) {
+            return CupertinoActionSheetAction(
+              child: Text(option),
+              onPressed: () {
+                setState(() => _condition = option);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text('취소'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        );
+      },
+    );
+  }
+
+  // --------------------
+  //   EDIT MODE 위젯 (태그 입력 및 동적 처리)
+  // --------------------
+  Widget _buildEditMode() {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GestureDetector(
-        onTap: () => Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => RecordDetailView(
-              record: widget.collection.record,
-            ),
-          ),
-        ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDark
-                  ? [const Color(0xFF4A4A4A), const Color(0xFF2A2A2A)]
-                  : [Colors.blueAccent, Colors.lightBlueAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          _buildFormSection(
+            title: '레코드 상태',
+            icon: Icons.check_circle,
+            child: GestureDetector(
+              onTap: _showConditionPicker,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF333333) : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: _conditionColors[_condition] ?? Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _condition,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Icon(
+                      CupertinoIcons.chevron_down,
+                      color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
+                      size: 16,
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-          child: Center(
-            child: Text(
-              '레코드 상세 정보 보기',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
+          _buildFormSection(
+            title: '상태 참고사항',
+            icon: Icons.notes,
+            child: _buildTextField(
+              controller: _conditionNoteController,
+              placeholder: '상태에 대한 추가 설명',
+            ),
+          ),
+          _buildFormSection(
+            title: '구매가',
+            icon: Icons.attach_money,
+            child: _buildTextField(
+              controller: _purchasePriceController,
+              placeholder: '구매 가격',
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              prefix: Text(
+                '₩',
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
+                ),
               ),
             ),
           ),
+          _buildFormSection(
+            title: '구매일',
+            icon: Icons.calendar_today,
+            child: GestureDetector(
+              onTap: _showDatePicker,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF333333) : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _purchaseDate != null
+                          ? DateFormat('yyyy년 MM월 dd일').format(_purchaseDate!)
+                          : '날짜 선택',
+                      style: TextStyle(
+                        color: _purchaseDate != null
+                            ? (isDark ? Colors.white : Colors.black)
+                            : (isDark ? const Color(0xFF9E9E9E) : Colors.grey),
+                      ),
+                    ),
+                    Icon(
+                      CupertinoIcons.calendar,
+                      color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          _buildFormSection(
+            title: '메모',
+            icon: Icons.edit_note,
+            child: _buildTextField(
+              controller: _notesController,
+              placeholder: '추가 메모',
+              maxLines: 4,
+            ),
+          ),
+          // 태그 입력 섹션 (동적 처리)
+          _buildFormSection(
+            title: '태그',
+            icon: Icons.label,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 현재 태그들을 Container 형태로 보여줌 (삭제 버튼 포함)
+                if (_tagList.isNotEmpty)
+                  Wrap(
+                    spacing: 8,
+                    children: _tagList.map((tag) {
+                      return _buildEditableTag(tag);
+                    }).toList(),
+                  ),
+                const SizedBox(height: 8),
+                // 새로운 태그 입력 필드와 추가 버튼
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _newTagController,
+                        placeholder: '새 태그 입력',
+                      ),
+                    ),
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: const Text('추가'),
+                      onPressed: () {
+                        final newTag = _newTagController.text.trim();
+                        if (newTag.isNotEmpty && !_tagList.contains(newTag)) {
+                          setState(() {
+                            _tagList.add(newTag);
+                          });
+                          _newTagController.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 태그를 편집 모드에서 보여주는 위젯 (Chip 대신 Container 사용)
+  Widget _buildEditableTag(String tag) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            tag,
+            style: const TextStyle(fontSize: 14),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _tagList.remove(tag);
+              });
+            },
+            child: const Icon(
+              Icons.close,
+              size: 16,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --------------------
+  //   공통 위젯 메서드
+  // --------------------
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String placeholder,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    Widget? prefix,
+  }) {
+    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    return CupertinoTextField(
+      controller: controller,
+      placeholder: placeholder,
+      placeholderStyle:
+      TextStyle(color: isDark ? const Color(0xFF9E9E9E) : Colors.grey),
+      style: TextStyle(color: isDark ? Colors.white : Colors.black),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      prefix: prefix,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF333333) : Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
         ),
       ),
     );
   }
 
-  Widget _buildGoSaleButton() {
-    return Center(
-      child: CupertinoButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (_) => SalesView(recordId: widget.collection.record.id),
-            ),
-          );
-        },
-        child: const Text("판매하러가기"),
+  Widget _buildFormSection({
+    required String title,
+    required Widget child,
+    IconData? icon,
+  }) {
+    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[600],
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                title,
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[700],
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          child,
+        ],
       ),
     );
   }
@@ -450,239 +726,73 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
     );
   }
 
-  // --------------------
-  //   EDIT MODE WIDGETS
-  // --------------------
-
-  Widget _buildEditMode() {
+  Widget _buildRecordDetailButton() {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          _buildFormSection(
-            title: '레코드 상태',
-            icon: Icons.check_circle,
-            child: GestureDetector(
-              onTap: _showConditionPicker,
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF333333) : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: _conditionColors[_condition] ?? Colors.grey,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _condition,
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Icon(
-                      CupertinoIcons.chevron_down,
-                      color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
-                      size: 16,
-                    ),
-                  ],
-                ),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => RecordDetailView(
+              record: widget.collection.record,
+            ),
+          ),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [const Color(0xFF4A4A4A), const Color(0xFF2A2A2A)]
+                  : [Colors.blueAccent, Colors.lightBlueAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              '레코드 상세 정보 보기',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
               ),
             ),
           ),
-          _buildFormSection(
-            title: '상태 참고사항',
-            icon: Icons.notes,
-            child: _buildTextField(
-              controller: _conditionNoteController,
-              placeholder: '상태에 대한 추가 설명',
-            ),
-          ),
-          _buildFormSection(
-            title: '구매가',
-            icon: Icons.attach_money,
-            child: _buildTextField(
-              controller: _purchasePriceController,
-              placeholder: '구매 가격',
-              keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
-              prefix: Text(
-                '₩',
-                style: TextStyle(
-                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
-                ),
-              ),
-            ),
-          ),
-          _buildFormSection(
-            title: '구매일',
-            icon: Icons.calendar_today,
-            child: GestureDetector(
-              onTap: _showDatePicker,
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF333333) : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _purchaseDate != null
-                          ? DateFormat('yyyy년 MM월 dd일').format(_purchaseDate!)
-                          : '날짜 선택',
-                      style: TextStyle(
-                        color: _purchaseDate != null
-                            ? (isDark ? Colors.white : Colors.black)
-                            : (isDark ? const Color(0xFF9E9E9E) : Colors.grey),
-                      ),
-                    ),
-                    Icon(
-                      CupertinoIcons.calendar,
-                      color: isDark ? const Color(0xFF9E9E9E) : Colors.grey,
-                      size: 16,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          _buildFormSection(
-            title: '메모',
-            icon: Icons.edit_note,
-            child: _buildTextField(
-              controller: _notesController,
-              placeholder: '추가 메모',
-              maxLines: 4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showConditionPicker() {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoActionSheet(
-          title: const Text('상태 선택'),
-          actions: _conditionOptions.map((option) {
-            return CupertinoActionSheetAction(
-              child: Text(option),
-              onPressed: () {
-                setState(() => _condition = option);
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
-          cancelButton: CupertinoActionSheetAction(
-            child: const Text('취소'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String placeholder,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-    Widget? prefix,
-  }) {
-    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-
-    return CupertinoTextField(
-      controller: controller,
-      placeholder: placeholder,
-      placeholderStyle:
-      TextStyle(color: isDark ? const Color(0xFF9E9E9E) : Colors.grey),
-      style: TextStyle(color: isDark ? Colors.white : Colors.black),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      prefix: prefix,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF333333) : Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isDark ? const Color(0xFF424242) : Colors.grey[300]!,
         ),
       ),
     );
   }
 
-  Widget _buildFormSection({
-    required String title,
-    required Widget child,
-    IconData? icon,
-  }) {
-    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 18,
-                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[600],
-                ),
-                const SizedBox(width: 6),
-              ],
-              Text(
-                title,
-                style: TextStyle(
-                  color: isDark ? const Color(0xFF9E9E9E) : Colors.grey[700],
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          child,
-        ],
+  Widget _buildGoSaleButton() {
+    return Center(
+      child: CupertinoButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => SalesView(recordId: widget.collection.record.id),
+            ),
+          );
+        },
+        child: const Text("판매하러가기"),
       ),
     );
   }
 
-  // --------------
+  // --------------------
   //   PAGE BUILD
-  // --------------
-
+  // --------------------
   @override
   Widget build(BuildContext context) {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
@@ -767,10 +877,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: isDark
-                                ? [
-                              const Color(0xFF1E1E1E),
-                              const Color(0xFF121212)
-                            ]
+                                ? [const Color(0xFF1E1E1E), const Color(0xFF121212)]
                                 : [Colors.grey[100]!, Colors.white],
                           ),
                         ),
@@ -780,13 +887,11 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
                           width: 180,
                           height: 180,
                           decoration: BoxDecoration(
-                            color:
-                            isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
+                            color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color:
-                                Colors.black.withOpacity(isDark ? 0.5 : 0.1),
+                                color: Colors.black.withOpacity(isDark ? 0.5 : 0.1),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -837,8 +942,7 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
                                 child: Text(
                                   widget.collection.record.title,
                                   style: TextStyle(
-                                    color:
-                                    isDark ? Colors.white : Colors.black,
+                                    color: isDark ? Colors.white : Colors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
