@@ -1,13 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/components/seller_row.dart';
+import 'package:kolektt/view/collection/collection_view.dart';
 import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:provider/provider.dart';
 
+import '../../components/collection_grid_item.dart';
 import '../../main.dart';
+import '../../model/local/collection_record.dart';
 import '../../model/supabase/profile.dart';
 import '../../model/supabase/user_stats.dart';
 import '../../view_models/auth_vm.dart';
+import '../../view_models/collection_vm.dart';
 import '../login_view.dart';
 import 'edit_profile_view.dart';
 
@@ -478,12 +482,27 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
   }
 
   Widget _buildCollectionTab() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          const Text("컬렉션 탭"),
-        ],
+    final model = context.watch<CollectionViewModel>();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.75,
+        ),
+        itemCount: model.collectionRecords.length,
+        itemBuilder: (context, index) {
+          CollectionRecord record = model.collectionRecords[index];
+          record.record.resourceUrl =
+          "https://api.discogs.com/releases/${record.record.id}";
+          return buildGridItem(context, record, model);
+        },
       ),
     );
   }
@@ -521,7 +540,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
           ),
         if (!profile.isLoading && mySales.salesListing.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: List.generate(
                 mySales.salesListing.length, (index) {
