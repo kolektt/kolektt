@@ -89,6 +89,25 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
+  Future<void> changePassword(String newPassword) async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Supabase Flutter 버전에 따라 아래 구문이 달라질 수 있습니다.
+      final response = await supabase.auth.updateUser(
+        // 예시: 최신 버전에서는 UserAttributes 사용
+        UserAttributes(password: newPassword),
+      );
+    } catch (e) {
+      _errorMessage = "비밀번호 변경 오류: $e";
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // 프로필 조회
   Future<void> fetchProfile() async {
     _setLoading(true);

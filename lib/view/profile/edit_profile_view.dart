@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../view_models/auth_vm.dart';
+import 'chage_password_view.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({Key? key}) : super(key: key);
@@ -142,6 +143,21 @@ class _EditProfileViewState extends State<EditProfileView> {
                             ),
                           ],
                         ),
+                      ),
+
+                      // EditProfileView.dart 내 적절한 위치에 버튼 추가 (예: 저장 버튼 아래)
+                      const SizedBox(height: 16),
+                      SizedBox(
+                          width: double.infinity,
+                          child: CupertinoButton(
+                            child: const Text("비밀번호 변경"),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(builder: (_) => const ChangePasswordView()),
+                              );
+                            },
+                          ),
                       ),
 
                       if (_errorMessage != null) ...[
