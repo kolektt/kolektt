@@ -71,12 +71,15 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
     try {
       final auth = context.read<AuthViewModel>();
       final profile = context.read<ProfileViweModel>();
+      final collection = context.read<CollectionViewModel>();
 
       final user = auth.currentUser;
       if (user == null) {
         throw Exception('로그인이 필요합니다.');
       }
+      await auth.fetchCurrentUser();
       await profile.fetchAll();
+      await collection.fetchUserCollectionsWithRecords();
 
       final Profiles profileData = auth.profiles!;
 
@@ -138,6 +141,10 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
               padding: EdgeInsets.zero,
               child: const Icon(CupertinoIcons.pencil),
               onPressed: () {
+                if (isLoadingProfile) {
+                  return;
+                }
+
                 Navigator.push(
                   context,
                   CupertinoPageRoute(

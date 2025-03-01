@@ -37,16 +37,25 @@ class ProfileViweModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  String? _userId;
+
   ProfileViweModel() {
-    fetchAll().then((value) {});
+    fetchAll();
   }
 
   Future<void> fetchAll() async {
+    _userId = _profileRepository.getCurrentUserId();
+    if (_userId == null) {
+      _errorMessage = '사용자 정보를 찾을 수 없습니다.';
+      notifyListeners();
+      return;
+    }
     await Future.wait([
       fetchUserCollectionsWithRecords(),
       fetchMySales(),
       fetchMyPurchases(),
     ]);
+    notifyListeners();
   }
 
   void setLoading(bool value) {
@@ -75,10 +84,8 @@ class ProfileViweModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = _profileRepository.getCurrentUserId();
-
       _collectionRecords =
-          await _collectionRepository.fetchUserCollection(userId);
+          await _collectionRepository.fetchUserCollection(_userId!);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
       debugPrint('Error fetching user collection: $e');
@@ -93,8 +100,7 @@ class ProfileViweModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = _profileRepository.getCurrentUserId();
-      _mySales.salesListing = await _saleRepository.getSaleBySellerId(userId);
+      _mySales.salesListing = await _saleRepository.getSaleBySellerId(_userId!);
 
       // _mySales.salesListing 갯수 만큼 myProfile을 추가
       final myProfile = await _profileRepository.getCurrentProfile();
@@ -132,9 +138,8 @@ class ProfileViweModel extends ChangeNotifier {
     setLoading(true);
 
     try {
-      final userId = _profileRepository.getCurrentUserId();
       final purchase_history =
-          await _purchaseRepository.getPurchaseByBuyerId(userId);
+          await _purchaseRepository.getPurchaseByBuyerId(_userId!);
       for (final purchase in purchase_history) {
         final seller_profile =
             await _profileRepository.getProfileById(purchase.seller_id);

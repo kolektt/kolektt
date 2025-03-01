@@ -29,6 +29,18 @@ class AuthViewModel with ChangeNotifier {
   /// 현재 로그인된 User
   get currentUser async => profileRepository.getCurrentUser();
 
+  Future<void> fetchCurrentUser() async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    await Future.wait([
+      fetchProfile(),
+      fetchUserStats(),
+    ]);
+    notifyListeners();
+  }
+
   /// 이메일/비밀번호 로그인
   Future<void> signIn(String email, String password) async {
     _setLoading(true);
