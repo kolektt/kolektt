@@ -35,7 +35,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
   static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp7ztBMgi9kezxmBS6JOEldawTsFCjnjvZzF9FE2SEwKhQiDLWJdFxBcPXd2c5zmM0do-GDhnH4Qj8NJGJunX8pDLkQFzP1Lx-gMnMwOxyvZYGjFSy-jboSZ9rcpNjuwQzzRzBw2qgEWBHRb0GqVAVNt_aK-1t4B22gJRrYlWxYaCgYKAUQSARESFQHGX2MiQgkT3KFaFghi0THqT6x2RQ0182';
+      'ya29.a0AeXRPp4FOM_-xutxkoWHdaX7pmBiGEi8ptKPZQ4RdzCOZVIg-gm4yNKacCgVCAQ6iV2LJYJ6JSXRn1EqxjCgEl9249ef-zh4pjrOsA9esjxq7M8txHYlQ4H8KWaQPJISWU3SazP1EPUbDbddbCkjqbp_lhWLoYq-6iAG64OJ_bVRoFQaCgYKAfESARESFQHGX2MiIeugxZDcF7MlBUmLCbve8g0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
@@ -118,9 +118,9 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> addToCollection(
     DiscogsRecord record,
     String condition,
-    String conditionNotes,
     double purchasePrice,
-  ) async {
+      DateTime purchaseDate,
+      List<String> _tagList) async {
     _isAdding = true;
     _errorMessage = null;
     notifyListeners();
@@ -135,9 +135,10 @@ class CollectionViewModel extends ChangeNotifier {
       final insertData = {
         'record_id': record.id.toInt(),
         'condition': condition,
-        'condition_notes': conditionNotes,
         'purchase_price': purchasePrice,
         'notes': record.notes ?? '', // DiscogsRecord notes
+        'purchase_date': purchaseDate.toIso8601String(),
+        'tags': _tagList,
       };
 
       try {
