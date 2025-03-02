@@ -3,7 +3,7 @@ class DiscogsRecord {
   final String title;
   final String artist;
   final int releaseYear;
-  final String resourceUrl;
+  String resourceUrl;
   final List<dynamic> artists;
   final String notes;
   final String genre;
@@ -36,4 +36,26 @@ class DiscogsRecord {
     required this.artist,
     required this.releaseYear,
   });
+
+  static List<DiscogsRecord> sampleData = [
+    DiscogsRecord(
+      id: 1,
+      title: 'Sample Record',
+      resourceUrl: 'https://www.discogs.com/release/1',
+      artists: [],
+      notes: '',
+      genre: '',
+      coverImage: '',
+      catalogNumber: '',
+      label: '',
+      format: '',
+      country: '',
+      style: '',
+      condition: '',
+      conditionNotes: '',
+      recordId: 1,
+      artist: '',
+      releaseYear: 2021,
+    )
+  ];
 }

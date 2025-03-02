@@ -9,6 +9,7 @@ import 'package:kolektt/model/supabase/user_collection.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/models/discogs_search_response.dart';
 import '../domain/entities/discogs_record.dart';
 import '../domain/repositories/discogs_repository.dart';
 import '../domain/usecases/search_and_upsert_discogs_records.dart';
@@ -49,9 +50,9 @@ class CollectionViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  List<DiscogsRecord> _searchResults = [];
+  List<DiscogsSearchItem> _searchResults = [];
 
-  List<DiscogsRecord> get searchResults => _searchResults;
+  List<DiscogsSearchItem> get searchResults => _searchResults;
 
   // Private backing field
   List<CollectionRecord> _collectionRecords = [];
@@ -118,8 +119,7 @@ class CollectionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addToCollection(
-    DiscogsRecord record,
+  Future<void> addToCollection(DiscogsSearchItem record,
     String condition,
     double purchasePrice,
       DateTime purchaseDate,
@@ -139,7 +139,7 @@ class CollectionViewModel extends ChangeNotifier {
         'record_id': record.id.toInt(),
         'condition': condition,
         'purchase_price': purchasePrice,
-        'notes': record.notes ?? '', // DiscogsRecord notes
+        // 'notes': record.notes ?? '', // DiscogsRecord notes
         'purchase_date': purchaseDate.toIso8601String(),
         'tags': _tagList,
       };
@@ -265,8 +265,9 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addDiscogsRecordToDB(DiscogsRecord record) async {
+  Future<void> addDiscogsRecordToDB(DiscogsSearchItem record) async {
     try {
+      // TODO: DiscogsRecord → Record 변환
       // Supabase insert
       // final response = await supabase
       //     .from('records')
@@ -310,8 +311,8 @@ class CollectionViewModel extends ChangeNotifier {
     // 1. 장르별 집계 (예: 각 레코드의 첫 번째 장르 기준)
     Map<String, int> genreCounts = {};
     for (final record in records) {
-      if (record.record.genres.isNotEmpty) {
-        String genre = record.record.genres[0];
+      if (record.record.genre.isNotEmpty) {
+        String genre = record.record.genre;
         genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
       }
     }
@@ -334,8 +335,8 @@ class CollectionViewModel extends ChangeNotifier {
     // 3. 연대별 집계 (releaseYear 값 기준)
     Map<String, int> decadeCounts = {};
     for (final record in records) {
-      if (record.record.year > 0) {
-        int decadeStart = (record.record.year ~/ 10) * 10;
+      if (record.record.releaseYear > 0) {
+        int decadeStart = (record.record.releaseYear ~/ 10) * 10;
         String decadeLabel = "${decadeStart}'s";
         decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
       }
@@ -343,10 +344,14 @@ class CollectionViewModel extends ChangeNotifier {
 
     // 4. 가장 오래된/최신 연도 계산
     int oldestRecord = records.isNotEmpty
-        ? records.map((r) => r.record.year ?? 0).reduce((a, b) => a < b ? a : b)
+        ? records
+            .map((r) => r.record.releaseYear)
+            .reduce((a, b) => a < b ? a : b)
         : 0;
     int newestRecord = records.isNotEmpty
-        ? records.map((r) => r.record.year ?? 0).reduce((a, b) => a > b ? a : b)
+        ? records
+            .map((r) => r.record.releaseYear)
+            .reduce((a, b) => a > b ? a : b)
         : 0;
 
     // 5. CollectionAnalytics 객체 생성 (모델 생성자는 상황에 맞게 정의)

@@ -39,8 +39,8 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
     // 1. 장르별 집계 (각 레코드의 첫번째 장르 기준)
     Map<String, int> genreCounts = {};
     for (final record in records) {
-      if (record.record.genres.isNotEmpty) {
-        String genre = record.record.genres[0];
+      if (record.record.genre.isNotEmpty) {
+        String genre = record.record.genre;
         genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
       }
     }
@@ -60,11 +60,11 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
         ? artistCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
         : '';
 
-    // 3. 연대별 집계 (record.year 기준)
+    // 3. 연대별 집계 (record.releaseYear 기준)
     Map<String, int> decadeCounts = {};
     for (final record in records) {
-      if (record.record.year > 0) {
-        int decadeStart = (record.record.year ~/ 10) * 10;
+      if (record.record.releaseYear > 0) {
+        int decadeStart = (record.record.releaseYear ~/ 10) * 10;
         String decadeLabel = "${decadeStart}'s";
         decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
       }
@@ -72,10 +72,10 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
 
     // 4. 가장 오래된/최신 레코드 연도 계산
     int oldestRecord = records.isNotEmpty
-        ? records.map((r) => r.record.year).reduce((a, b) => a < b ? a : b)
+        ? records.map((r) => r.record.releaseYear).reduce((a, b) => a < b ? a : b)
         : 0;
     int newestRecord = records.isNotEmpty
-        ? records.map((r) => r.record.year).reduce((a, b) => a > b ? a : b)
+        ? records.map((r) => r.record.releaseYear).reduce((a, b) => a > b ? a : b)
         : 0;
 
     // 5. CollectionAnalytics 객체 생성

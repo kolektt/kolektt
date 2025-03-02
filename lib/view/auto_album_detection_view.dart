@@ -138,8 +138,6 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
                     children: [
                       Text(record.title,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
-                      if (record.artists.isNotEmpty)
-                        Text(record.artists[0].name),
                     ],
                   ),
                 ),

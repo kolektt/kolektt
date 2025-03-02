@@ -4,6 +4,7 @@ import '../../domain/entities/discogs_record.dart';
 import '../../domain/repositories/discogs_repository.dart';
 import '../../domain/value_objects/criteria.dart';
 import '../datasources/discogs_remote_data_source.dart';
+import '../models/discogs_search_response.dart';
 
 class DiscogsRepositoryImpl implements DiscogsRepository {
   final DiscogsRemoteDataSource remoteDataSource;
@@ -12,13 +13,34 @@ class DiscogsRepositoryImpl implements DiscogsRepository {
   DiscogsRepositoryImpl({required this.remoteDataSource, required this.supabase});
 
   @override
-  Future<List<DiscogsRecord>> searchDiscogs(String query, {String? type}) async {
+  Future<List<DiscogsSearchItem>> searchDiscogs(String query, {String? type}) async {
     return await remoteDataSource.searchDiscogs(query, type: type);
   }
 
   @override
   Future<DiscogsRecord> getReleaseById(int releaseId) async {
-    return await remoteDataSource.getReleaseById(releaseId);
+    final domainRecord = await remoteDataSource.getReleaseById(releaseId);
+    // DiscogsRecord 엔티티로 변환
+    final record = DiscogsRecord(
+      id: domainRecord.id,
+      title: domainRecord.title,
+      artist: domainRecord.artists.join(", "),
+      releaseYear: domainRecord.year,
+      resourceUrl: domainRecord.resourceUrl,
+      artists: domainRecord.artists,
+      notes: domainRecord.notes,
+      genre: domainRecord.genres.join(", "),
+      coverImage: domainRecord.images[0].uri,
+      catalogNumber: "domainRecord.catalogNumber",  // TODO: catalogNumber가 없는 경우 처리 필요
+      label: domainRecord.labels.join(", "),
+      format: domainRecord.formats.join(", "),
+      country: domainRecord.country,
+      style: domainRecord.styles.join(", "),
+      condition: "domainRecord.condition",  // TODO: condition이 없는 경우 처리 필요
+      conditionNotes: "domainRecord.conditionNotes",  // TODO: conditionNotes가 없는 경우 처리 필요
+      recordId: domainRecord.id,
+    );
+    return record;
   }
 
   @override

@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
+import '../data/datasources/discogs_remote_data_source.dart';
+import '../data/repositories/discogs_repository_impl.dart';
 import '../domain/entities/discogs_record.dart';
 import '../view_models/record_detail_vm.dart';
 
@@ -19,7 +22,12 @@ class _SellersListViewState extends State<SellersListView> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => RecordDetailViewModel(baseRecord: widget.record),
+      create: (_) => RecordDetailViewModel(
+          recordResourceUrl: widget.record.resourceUrl,
+          discogsRepository: DiscogsRepositoryImpl(
+              remoteDataSource: DiscogsRemoteDataSource(),
+              supabase: Supabase.instance.client)
+      ),
       child: Consumer<RecordDetailViewModel>(
         builder: (context, model, Widget? child) {
           return CupertinoPageScaffold(

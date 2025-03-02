@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:kolektt/data/models/discogs_search_response.dart';
 import 'package:provider/provider.dart';
 
 import '../domain/entities/discogs_record.dart';
 import '../view_models/collection_vm.dart';
 
 class AddToCollectionScreen extends StatefulWidget {
-  final DiscogsRecord record;
+  final DiscogsSearchItem record;
 
   const AddToCollectionScreen({
     Key? key,
@@ -460,7 +461,7 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
     );
   }
 
-  Widget _buildRecordInfo(DiscogsRecord record) {
+  Widget _buildRecordInfo(DiscogsSearchItem record) {
     return Row(
       children: [
         ClipRRect(
@@ -498,17 +499,9 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              if (record.artists.isNotEmpty)
-                Text(
-                  record.artists[0].name,
-                  style: const TextStyle(
-                    color: CupertinoColors.systemGrey,
-                    fontSize: 14,
-                  ),
-                ),
               const SizedBox(height: 4),
               Text(
-                '${record.releaseYear}년',
+                '${record.year}년',
                 style: const TextStyle(
                   color: CupertinoColors.systemGrey,
                   fontSize: 14,

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:kolektt/domain/entities/search_term.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/models/discogs_search_response.dart';
 import '../domain/entities/discogs_record.dart';
 import '../domain/repositories/recent_search_repository.dart';
 import '../domain/usecases/search_and_upsert_discogs_records.dart';
@@ -19,7 +20,7 @@ class SearchViewModel extends ChangeNotifier {
 
   String selectedGenre = '전체';
   SortOption sortOption = SortOption.latest;
-  List<DiscogsRecord> results = [];
+  List<DiscogsSearchItem> results = [];
   bool isLoading = false;
   String? errorMessage;
   List<SearchTerm> _recentSearchTerms = [];
@@ -222,7 +223,7 @@ class SearchViewModel extends ChangeNotifier {
     }
   }
 
-  void onRecordSelected(DiscogsRecord record, BuildContext context) {
+  void onRecordSelected(DiscogsSearchItem record, BuildContext context) {
     Navigator.of(context).push(
       CupertinoPageRoute(
         builder: (context) => RecordDetailView(record: record),

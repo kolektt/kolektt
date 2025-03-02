@@ -73,8 +73,7 @@ class _CollectionViewState extends State<CollectionView> {
                     itemCount: model.collectionRecords.length,
                     itemBuilder: (context, index) {
                       CollectionRecord record = model.collectionRecords[index];
-                      record.record.resourceUrl =
-                      "https://api.discogs.com/releases/${record.record.id}";
+                      record.record.resourceUrl = "https://api.discogs.com/releases/${record.record.id}";
                       return buildGridItem(context, record, model);
                     },
                   ),

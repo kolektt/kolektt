@@ -61,144 +61,155 @@ class PaginationUrls {
 }
 
 class DiscogsSearchItem {
-  // 주로 검색 결과에서 내려오는 필드들
-  final String? country;
-  final String? year; // 어떤 경우는 int로 내려오지만, 문자열일 수도 있음
+  final String country;
+  final String? year;
   final List<String> format;
   final List<String> label;
-  final String? type; // release, master, artist 등
+  final String type;
   final List<String> genre;
   final List<String> style;
-  final int? id; // 검색결과에는 int일 수도, string일 수도 있으니 주의
+  final int id;
   final List<String> barcode;
-  final int? masterId;
+  final int masterId;
   final String? masterUrl;
-  final String? uri;
-  final String? catno;
-  final String? title;
-  final String? thumb; // 썸네일
-  final String? coverImage; // 전체 표지
-  final String? resourceUrl;
-
-  // community, format_quantity, formats 등도 검색 시 종종 내려옴
-  final DiscogsSearchCommunity? community;
-  final int? formatQuantity;
-  final List<DiscogsFormatShort> formats;
+  final String uri;
+  final String catno;
+  final String title;
+  final String thumb;
+  final String coverImage;
+  final String resourceUrl;
+  final Community community;
+  final int formatQuantity;
+  final List<DiscogsFormat> formats;
 
   DiscogsSearchItem({
-    this.country,
+    required this.country,
     this.year,
-    this.format = const [],
-    this.label = const [],
-    this.type,
-    this.genre = const [],
-    this.style = const [],
-    this.id,
-    this.barcode = const [],
-    this.masterId,
+    required this.format,
+    required this.label,
+    required this.type,
+    required this.genre,
+    required this.style,
+    required this.id,
+    required this.barcode,
+    required this.masterId,
     this.masterUrl,
-    this.uri,
-    this.catno,
-    this.title,
-    this.thumb,
-    this.coverImage,
-    this.resourceUrl,
-    this.community,
-    this.formatQuantity,
-    this.formats = const [],
+    required this.uri,
+    required this.catno,
+    required this.title,
+    required this.thumb,
+    required this.coverImage,
+    required this.resourceUrl,
+    required this.community,
+    required this.formatQuantity,
+    required this.formats,
   });
 
   factory DiscogsSearchItem.fromJson(Map<String, dynamic> json) {
     return DiscogsSearchItem(
-      country: json['country']?.toString(),
-      year: json['year']?.toString(),
-      format: (json['format'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
-      label: (json['label'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
-      type: json['type']?.toString(),
-      genre: (json['genre'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
-      style: (json['style'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
-      id: json['id'] is int
-          ? json['id']
-          : int.tryParse(json['id']?.toString() ?? ''),
-      barcode: (json['barcode'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
-      masterId: json['master_id'] is int
-          ? json['master_id']
-          : int.tryParse(json['master_id']?.toString() ?? ''),
-      masterUrl: json['master_url']?.toString(),
-      uri: json['uri']?.toString(),
-      catno: json['catno']?.toString(),
-      title: json['title']?.toString(),
-      thumb: json['thumb']?.toString(),
-      coverImage: json['cover_image']?.toString(),
-      resourceUrl: json['resource_url']?.toString(),
-      community: json['community'] != null
-          ? DiscogsSearchCommunity.fromJson(json['community'])
-          : null,
-      formatQuantity: json['format_quantity'] is int
-          ? json['format_quantity']
-          : int.tryParse(json['format_quantity']?.toString() ?? ''),
-      formats: (json['formats'] as List<dynamic>?)
-          ?.map((e) => DiscogsFormatShort.fromJson(e))
-          .toList() ??
-          [],
+      country: json['country'],
+      year: json['year'],
+      format: List<String>.from(json['format']),
+      label: List<String>.from(json['label']),
+      type: json['type'],
+      genre: List<String>.from(json['genre']),
+      style: List<String>.from(json['style']),
+      id: json['id'],
+      barcode: List<String>.from(json['barcode']),
+      masterId: json['master_id'],
+      masterUrl: json['master_url'],
+      uri: json['uri'],
+      catno: json['catno'],
+      title: json['title'],
+      thumb: json['thumb'],
+      coverImage: json['cover_image'],
+      resourceUrl: json['resource_url'],
+      community: Community.fromJson(json['community']),
+      formatQuantity: json['format_quantity'],
+      formats: (json['formats'] as List)
+          .map((item) => DiscogsFormat.fromJson(item))
+          .toList(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'country': country,
+      'year': year,
+      'format': format,
+      'label': label,
+      'type': type,
+      'genre': genre,
+      'style': style,
+      'id': id,
+      'barcode': barcode,
+      'master_id': masterId,
+      'master_url': masterUrl,
+      'uri': uri,
+      'catno': catno,
+      'title': title,
+      'thumb': thumb,
+      'cover_image': coverImage,
+      'resource_url': resourceUrl,
+      'community': community.toJson(),
+      'format_quantity': formatQuantity,
+      'formats': formats.map((f) => f.toJson()).toList(),
+    };
   }
 }
 
-class DiscogsSearchCommunity {
+class Community {
   final int want;
   final int have;
 
-  DiscogsSearchCommunity({
+  Community({
     required this.want,
     required this.have,
   });
 
-  factory DiscogsSearchCommunity.fromJson(Map<String, dynamic> json) {
-    return DiscogsSearchCommunity(
-      want: json['want'] ?? 0,
-      have: json['have'] ?? 0,
+  factory Community.fromJson(Map<String, dynamic> json) {
+    return Community(
+      want: json['want'],
+      have: json['have'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'want': want,
+      'have': have,
+    };
   }
 }
 
-class DiscogsFormatShort {
+class DiscogsFormat {
   final String name;
   final String qty;
-  final List<String> descriptions;
   final String? text;
+  final List<String> descriptions;
 
-  DiscogsFormatShort({
+  DiscogsFormat({
     required this.name,
     required this.qty,
-    required this.descriptions,
     this.text,
+    required this.descriptions,
   });
 
-  factory DiscogsFormatShort.fromJson(Map<String, dynamic> json) {
-    return DiscogsFormatShort(
-      name: json['name'] ?? '',
-      qty: json['qty'] ?? '',
-      descriptions: (json['descriptions'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
-      text: json['text'],
+  factory DiscogsFormat.fromJson(Map<String, dynamic> json) {
+    return DiscogsFormat(
+      name: json['name'],
+      qty: json['qty'],
+      text: json['text'], // text might be null if not provided
+      descriptions: List<String>.from(json['descriptions']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'qty': qty,
+      'text': text,
+      'descriptions': descriptions,
+    };
   }
 }

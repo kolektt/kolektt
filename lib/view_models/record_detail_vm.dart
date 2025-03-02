@@ -1,22 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
+import 'package:kolektt/domain/repositories/discogs_repository.dart';
 import 'package:kolektt/model/local/sales_listing_with_profile.dart';
 import 'package:kolektt/repository/profile_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../data/models/discogs_record.dart';
+import '../domain/entities/discogs_record.dart';
 import '../model/supabase/sales_listings.dart';
 import '../repository/sale_repository.dart';
 
 class RecordDetailViewModel extends ChangeNotifier {
+  final DiscogsRepository discogsRepository;
   final SaleRepository _saleRepository = SaleRepository();
   final ProfileRepository _profileRepository = ProfileRepository();
 
-  final DiscogsRecord _baseRecord;
-
-  get baseRecord => _baseRecord;
+  final String recordResourceUrl;
 
   DiscogsRecord? detailedRecord;
   bool isLoading = true;
@@ -31,9 +27,9 @@ class RecordDetailViewModel extends ChangeNotifier {
 
   SalesListingWithProfile? get salesListingWithProfile => _salesListingWithProfile;
 
-  RecordDetailViewModel({required DiscogsRecord baseRecord})
-      : _baseRecord = baseRecord {
-    fetchRecordDetails().then((_) {
+  RecordDetailViewModel(
+      {required this.recordResourceUrl, required this.discogsRepository}) {
+    fetchRecordDetails(int.parse(recordResourceUrl.split("/").last)).then((_) {
       updateRecordToDb();
       notifyListeners();
     }).then((_) {
@@ -42,20 +38,10 @@ class RecordDetailViewModel extends ChangeNotifier {
     });
   }
 
-  Future<void> fetchRecordDetails() async {
+  Future<void> fetchRecordDetails(int id) async {
     try {
-      final uri = Uri.parse(_baseRecord.resourceUrl);
-      debugPrint('Fetching Discogs record details: $uri');
-      final response = await http.get(
-        uri,
-        headers: {
-          'User-Agent': 'MyDiscogsApp/1.0',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      final Map<String, dynamic> data = jsonDecode(response.body);
-      detailedRecord = DiscogsRecord.fromJson(data);
+      detailedRecord = await discogsRepository.getReleaseById(id);
+      debugPrint('Detailed record: $detailedRecord');
       notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
@@ -66,24 +52,25 @@ class RecordDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> updateRecordToDb() async {
-    final supabase = Supabase.instance.client;
-
-    if (detailedRecord == null) return;
-    // 전체 JSON 생성
-    final detailRecordJson = detailedRecord!.toJson();
-
-    // cover_image와 format 키 제거
-    detailRecordJson.remove('cover_image');
-    detailRecordJson.remove('format');
-
-    debugPrint('Updating record (without cover_image and format): $detailRecordJson');
-
-    final response = await supabase
-        .from('records')
-        .update(detailRecordJson)
-        .eq('record_id', _baseRecord.id);
-
-    debugPrint('Record updated: $response');
+    // TODO: Supabase로 업데이트하는 로직 추가
+    // final supabase = Supabase.instance.client;
+    //
+    // if (detailedRecord == null) return;
+    // // 전체 JSON 생성
+    // final detailRecordJson = detailedRecord!.toJson();
+    //
+    // // cover_image와 format 키 제거
+    // detailRecordJson.remove('cover_image');
+    // detailRecordJson.remove('format');
+    //
+    // debugPrint('Updating record (without cover_image and format): $detailRecordJson');
+    //
+    // final response = await supabase
+    //     .from('records')
+    //     .update(detailRecordJson)
+    //     .eq('record_id', _baseRecord.id);
+    //
+    // debugPrint('Record updated: $response');
   }
 
   Future<void> getSellers() async {

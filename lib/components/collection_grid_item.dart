@@ -11,7 +11,7 @@ Widget buildGridItem(
     context, CollectionRecord record, CollectionViewModel model) {
   return GestureDetector(
     onTap: () {
-      debugPrint("Record tapped: ${record.record.toJson()}");
+      // debugPrint("Record tapped: ${record.record.toJson()}");
       Navigator.push(
         context,
         CupertinoPageRoute(

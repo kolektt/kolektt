@@ -732,13 +732,13 @@ class _CollectionEditPageState extends State<CollectionEditPage> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: GestureDetector(
-        onTap: () => Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => RecordDetailView(
-              record: widget.collection.record,
-            ),
-          ),
-        ),
+        // onTap: () => Navigator.of(context).push(
+        //   CupertinoPageRoute(
+        //     builder: (context) => RecordDetailView(
+        //       record: widget.collection.record,
+        //     ),
+        //   ),
+        // ),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           decoration: BoxDecoration(

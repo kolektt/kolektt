@@ -1,11 +1,13 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/data/datasources/discogs_remote_data_source.dart';
+import 'package:kolektt/data/repositories/discogs_repository_impl.dart';
 import 'package:kolektt/view/sellers_list_view.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
-import '../domain/entities/discogs_record.dart';
+import '../data/models/discogs_search_response.dart';
 import '../view_models/record_detail_vm.dart';
 
 // AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
@@ -36,7 +38,7 @@ class AudioPlayerService {
 // RecordDetailView: 이제 DiscogsRecord를 사용하며,
 // previewUrl와 sellersCount가 없으므로 미리듣기 및 매물 수 표시를 제외합니다.
 class RecordDetailView extends StatefulWidget {
-  final DiscogsRecord record;
+  final DiscogsSearchItem record;
 
   const RecordDetailView({Key? key, required this.record}) : super(key: key);
 
@@ -57,7 +59,12 @@ class _RecordDetailViewState extends State<RecordDetailView> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => RecordDetailViewModel(baseRecord: widget.record),
+      create: (_) => RecordDetailViewModel(
+          recordResourceUrl: widget.record.resourceUrl,
+          discogsRepository: DiscogsRepositoryImpl(
+              remoteDataSource: DiscogsRemoteDataSource(),
+              supabase: Supabase.instance.client)
+      ),
       builder: (context, _) {
         return Consumer<RecordDetailViewModel>(
           builder: (context, model, child) {
@@ -212,9 +219,9 @@ class _RecordDetailViewState extends State<RecordDetailView> {
   }
 
   void _showPurchaseSheet() {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => PurchaseView(record: widget.record),
-    );
+    // showCupertinoModalPopup(
+    //   context: context,
+    //   builder: (context) => PurchaseView(record: widget.record),
+    // );
   }
 }
