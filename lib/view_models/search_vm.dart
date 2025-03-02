@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/domain/entities/search_term.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../model/discogs/discogs_record.dart';
-import '../services/discogs_api_service.dart';
-import '../services/recent_search_db.dart';
+
+import '../data/datasources/discogs_repository_impl.dart';
+import '../data/datasources/recent_search_local_data_source.dart';
+import '../data/models/discogs_record.dart';
+import '../domain/repositories/recent_search_repository.dart';
 import '../view/record_detail_view.dart';
 
 enum SortOption { latest, popularity, priceLow, priceHigh }
@@ -12,34 +15,37 @@ enum SortOption { latest, popularity, priceLow, priceHigh }
 final List<String> genres = ["전체", "House", "Techno", "Disco", "Jazz", "Hip-Hop"];
 
 class SearchViewModel extends ChangeNotifier {
+  final RecentSearchRepository recentSearchRepository;
   final TextEditingController searchController = TextEditingController();
+
   String selectedGenre = '전체';
   SortOption sortOption = SortOption.latest;
   List<DiscogsRecord> results = [];
   bool isLoading = false;
   String? errorMessage;
-  List<String> recentSearchTerms = [];
+  List<SearchTerm> _recentSearchTerms = [];
+  List<SearchTerm> get recentSearchTerms =>
+      _recentSearchTerms..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   final SupabaseClient _supabase = Supabase.instance.client;
 
   // 추천 검색어
-  final List<String> suggestedSearchTerms = [
-    "Aphex Twin",
-    "Boards of Canada",
-    "Autechre",
-    "Squarepusher",
-    "Radiohead",
-    "Four Tet"
+  final List<SearchTerm> suggestedSearchTerms = [
+    SearchTerm(term: "Aphex Twin", timestamp: DateTime.now()),
+    SearchTerm(term: "Boards of Canada", timestamp: DateTime.now()),
+    SearchTerm(term: "Autechre", timestamp: DateTime.now()),
+    SearchTerm(term: "Squarepusher", timestamp: DateTime.now()),
+    SearchTerm(term: "Radiohead", timestamp: DateTime.now()),
+    SearchTerm(term: "Four Tet", timestamp: DateTime.now()),
   ];
 
-  final DiscogsApiService _apiService = DiscogsApiService();
-  final RecentSearchDB _searchDb = RecentSearchDB.instance;
+  final DiscogsRepositoryImpl _apiService = DiscogsRepositoryImpl();
 
   // 디바운싱을 위한 타이머
   Timer? _debounceTimer;
   // 검색 임계값
   static const int searchDebounceTimeMs = 500;
 
-  SearchViewModel() {
+  SearchViewModel({required this.recentSearchRepository}) {
     loadRecentSearches();
     searchController.addListener(_onSearchControllerChanged);
   }
@@ -64,7 +70,7 @@ class SearchViewModel extends ChangeNotifier {
 
   Future<void> loadRecentSearches() async {
     try {
-      recentSearchTerms = await _searchDb.getRecentSearchTerms();
+      _recentSearchTerms = await recentSearchRepository.getRecentSearchTerms();
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to load recent searches: $e');
@@ -216,8 +222,8 @@ class SearchViewModel extends ChangeNotifier {
 
   Future<void> clearRecentSearches() async {
     try {
-      await _searchDb.clearRecentSearches();
-      recentSearchTerms = [];
+      await recentSearchRepository.clearRecentSearches();
+      _recentSearchTerms = [];
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to clear recent searches: $e');
@@ -226,7 +232,7 @@ class SearchViewModel extends ChangeNotifier {
 
   Future<void> removeSearchTerm(String term) async {
     try {
-      await _searchDb.removeSearchTerm(term);
+      await recentSearchRepository.removeSearchTerm(term);
       await loadRecentSearches();
     } catch (e) {
       debugPrint('Failed to remove search term: $e');

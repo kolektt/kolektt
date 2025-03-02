@@ -11,11 +11,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/collection_analytics.dart';
 import '../model/decade_analytics.dart';
-import '../model/discogs/discogs_record.dart';
+import '../data/models/discogs_record.dart';
 import '../model/genre_analytics.dart';
 import '../model/record.dart';
+import '../model/local/collection_classification.dart';
 import '../repository/collection_repository.dart';
-import '../services/discogs_api_service.dart';
+import '../data/datasources/discogs_repository_impl.dart';
 
 class CollectionViewModel extends ChangeNotifier {
   CollectionRepository _collectionRepository = CollectionRepository();
@@ -255,7 +256,7 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> _searchOnDiscogs(String query) async {
     if (query.isEmpty) return;
     try {
-      final discogsApi = DiscogsApiService();
+      final discogsApi = DiscogsRepositoryImpl();
       final results = await discogsApi.searchDiscogs(query, type: 'release');
       updateAllRecordsAsync(results);
       _searchResults = results;
@@ -293,15 +294,16 @@ class CollectionViewModel extends ChangeNotifier {
         .catchError((error) => debugPrint('Some upsert failed: $error'));
   }
 
+  CollectionClassification? classification;
+
   Future<void> fetchUserCollectionsWithRecords() async {
     _isLoading = true;
     notifyListeners();
 
     try {
       final userId = _profileRepository.getCurrentUserId();
-
-      collectionRecords =
-          await _collectionRepository.fetchUserCollection(userId);
+      collectionRecords = await _collectionRepository.fetchUserCollection(userId);
+      classification = classifyCollections(collectionRecords);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
       debugPrint('Error fetching user collection: $e');

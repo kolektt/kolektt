@@ -6,7 +6,7 @@ import 'package:kolektt/model/local/sales_listing_with_profile.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../model/discogs/discogs_record.dart';
+import '../data/models/discogs_record.dart';
 import '../model/supabase/sales_listings.dart';
 import '../repository/sale_repository.dart';
 

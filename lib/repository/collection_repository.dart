@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../model/discogs/discogs_record.dart';
+import '../data/models/discogs_record.dart';
 import '../model/local/collection_record.dart';
 import '../model/supabase/user_collection.dart';
 

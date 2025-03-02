@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:kolektt/model/discogs/discogs_record.dart';
+import 'package:kolektt/data/models/discogs_record.dart';
 
 class PurchaseView extends StatelessWidget {
   final DiscogsRecord record;

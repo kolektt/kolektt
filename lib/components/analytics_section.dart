@@ -4,7 +4,7 @@ import 'package:kolektt/model/local/collection_record.dart';
 
 import '../model/collection_analytics.dart';
 import '../model/decade_analytics.dart';
-import '../model/discogs/discogs_record.dart';
+import '../data/models/discogs_record.dart';
 import '../model/genre_analytics.dart';
 import '../components/analytic_card.dart';
 import '../view/collectino_summary_view.dart';

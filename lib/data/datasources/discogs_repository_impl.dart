@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import '../model/discogs/discogs_record.dart';
+import '../models/discogs_record.dart';
 
-class DiscogsApiService {
+class DiscogsRepositoryImpl {
   static const String baseUrl = 'https://api.discogs.com';
 
   // TODO: .env 파일로 이동

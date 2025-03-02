@@ -1,11 +1,13 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../models/search_term_model.dart';
 
-class RecentSearchDB {
-  static final RecentSearchDB instance = RecentSearchDB._init();
+class RecentSearchLocalDataSource {
+  static final RecentSearchLocalDataSource instance =
+  RecentSearchLocalDataSource._init();
   static Database? _database;
 
-  RecentSearchDB._init();
+  RecentSearchLocalDataSource._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -24,7 +26,7 @@ class RecentSearchDB {
     );
   }
 
-  Future<void> _createDB(Database db, int version) async {
+  Future _createDB(Database db, int version) async {
     await db.execute('''
     CREATE TABLE recent_searches(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,19 +36,19 @@ class RecentSearchDB {
     ''');
   }
 
-  Future<List<String>> getRecentSearchTerms() async {
-    final db = await instance.database;
+  Future<List<SearchTermModel>> getRecentSearchTerms() async {
+    final db = await database;
     final result = await db.query(
       'recent_searches',
       orderBy: 'timestamp DESC',
       limit: 10,
     );
 
-    return result.map((row) => row['term'] as String).toList();
+    return result.map((row) => SearchTermModel.fromMap(row)).toList();
   }
 
   Future<void> insertSearchTerm(String term) async {
-    final db = await instance.database;
+    final db = await database;
 
     // 중복 검색어가 있으면 삭제
     await db.delete(
@@ -87,7 +89,7 @@ class RecentSearchDB {
   }
 
   Future<void> removeSearchTerm(String term) async {
-    final db = await instance.database;
+    final db = await database;
     await db.delete(
       'recent_searches',
       where: 'term = ?',
@@ -96,7 +98,7 @@ class RecentSearchDB {
   }
 
   Future<void> clearRecentSearches() async {
-    final db = await instance.database;
+    final db = await database;
     await db.delete('recent_searches');
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+import '../domain/entities/search_term.dart';
 import '../view_models/search_vm.dart';
 
 class SearchView extends StatelessWidget {
@@ -221,7 +222,7 @@ class SearchView extends StatelessWidget {
 
   Widget _buildSearchTermsSection({
     required String title,
-    required List<String> terms,
+    required List<SearchTerm> terms,
     required SearchViewModel model,
     required bool showClearButton,
   }) {
@@ -255,19 +256,19 @@ class SearchView extends StatelessWidget {
                 color: CupertinoColors.systemGrey5,
                 borderRadius: BorderRadius.circular(16),
                 onPressed: () {
-                  model.updateSearchText(term);
+                  model.updateSearchText(term.term);
                   model.search();
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(term),
+                    Text(term.term),
                     if (showClearButton)
                       Padding(
                         padding: const EdgeInsets.only(left: 4),
                         child: GestureDetector(
                           onTap: () {
-                            model.removeSearchTerm(term);
+                            model.removeSearchTerm(term.term);
                             },
                           child: Icon(CupertinoIcons.clear_circled, size: 16),
                         ),
