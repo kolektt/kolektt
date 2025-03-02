@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/data/repositories/collection_repository_impl.dart';
 import 'package:kolektt/model/local/collection_record.dart';
-import 'package:kolektt/repository/collection_repository.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:kolektt/repository/sale_repository.dart';
 
+import '../domain/repositories/collection_repositroy.dart';
 import '../model/local/purhcase_with_profile.dart';
 import '../model/local/sales_listing_with_profile.dart';
 import '../repository/purcahse_respository.dart';
 
 class ProfileViweModel extends ChangeNotifier {
+  CollectionRepository collectionRepository;
   ProfileRepository _profileRepository = ProfileRepository();
   PurchaseRepository _purchaseRepository = PurchaseRepository();
   SaleRepository _saleRepository = SaleRepository();
-  CollectionRepository _collectionRepository = CollectionRepository();
 
   List<CollectionRecord> _collectionRecords = [];
 
@@ -39,7 +40,8 @@ class ProfileViweModel extends ChangeNotifier {
 
   String? _userId;
 
-  ProfileViweModel() {
+  ProfileViweModel(
+      {required CollectionRepositoryImpl this.collectionRepository}) {
     fetchAll();
   }
 
@@ -85,7 +87,7 @@ class ProfileViweModel extends ChangeNotifier {
 
     try {
       _collectionRecords =
-          await _collectionRepository.fetchUserCollection(_userId!);
+          await collectionRepository.fetchUserCollection(_userId!);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
       debugPrint('Error fetching user collection: $e');

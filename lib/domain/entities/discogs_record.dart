@@ -21,7 +21,7 @@ class DiscogsRecord {
     required this.id,
     required this.title,
     required this.resourceUrl,
-    required this.artists,
+    required this.artists,  // TODO: artists, artist 필드 중복 해결
     required this.notes,
     required this.genre,
     required this.coverImage,

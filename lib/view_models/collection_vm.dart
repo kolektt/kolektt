@@ -10,7 +10,7 @@ import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/models/discogs_search_response.dart';
-import '../domain/entities/discogs_record.dart';
+import '../domain/repositories/collection_repositroy.dart';
 import '../domain/repositories/discogs_repository.dart';
 import '../domain/usecases/search_and_upsert_discogs_records.dart';
 import '../model/collection_analytics.dart';
@@ -18,11 +18,10 @@ import '../model/decade_analytics.dart';
 import '../model/genre_analytics.dart';
 import '../model/local/collection_classification.dart';
 import '../model/record.dart';
-import '../repository/collection_repository.dart';
 
 class CollectionViewModel extends ChangeNotifier {
   final SearchAndUpsertDiscogsRecords searchAndUpsertUseCase;
-  CollectionRepository _collectionRepository = CollectionRepository();
+  CollectionRepository collectionRepository;
   ProfileRepository _profileRepository = ProfileRepository();
 
   File? selectedImage;
@@ -283,9 +282,11 @@ class CollectionViewModel extends ChangeNotifier {
 
   CollectionClassification? classification;
 
-  CollectionViewModel(
-      {required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
-      required DiscogsRepository discogs_repository});
+  CollectionViewModel({
+    required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
+    required DiscogsRepository discogs_repository,
+    required CollectionRepository this.collectionRepository,
+  });
 
   Future<void> fetchUserCollectionsWithRecords() async {
     _isLoading = true;
@@ -293,7 +294,8 @@ class CollectionViewModel extends ChangeNotifier {
 
     try {
       final userId = _profileRepository.getCurrentUserId();
-      collectionRecords = await _collectionRepository.fetchUserCollection(userId);
+      collectionRecords =
+          await collectionRepository.fetchUserCollection(userId);
       classification = classifyCollections(collectionRecords);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';

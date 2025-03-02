@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/data/repositories/collection_repository_impl.dart';
 import 'package:kolektt/repository/sale_repository.dart';
 import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view_models/auth_vm.dart';
@@ -114,6 +115,8 @@ class KolekttApp extends StatelessWidget {
                   discogs_repository: DiscogsRepositoryImpl(
                       remoteDataSource: DiscogsRemoteDataSource(),
                       supabase: Supabase.instance.client),
+                  collectionRepository: CollectionRepositoryImpl(
+                      supabase: Supabase.instance.client),
                 )),
         ChangeNotifierProvider(create: (_) => SearchViewModel(
                 searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
@@ -126,7 +129,10 @@ class KolekttApp extends StatelessWidget {
                 recentSearchRepository: RecentSearchRepositoryImpl(
                     localDataSource: RecentSearchLocalDataSource.instance))),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileViweModel()),
+        ChangeNotifierProvider(
+            create: (_) => ProfileViweModel(
+                collectionRepository: CollectionRepositoryImpl(
+                    supabase: Supabase.instance.client))),
         ChangeNotifierProvider(
           create: (_) => SaleViewModel(saleRepository: SaleRepository()),
         ),
