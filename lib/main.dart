@@ -1,30 +1,41 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Data sources
+import 'package:kolektt/data/datasources/collection_remote_data_source.dart';
+import 'package:kolektt/data/datasources/discogs_remote_data_source.dart';
+import 'package:kolektt/data/datasources/recent_search_local_data_source.dart';
+
+// Repositories
 import 'package:kolektt/data/repositories/collection_repository_impl.dart';
+import 'package:kolektt/data/repositories/discogs_repository_impl.dart';
+import 'package:kolektt/data/repositories/discogs_storage_repository_impl.dart';
+import 'package:kolektt/data/repositories/recent_search_repository_impl.dart';
 import 'package:kolektt/repository/sale_repository.dart';
-import 'package:kolektt/view/content_view.dart';
+
+// Domain UseCases
+import 'package:kolektt/domain/usecases/search_and_upsert_discogs_records.dart';
+
+// ViewModels
 import 'package:kolektt/view_models/auth_vm.dart';
 import 'package:kolektt/view_models/collection_vm.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:kolektt/view_models/sale_vm.dart';
 import 'package:kolektt/view_models/search_vm.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'data/datasources/discogs_remote_data_source.dart';
-import 'data/datasources/recent_search_local_data_source.dart';
-import 'data/repositories/discogs_repository_impl.dart';
-import 'data/repositories/discogs_storage_repository_impl.dart';
-import 'data/repositories/recent_search_repository_impl.dart';
-import 'domain/usecases/search_and_upsert_discogs_records.dart';
+// Views
+import 'package:kolektt/view/content_view.dart';
 
-// 기본 색상 (Primary Blue: #0036FF)
+/// 기본 색상 (Primary Blue: #0036FF)
 final Color primaryColor = const Color(0xFF0036FF);
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 애플리케이션 문서 디렉터리 (예: Hive 초기화 시 사용)
   final appDocumentDir = await getApplicationDocumentsDirectory();
   // Hive 초기화 및 모델 등록 (필요 시 주석 해제)
   // Hive.init(appDocumentDir.path);
@@ -34,7 +45,7 @@ void main() async {
   await Supabase.initialize(
     url: 'https://awdnjducwqwfmbfigugq.supabase.co',
     anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3ZG5qZHVjd3F3Zm1iZmlndWdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MDQ4OTk5MywiZXhwIjoyMDU2MDY1OTkzfQ.S6u5gaLR5JeL76aJa0jRXzvTGeIYsXU4qPJ63QEEY1I',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3ZG5qZHVjd3F3Zm1iZmlndWdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MDQ4OTk5MywiZXhwIjoyMDU2MDY1OTkzfQ.S6u5gaLR5JeL76aJa0jRXzvTGeIYsXU4qPJ63QEEY1I',
   );
 
   runApp(const KolekttApp());
@@ -70,7 +81,7 @@ class AppTextStyles {
     fontSize: 17,
     fontWeight: FontWeight.normal,
     fontFamily: 'SF Pro Text',
-    color: Color(0xFF6B7280), // Secondary Gray
+    color: Color(0xFF6B7280),
   );
   static const TextStyle bodyM = TextStyle(
     fontSize: 15,
@@ -92,7 +103,7 @@ class AppTextStyles {
   );
 }
 
-/// 앱 전체 설정 (MultiProvider, CupertinoApp)
+/// 앱 전체 설정 (MultiProvider 및 CupertinoApp)
 class KolekttApp extends StatelessWidget {
   const KolekttApp({super.key});
 
@@ -100,41 +111,70 @@ class KolekttApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // 홈 화면 관련 뷰모델
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
+
+        // 컬렉션 관련 뷰모델
         ChangeNotifierProvider(
-            create: (_) => CollectionViewModel(
-                  searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
-                    discogsRepository: DiscogsRepositoryImpl(
-                      remoteDataSource: DiscogsRemoteDataSource(),
-                      supabase: Supabase.instance.client,
-                    ),
-                    discogsStorageRepository: DiscogsStorageRepositoryImpl(
-                      supabase: Supabase.instance.client,
-                    ),
-                  ),
-                  discogs_repository: DiscogsRepositoryImpl(
-                      remoteDataSource: DiscogsRemoteDataSource(),
-                      supabase: Supabase.instance.client),
-                  collectionRepository: CollectionRepositoryImpl(
-                      supabase: Supabase.instance.client),
-                )),
-        ChangeNotifierProvider(create: (_) => SearchViewModel(
-                searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
-                  discogsRepository: DiscogsRepositoryImpl(
-                      remoteDataSource: DiscogsRemoteDataSource(),
-                      supabase: Supabase.instance.client),
-                  discogsStorageRepository: DiscogsStorageRepositoryImpl(
-                      supabase: Supabase.instance.client),
-                ),
-                recentSearchRepository: RecentSearchRepositoryImpl(
-                    localDataSource: RecentSearchLocalDataSource.instance))),
+          create: (_) => CollectionViewModel(
+            searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
+              discogsRepository: DiscogsRepositoryImpl(
+                remoteDataSource: DiscogsRemoteDataSource(),
+                supabase: Supabase.instance.client,
+              ),
+              discogsStorageRepository: DiscogsStorageRepositoryImpl(
+                supabase: Supabase.instance.client,
+              ),
+            ),
+            discogs_repository: DiscogsRepositoryImpl(
+              remoteDataSource: DiscogsRemoteDataSource(),
+              supabase: Supabase.instance.client,
+            ),
+            collectionRepository: CollectionRepositoryImpl(
+              remoteDataSource: CollectionRemoteDataSource(
+                supabase: Supabase.instance.client,
+              ),
+            ),
+          ),
+        ),
+
+        // 검색 관련 뷰모델
+        ChangeNotifierProvider(
+          create: (_) => SearchViewModel(
+            searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
+              discogsRepository: DiscogsRepositoryImpl(
+                remoteDataSource: DiscogsRemoteDataSource(),
+                supabase: Supabase.instance.client,
+              ),
+              discogsStorageRepository: DiscogsStorageRepositoryImpl(
+                supabase: Supabase.instance.client,
+              ),
+            ),
+            recentSearchRepository: RecentSearchRepositoryImpl(
+              localDataSource: RecentSearchLocalDataSource.instance,
+            ),
+          ),
+        ),
+
+        // 인증 관련 뷰모델
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
+
+        // 프로필 관련 뷰모델
         ChangeNotifierProvider(
-            create: (_) => ProfileViweModel(
-                collectionRepository: CollectionRepositoryImpl(
-                    supabase: Supabase.instance.client))),
+          create: (_) => ProfileViweModel(
+            collectionRepository: CollectionRepositoryImpl(
+              remoteDataSource: CollectionRemoteDataSource(
+                supabase: Supabase.instance.client,
+              ),
+            ),
+          ),
+        ),
+
+        // 판매 관련 뷰모델
         ChangeNotifierProvider(
-          create: (_) => SaleViewModel(saleRepository: SaleRepository()),
+          create: (_) => SaleViewModel(
+            saleRepository: SaleRepository(),
+          ),
         ),
       ],
       child: CupertinoApp(
