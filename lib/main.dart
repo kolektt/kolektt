@@ -11,8 +11,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'data/datasources/discogs_remote_data_source.dart';
 import 'data/datasources/recent_search_local_data_source.dart';
+import 'data/repositories/discogs_repository_impl.dart';
+import 'data/repositories/discogs_storage_repository_impl.dart';
 import 'data/repositories/recent_search_repository_impl.dart';
+import 'domain/usecases/search_and_upsert_discogs_records.dart';
 
 // 기본 색상 (Primary Blue: #0036FF)
 final Color primaryColor = const Color(0xFF0036FF);
@@ -95,11 +99,32 @@ class KolekttApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CollectionViewModel()),
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
+        ChangeNotifierProvider(
+            create: (_) => CollectionViewModel(
+                  searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
+                    discogsRepository: DiscogsRepositoryImpl(
+                      remoteDataSource: DiscogsRemoteDataSource(),
+                      supabase: Supabase.instance.client,
+                    ),
+                    discogsStorageRepository: DiscogsStorageRepositoryImpl(
+                      supabase: Supabase.instance.client,
+                    ),
+                  ),
+                  discogs_repository: DiscogsRepositoryImpl(
+                      remoteDataSource: DiscogsRemoteDataSource(),
+                      supabase: Supabase.instance.client),
+                )),
         ChangeNotifierProvider(create: (_) => SearchViewModel(
-            recentSearchRepository: RecentSearchRepositoryImpl(localDataSource: RecentSearchLocalDataSource.instance)
-        )),
+                searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
+                  discogsRepository: DiscogsRepositoryImpl(
+                      remoteDataSource: DiscogsRemoteDataSource(),
+                      supabase: Supabase.instance.client),
+                  discogsStorageRepository: DiscogsStorageRepositoryImpl(
+                      supabase: Supabase.instance.client),
+                ),
+                recentSearchRepository: RecentSearchRepositoryImpl(
+                    localDataSource: RecentSearchLocalDataSource.instance))),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => ProfileViweModel()),
         ChangeNotifierProvider(

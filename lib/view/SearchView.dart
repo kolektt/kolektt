@@ -151,12 +151,12 @@ class SearchView extends StatelessWidget {
       itemBuilder: (context, index) {
         final record = model.results[index];
         return CupertinoListTile(
-          leading: record.thumb.isNotEmpty
+          leading: record.coverImage.isNotEmpty
               ? ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: FadeInImage.memoryNetwork(
               placeholder: kTransparentImage, // 투명한 1px GIF를 플레이스홀더로 사용
-              image: record.thumb,
+              image: record.coverImage,
               width: 50,
               height: 50,
               fit: BoxFit.cover,

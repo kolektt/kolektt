@@ -4,10 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:kolektt/domain/entities/search_term.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../data/datasources/discogs_repository_impl.dart';
-import '../data/datasources/recent_search_local_data_source.dart';
-import '../data/models/discogs_record.dart';
+import '../domain/entities/discogs_record.dart';
 import '../domain/repositories/recent_search_repository.dart';
+import '../domain/usecases/search_and_upsert_discogs_records.dart';
 import '../view/record_detail_view.dart';
 
 enum SortOption { latest, popularity, priceLow, priceHigh }
@@ -38,14 +37,18 @@ class SearchViewModel extends ChangeNotifier {
     SearchTerm(term: "Four Tet", timestamp: DateTime.now()),
   ];
 
-  final DiscogsRepositoryImpl _apiService = DiscogsRepositoryImpl();
+  // final DiscogsRepositoryImpl _apiService = DiscogsRepositoryImpl();
+  final SearchAndUpsertDiscogsRecords searchAndUpsertUseCase;
 
   // 디바운싱을 위한 타이머
   Timer? _debounceTimer;
   // 검색 임계값
   static const int searchDebounceTimeMs = 500;
 
-  SearchViewModel({required this.recentSearchRepository}) {
+  SearchViewModel({
+    required this.searchAndUpsertUseCase,
+    required this.recentSearchRepository,
+  }) {
     loadRecentSearches();
     searchController.addListener(_onSearchControllerChanged);
   }
@@ -90,21 +93,17 @@ class SearchViewModel extends ChangeNotifier {
 
     try {
       // (1) API로부터 결과를 가져옴
-      results = await _apiService.searchDiscogs(searchText, type: 'release');
+      results = await searchAndUpsertUseCase.call(searchText, type: 'release');
       debugPrint('Search results: ${results}');
 
       // (2) UI 업데이트
       //     - 장르 필터, 정렬 등
       // _applyGenreFilter();
-      _applySorting();
+      // _applySorting();
 
       // (3) 로딩 끝
       isLoading = false;
       notifyListeners();
-
-      // (4) Supabase DB 업서트를 비동기로 호출만 하고, 굳이 `await`하지 않음
-      //     => DB 작업이 끝날 때까지 기다리지 않고 즉시 함수 종료
-      await updateAllRecordsAsync(results);
 
     } catch (e) {
       // 에러 처리
@@ -113,22 +112,6 @@ class SearchViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
-  }
-
-  // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
-  Future<void> updateAllRecordsAsync(List<DiscogsRecord> records) async {
-    // 병렬 실행을 위한 Future 리스트
-    final futures = <Future>[];
-
-    for (final r in records) {
-      futures.add(
-          _supabase.from('records').upsert(r.toJson(), onConflict: 'record_id')
-      );
-    }
-
-    Future.wait(futures)
-        .then((_) => debugPrint('All upserts completed.'))
-        .catchError((error) => debugPrint('Some upsert failed: $error'));
   }
 
   void updateSearchText(String text) {
@@ -159,12 +142,12 @@ class SearchViewModel extends ChangeNotifier {
       if (results.isNotEmpty) {
         if (genre != '전체') {
           final filteredResults = results.where((record) =>
-          record.genres[0].contains(genre) ?? false
+          record.genre[0].contains(genre) ?? false
           ).toList();
 
           // 필터링 후 정렬 적용
           results = filteredResults;
-          _applySorting();
+          // _applySorting();
         } else {
           // 전체 선택 시 원래 검색결과로 복원 후 다시 검색
           search();
@@ -182,28 +165,28 @@ class SearchViewModel extends ChangeNotifier {
 
       // 검색 결과가 있으면 정렬 적용
       if (results.isNotEmpty) {
-        _applySorting();
+        // _applySorting();
         notifyListeners();
       }
     }
   }
 
-  void _applySorting() {
-    switch (sortOption) {
-      case SortOption.latest:
-        results.sort((a, b) => (b.year ?? 0).compareTo(a.year ?? 0));
-        break;
-      case SortOption.popularity:
-        results.sort((a, b) => (b.community.have ?? 0).compareTo(a.community.have ?? 0));
-        break;
-      case SortOption.priceLow:
-        results.sort((a, b) => (a.lowestPrice ?? 0).compareTo(b.lowestPrice ?? 0));
-        break;
-      case SortOption.priceHigh:
-        results.sort((a, b) => (b.lowestPrice ?? 0).compareTo(a.lowestPrice ?? 0));
-        break;
-    }
-  }
+  // void _applySorting() {
+  //   switch (sortOption) {
+  //     case SortOption.latest:
+  //       results.sort((a, b) => (b.year ?? 0).compareTo(a.year ?? 0));
+  //       break;
+  //     case SortOption.popularity:
+  //       results.sort((a, b) => (b.community.have ?? 0).compareTo(a.community.have ?? 0));
+  //       break;
+  //     case SortOption.priceLow:
+  //       results.sort((a, b) => (a.lowestPrice ?? 0).compareTo(b.lowestPrice ?? 0));
+  //       break;
+  //     case SortOption.priceHigh:
+  //       results.sort((a, b) => (b.lowestPrice ?? 0).compareTo(a.lowestPrice ?? 0));
+  //       break;
+  //   }
+  // }
 
   String getSortOptionDisplayName([SortOption? option]) {
     option = option ?? sortOption;

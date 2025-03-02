@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
-import '../data/models/discogs_record.dart';
+import '../domain/entities/discogs_record.dart';
 import '../view_models/record_detail_vm.dart';
 
 // AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
@@ -101,9 +101,9 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                           Container(
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.width,
-                            child: (model.detailedRecord?.images.isNotEmpty ?? false)
+                            child: (model.detailedRecord?.coverImage.isNotEmpty ?? false)
                                 ? Image.network(
-                              model.detailedRecord!.images.first.uri,
+                              model.detailedRecord!.coverImage,
                               fit: BoxFit.cover,
                             )
                                 : Container(
@@ -185,8 +185,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                                                 CupertinoPageRoute(
                                                     builder: (context) =>
                                                         SellersListView(
-                                                            record: model
-                                                                .detailedRecord!)));
+                                                            record: model.detailedRecord!)));
                                           },
                                           child: const Text(
                                       '전체 판매자 보기',

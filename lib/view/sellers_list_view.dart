@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:kolektt/data/models/discogs_record.dart';
 import 'package:provider/provider.dart';
 
 import '../components/purchase_view.dart';
 import '../components/seller_row.dart';
+import '../domain/entities/discogs_record.dart';
 import '../view_models/record_detail_vm.dart';
 
 class SellersListView extends StatefulWidget {

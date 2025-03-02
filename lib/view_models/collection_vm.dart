@@ -9,16 +9,18 @@ import 'package:kolektt/model/supabase/user_collection.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../domain/entities/discogs_record.dart';
+import '../domain/repositories/discogs_repository.dart';
+import '../domain/usecases/search_and_upsert_discogs_records.dart';
 import '../model/collection_analytics.dart';
 import '../model/decade_analytics.dart';
-import '../data/models/discogs_record.dart';
 import '../model/genre_analytics.dart';
-import '../model/record.dart';
 import '../model/local/collection_classification.dart';
+import '../model/record.dart';
 import '../repository/collection_repository.dart';
-import '../data/datasources/discogs_repository_impl.dart';
 
 class CollectionViewModel extends ChangeNotifier {
+  final SearchAndUpsertDiscogsRecords searchAndUpsertUseCase;
   CollectionRepository _collectionRepository = CollectionRepository();
   ProfileRepository _profileRepository = ProfileRepository();
 
@@ -256,9 +258,7 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> _searchOnDiscogs(String query) async {
     if (query.isEmpty) return;
     try {
-      final discogsApi = DiscogsRepositoryImpl();
-      final results = await discogsApi.searchDiscogs(query, type: 'release');
-      updateAllRecordsAsync(results);
+      final results = await searchAndUpsertUseCase.call(query, type: 'release');
       _searchResults = results;
     } catch (e) {
       _errorMessage = 'Discogs 검색 오류: $e';
@@ -268,33 +268,23 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> addDiscogsRecordToDB(DiscogsRecord record) async {
     try {
       // Supabase insert
-      final response = await supabase
-          .from('records')
-          .insert(record.toJson())
-          .single(); // single() → 단일 row 반환
-
-      print('Record inserted successfully: $response');
+      // final response = await supabase
+      //     .from('records')
+      //     .insert(record.toJson())
+      //     .single(); // single() → 단일 row 반환
+      //
+      // print('Record inserted successfully: $response');
     } catch (e) {
       print('Error inserting record: $e');
       rethrow; // 필요하면 에러를 상위로 던짐
     }
   }
 
-  // 예: 여러 작업을 병렬 처리하고, 전부 완료되면 로그만 남기는 예시
-  Future<void> updateAllRecordsAsync(List<DiscogsRecord> records) async {
-    final futures = <Future>[];
-    for (final r in records) {
-      futures.add(supabase.from('records').upsert(
-            r.toJson(),
-            onConflict: 'record_id',
-          ));
-    }
-    await Future.wait(futures)
-        .then((_) => debugPrint('All upserts completed.'))
-        .catchError((error) => debugPrint('Some upsert failed: $error'));
-  }
-
   CollectionClassification? classification;
+
+  CollectionViewModel(
+      {required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
+      required DiscogsRepository discogs_repository});
 
   Future<void> fetchUserCollectionsWithRecords() async {
     _isLoading = true;

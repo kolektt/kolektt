@@ -110,12 +110,12 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
             ),
             child: Row(
               children: [
-                if (record.thumb.isNotEmpty)
+                if (record.coverImage.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: FadeInImage.memoryNetwork(
                       placeholder: kTransparentImage, // 투명한 1px GIF를 플레이스홀더로 사용
-                      image: record.thumb,
+                      image: record.coverImage,
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,

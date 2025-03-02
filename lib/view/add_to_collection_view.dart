@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../data/models/discogs_record.dart';
+
+import '../domain/entities/discogs_record.dart';
 import '../view_models/collection_vm.dart';
 
 class AddToCollectionScreen extends StatefulWidget {
@@ -464,9 +465,9 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: record.thumb.isNotEmpty
+          child: record.coverImage.isNotEmpty
               ? Image.network(
-            record.thumb,
+            record.coverImage,
             width: 80,
             height: 80,
             fit: BoxFit.cover,
@@ -507,7 +508,7 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
                 ),
               const SizedBox(height: 4),
               Text(
-                '${record.year}년',
+                '${record.releaseYear}년',
                 style: const TextStyle(
                   color: CupertinoColors.systemGrey,
                   fontSize: 14,
