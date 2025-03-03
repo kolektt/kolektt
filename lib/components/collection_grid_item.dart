@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../model/local/collection_record.dart';
@@ -9,9 +9,10 @@ import '../view_models/collection_vm.dart';
 
 Widget buildGridItem(
     context, CollectionRecord record, CollectionViewModel model) {
+  final currencyFormat = NumberFormat.currency(symbol: '₩', decimalDigits: 0);
+
   return GestureDetector(
     onTap: () {
-      // debugPrint("Record tapped: ${record.record.toJson()}");
       Navigator.push(
         context,
         CupertinoPageRoute(
@@ -100,8 +101,11 @@ Widget buildGridItem(
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              "₩ ${record.user_collection.purchase_price.toInt()}",
-              style: const TextStyle(fontSize: 14),
+              currencyFormat.format(record.user_collection.purchase_price.toInt()),
+              style: const TextStyle(
+                fontSize: 14,
+                color: CupertinoColors.systemGrey,
+              ),
             ),
           ),
           const SizedBox(height: 8),
