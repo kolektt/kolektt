@@ -14,7 +14,9 @@ class RecordDetailViewModel extends ChangeNotifier {
 
   final String recordResourceUrl;
 
-  DiscogsRecord? detailedRecord;
+  DiscogsRecord? _detailedRecord;
+  DiscogsRecord? get detailedRecord => _detailedRecord;
+
   bool isLoading = true;
   String? errorMessage;
 
@@ -40,8 +42,8 @@ class RecordDetailViewModel extends ChangeNotifier {
 
   Future<void> fetchRecordDetails(int id) async {
     try {
-      detailedRecord = await discogsRepository.getReleaseById(id);
-      debugPrint('Detailed record: $detailedRecord');
+      _detailedRecord = await discogsRepository.getReleaseById(id);
+      debugPrint('Detailed record: $_detailedRecord');
       notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
@@ -55,9 +57,9 @@ class RecordDetailViewModel extends ChangeNotifier {
     // TODO: Supabase로 업데이트하는 로직 추가
     // final supabase = Supabase.instance.client;
     //
-    // if (detailedRecord == null) return;
+    // if (_detailedRecord == null) return;
     // // 전체 JSON 생성
-    // final detailRecordJson = detailedRecord!.toJson();
+    // final detailRecordJson = _detailedRecord!.toJson();
     //
     // // cover_image와 format 키 제거
     // detailRecordJson.remove('cover_image');
@@ -74,13 +76,13 @@ class RecordDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> getSellers() async {
-    if (detailedRecord == null) return;
+    if (_detailedRecord == null) return;
     try {
       _fetchingSellers = true;
       notifyListeners();
 
       List<SalesListing> _salesListing =
-          await _saleRepository.getSaleByRecordId(detailedRecord!.id);
+          await _saleRepository.getSaleByRecordId(_detailedRecord!.id);
       debugPrint("SalesListing: $_salesListing");
       debugPrint("detailedRecord!.id ${_salesListing[0]}");
 

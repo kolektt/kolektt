@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/entities/discogs_record.dart';
@@ -24,7 +25,7 @@ class DiscogsRepositoryImpl implements DiscogsRepository {
     final record = DiscogsRecord(
       id: domainRecord.id,
       title: domainRecord.title,
-      artist: domainRecord.artists.join(", "),
+      artist: domainRecord.artists.map((e) => e.name).join(", "),
       releaseYear: domainRecord.year,
       resourceUrl: domainRecord.resourceUrl,
       notes: domainRecord.notes,
