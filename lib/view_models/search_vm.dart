@@ -226,7 +226,7 @@ class SearchViewModel extends ChangeNotifier {
   void onRecordSelected(DiscogsSearchItem record, BuildContext context) {
     Navigator.of(context).push(
       CupertinoPageRoute(
-        builder: (context) => RecordDetailView(record: record),
+        builder: (context) => RecordDetailView(recordResourcelUrl: record.resourceUrl),
       ),
     );
   }

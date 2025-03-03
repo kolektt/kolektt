@@ -38,9 +38,9 @@ class AudioPlayerService {
 // RecordDetailView: 이제 DiscogsRecord를 사용하며,
 // previewUrl와 sellersCount가 없으므로 미리듣기 및 매물 수 표시를 제외합니다.
 class RecordDetailView extends StatefulWidget {
-  final DiscogsSearchItem record;
+  final String recordResourcelUrl;
 
-  const RecordDetailView({Key? key, required this.record}) : super(key: key);
+  const RecordDetailView({Key? key, required this.recordResourcelUrl}) : super(key: key);
 
   @override
   _RecordDetailViewState createState() => _RecordDetailViewState();
@@ -60,7 +60,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => RecordDetailViewModel(
-          recordResourceUrl: widget.record.resourceUrl,
+          recordResourceUrl: widget.recordResourcelUrl,
           discogsRepository: DiscogsRepositoryImpl(
               remoteDataSource: DiscogsRemoteDataSource(),
               supabase: Supabase.instance.client)
