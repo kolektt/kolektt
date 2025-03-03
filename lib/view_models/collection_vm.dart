@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:kolektt/data/repositories/album_recognition_repository.dart';
+import 'package:kolektt/data/repositories/album_recognition_repository_impl.dart';
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
 import 'package:kolektt/model/supabase/user_collection.dart';
@@ -10,6 +10,7 @@ import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/models/discogs_search_response.dart';
+import '../domain/repositories/album_recognition_repository.dart';
 import '../domain/repositories/collection_repositroy.dart';
 import '../domain/repositories/discogs_record_repository.dart';
 import '../domain/repositories/discogs_repository.dart';
@@ -34,10 +35,6 @@ class CollectionViewModel extends ChangeNotifier {
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
-
-  // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
-  static const String _googleVisionApiKey =
-      'ya29.a0AeXRPp6ohvj7IHHu4o4izTc11zCP5gNBkzQkjKBShZgskxiC8F1gULnAgct1RZACuYQs0JB14cybUQ-SfQynX0q-tFCmUu_AhMCxpq5dKDFTZdvCeOsDPbJdgVSgPAXL1c29JYAv6TMdlmD9PZ2zZJfYTtUTcbQMFnySv5vaHH4lSM4aCgYKAekSARESFQHGX2Mi8GxrKmY5-ZexCZp2iBT6dg0182';
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;

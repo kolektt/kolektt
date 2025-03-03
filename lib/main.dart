@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kolektt/data/datasources/google_vision_data_source.dart';
-import 'package:kolektt/data/repositories/album_recognition_repository.dart';
+import 'package:kolektt/data/repositories/album_recognition_repository_impl.dart';
 import 'package:kolektt/data/repositories/discogs_record_repository_impl.dart';
 import 'package:kolektt/view_models/analytics_vm.dart';
 import 'package:provider/provider.dart';
@@ -141,7 +141,7 @@ class KolekttApp extends StatelessWidget {
                 supabase: Supabase.instance.client,
               ),
             ),
-            albumRecognitionRepository: AlbumRecognitionRepository(
+            albumRecognitionRepository: AlbumRecognitionRepositoryImpl(
                 dataSource: GoogleVisionDataSource(
                     apiKey: 'ya29.a0AeXRPp7EhJzihIXjaDG_3qY6XyIodza2VNoZfzRqGbhz9og4RJ7RK_fjpNQiu_uPGeWEOXiEcUqY8dj77X2uw8LYyZWg0mGKygG_iNDdRAHMvHBk5z1x4dZceCkXgnsmnRV_B5ryszspV_HE8wCKVphv124iJ2LfmSv-ZmDQq6UaFsgaCgYKAd4SARESFQHGX2Mio6NV5xvu8mS0SBaxBbg1HA0182'
                 )
