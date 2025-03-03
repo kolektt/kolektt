@@ -1,6 +1,8 @@
 // datasource/collection_remote_data_source.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../model/supabase/user_collection.dart';
+
 class CollectionRemoteDataSource {
   static const String tableName = 'user_collections';
   final SupabaseClient supabase;
@@ -19,6 +21,10 @@ class CollectionRemoteDataSource {
 
   Future<void> insertUserCollection(Map<String, dynamic> data) async {
     await supabase.from(tableName).insert(data).maybeSingle();
+  }
+
+  Future<void> updateUserCollection(UserCollection data) async {
+    await supabase.from(tableName).update(data.toJson()).eq('id', data.id);
   }
 
   Future<void> deleteUserCollection(String id) async {

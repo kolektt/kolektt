@@ -58,7 +58,12 @@ class CollectionRepositoryImpl implements CollectionRepository {
   }
 
   @override
-  Future<void> deleteUserCollection(int id) {
+  Future<void> updateUserCollection(UserCollection data) {
+    return remoteDataSource.updateUserCollection(data);
+  }
+
+  @override
+  Future<void> deleteUserCollection(String id) {
     return remoteDataSource.deleteUserCollection(id);
   }
 }

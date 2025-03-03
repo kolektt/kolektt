@@ -121,12 +121,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   Future<void> updateRecord(UserCollection record) async {
     try {
-      await supabase
-          .from('user_collections')
-          .update(record.toJson())
-          .eq('id', record.id)
-          .single();
-
+      await collectionRepository.updateUserCollection(record);
       debugPrint("Record: ${record.toJson()}");
     } catch (e) {
       debugPrint('Error in updateRecord: $e');
