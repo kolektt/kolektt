@@ -139,9 +139,7 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                                           model.detailedRecord!.artist
                                               .isNotEmpty)
                                         Text(
-                                          model.detailedRecord!.artist
-                                              .split((", "))
-                                              .first,
+                                          model.detailedRecord!.artist.split((", ")).map((e) => e).join(", "),
                                           style: const TextStyle(
                                       fontSize: 20,
                                       color: CupertinoColors.systemGrey,
