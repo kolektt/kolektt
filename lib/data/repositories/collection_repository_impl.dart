@@ -52,4 +52,9 @@ class CollectionRepositoryImpl implements CollectionRepository {
 
     return _collectionRecords;
   }
+
+  @override
+  Future<void> insertUserCollection(Map<String, dynamic> data) {
+    return remoteDataSource.insertUserCollection(data);
+  }
 }

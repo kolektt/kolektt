@@ -14,10 +14,7 @@ import '../domain/repositories/collection_repositroy.dart';
 import '../domain/repositories/discogs_repository.dart';
 import '../domain/usecases/search_and_upsert_discogs_records.dart';
 import '../model/collection_analytics.dart';
-import '../model/decade_analytics.dart';
-import '../model/genre_analytics.dart';
-import '../model/local/collection_classification.dart';
-import '../model/record.dart';
+import '../model/local/collection_classification.dart'; // classifyCollections 함수와 CollectionClassification 클래스 포함
 
 class CollectionViewModel extends ChangeNotifier {
   final SearchAndUpsertDiscogsRecords searchAndUpsertUseCase;
@@ -30,10 +27,9 @@ class CollectionViewModel extends ChangeNotifier {
 
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isAdding = false;
-
   bool get isAdding => _isAdding;
-  String? _errorMessage;
 
+  String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
   // 구글 비전 API 키 (보안을 위해 .env나 서버에서 관리 권장)
@@ -149,10 +145,9 @@ class CollectionViewModel extends ChangeNotifier {
         print('Error adding Discogs record: $e');
       }
 
-      // 추가로 purchase_date 같은 게 필요하다면, 아래처럼:
+      await collectionRepository.insertUserCollection(insertData);
       // insertData['purchase_date'] = DateTime.now().toIso8601String();
 
-      await supabase.from('user_collections').insert(insertData).maybeSingle();
     } catch (e) {
       _errorMessage = '컬렉션 추가 실패: $e';
     } finally {

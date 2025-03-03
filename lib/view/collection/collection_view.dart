@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/analytics_section.dart';
@@ -19,8 +20,7 @@ class _CollectionViewState extends State<CollectionView> {
   void initState() {
     super.initState();
     // Fetch collection records on initialization.
-    Provider.of<CollectionViewModel>(context, listen: false)
-        .fetchUserCollectionsWithRecords();
+    Provider.of<CollectionViewModel>(context, listen: false).fetchUserCollectionsWithRecords();
   }
 
   @override
