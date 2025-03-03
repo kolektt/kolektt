@@ -57,4 +57,9 @@ class CollectionRepositoryImpl implements CollectionRepository {
   Future<void> insertUserCollection(Map<String, dynamic> data) {
     return remoteDataSource.insertUserCollection(data);
   }
+
+  @override
+  Future<void> deleteUserCollection(int id) {
+    return remoteDataSource.deleteUserCollection(id);
+  }
 }

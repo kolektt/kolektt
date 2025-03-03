@@ -158,17 +158,10 @@ class CollectionViewModel extends ChangeNotifier {
 
   Future<void> removeRecord(CollectionRecord record) async {
     try {
-      final response =
-          await supabase.from('user_collections').delete().eq('id', record.user_collection.id);
-
-      if (response.error == null) {
-        // 로컬 컬렉션에서도 제거
-        _collectionRecords.removeWhere((r) => r.user_collection.id == record.user_collection.id);
-        notifyListeners();
-        debugPrint('Record removed successfully.');
-      } else {
-        debugPrint('Error removing record: ${response.error!.message}');
-      }
+      collectionRepository.deleteUserCollection(record.user_collection.id);
+      _collectionRecords.removeWhere((r) => r.user_collection.id == record.user_collection.id);
+      notifyListeners();
+      debugPrint('Record removed successfully.');
     } catch (e) {
       debugPrint('Error in removeRecord: $e');
     }

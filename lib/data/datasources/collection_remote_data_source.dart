@@ -20,4 +20,8 @@ class CollectionRemoteDataSource {
   Future<void> insertUserCollection(Map<String, dynamic> data) async {
     await supabase.from(tableName).insert(data).maybeSingle();
   }
+
+  Future<void> deleteUserCollection(String id) async {
+    await supabase.from(tableName).delete().eq('id', id);
+  }
 }
