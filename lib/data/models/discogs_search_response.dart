@@ -7,7 +7,7 @@ class DiscogsSearchResponse {
     required this.results,
   });
 
-  factory DiscogsSearchResponse.fromJson(Map<String, dynamic> json) {
+  factory DiscogsSearchResponse.fromJson(Map<String, dynamic?> json) {
     return DiscogsSearchResponse(
       pagination: Pagination.fromJson(json['pagination'] ?? {}),
       results: (json['results'] as List<dynamic>? ?? [])
@@ -117,7 +117,7 @@ class DiscogsSearchItem {
       id: json['id'],
       barcode: List<String>.from(json['barcode']),
       masterId: json['master_id'],
-      masterUrl: json['master_url'],
+      masterUrl: json['master_url'] ?? '',
       uri: json['uri'],
       catno: json['catno'],
       title: json['title'],
@@ -186,7 +186,7 @@ class DiscogsFormat {
   final String name;
   final String qty;
   final String? text;
-  final List<String> descriptions;
+  final List<String>? descriptions;
 
   DiscogsFormat({
     required this.name,
@@ -199,8 +199,8 @@ class DiscogsFormat {
     return DiscogsFormat(
       name: json['name'],
       qty: json['qty'],
-      text: json['text'], // text might be null if not provided
-      descriptions: List<String>.from(json['descriptions']),
+      text: json['text'] ?? "", // text might be null if not provided
+      descriptions: List<String>.from(json['descriptions'] ?? []),
     );
   }
 

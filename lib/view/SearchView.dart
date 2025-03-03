@@ -32,11 +32,11 @@ class SearchView extends StatelessWidget {
                   child: CupertinoSearchTextField(
                     controller: model.searchController,
                     placeholder: '레코드 검색',
-                    onChanged: (value) {
-                      model.updateSearchText(value);
+                    onChanged: (value) async {
+                      await model.updateSearchText(value);
                     },
-                    onSubmitted: (_) {
-                      model.search();
+                    onSubmitted: (_) async {
+                      await model.search();
                     },
                   ),
                 ),
@@ -130,7 +130,7 @@ class SearchView extends StatelessWidget {
             Text('Error: ${model.errorMessage}', textAlign: TextAlign.center),
             const SizedBox(height: 16),
             CupertinoButton(
-              onPressed: () => model.search(),
+              onPressed: () async => await model.search(),
               child: Text('다시 시도'),
             ),
           ],
@@ -253,9 +253,9 @@ class SearchView extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 color: CupertinoColors.systemGrey5,
                 borderRadius: BorderRadius.circular(16),
-                onPressed: () {
-                  model.updateSearchText(term.term);
-                  model.search();
+                onPressed: () async {
+                  await model.updateSearchText(term.term);
+                  await model.search();
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

@@ -26,7 +26,6 @@ class SearchViewModel extends ChangeNotifier {
   List<SearchTerm> _recentSearchTerms = [];
   List<SearchTerm> get recentSearchTerms =>
       _recentSearchTerms..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-  final SupabaseClient _supabase = Supabase.instance.client;
 
   // 추천 검색어
   final List<SearchTerm> suggestedSearchTerms = [
@@ -115,7 +114,7 @@ class SearchViewModel extends ChangeNotifier {
     }
   }
 
-  void updateSearchText(String text) {
+  Future<void> updateSearchText(String text) async {
     // 검색 컨트롤러 업데이트
     if (searchController.text != text) {
       searchController.text = text;
@@ -126,16 +125,13 @@ class SearchViewModel extends ChangeNotifier {
 
     // 디바운싱 적용
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(Duration(milliseconds: searchDebounceTimeMs), () {
-      if (text.isNotEmpty) {
-        search();
-      }
+    _debounceTimer = Timer(Duration(milliseconds: searchDebounceTimeMs), () async {
     });
 
     notifyListeners();
   }
 
-  void updateSelectedGenre(String genre) {
+  Future<void> updateSelectedGenre(String genre) async {
     if (selectedGenre != genre) {
       selectedGenre = genre;
 
@@ -151,7 +147,7 @@ class SearchViewModel extends ChangeNotifier {
           // _applySorting();
         } else {
           // 전체 선택 시 원래 검색결과로 복원 후 다시 검색
-          search();
+          await search();
           return;
         }
       }
