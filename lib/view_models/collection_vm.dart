@@ -38,81 +38,33 @@ class CollectionViewModel extends ChangeNotifier {
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
-
   String? get lastRecognizedLabel => _lastRecognizedLabel;
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
 
   List<DiscogsSearchItem> _searchResults = [];
-
   List<DiscogsSearchItem> get searchResults => _searchResults;
 
   // Private backing field
   List<CollectionRecord> _collectionRecords = [];
-
   // Public getter
   List<CollectionRecord> get collectionRecords => _collectionRecords;
 
-  // Public setter (옵션에 따라 필요 시 정의)
+  // Public setter (컬렉션 업데이트 시 notifyListeners)
   set collectionRecords(List<CollectionRecord> records) {
     _collectionRecords = records;
     notifyListeners();
   }
 
-  void updateAnalytics(List<Record> records) {
-    int totalRecords = records.length;
+  // 분류 결과 (장르/레이블/아티스트)
+  CollectionClassification? classification;
 
-    // 장르 분석
-    var genreGroups = <String, int>{};
-    for (var record in records) {
-      genreGroups[record.genre ?? "기타"] = (genreGroups[record.genre ?? "기타"] ?? 0) + 1;
-    }
-
-    var genres = genreGroups.entries.map((entry) => GenreAnalytics(
-      name: entry.key,
-      count: entry.value,
-      // totalCount: totalRecords,
-    )).toList();
-
-    // 아티스트 분석
-    var artistGroups = <String, int>{};
-    for (var record in records) {
-      artistGroups[record.artist] = (artistGroups[record.artist] ?? 0) + 1;
-    }
-    var mostCollectedArtist = artistGroups.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-
-    // 연도별 분석
-    var decadeGroups = <String, int>{};
-    for (var record in records.where((r) => r.releaseYear != null)) {
-      String decade = "\${(record.releaseYear! ~/ 10) * 10}년대";
-      decadeGroups[decade] = (decadeGroups[decade] ?? 0) + 1;
-    }
-    var decades = decadeGroups.entries.map((entry) => DecadeAnalytics(
-      decade: entry.key,
-      count: entry.value,
-      // totalCount: totalRecords,
-    )).toList();
-
-    // 가장 많이 수집된 장르
-    var mostCollectedGenre = genres.where((g) => g.name != "기타").reduce((a, b) => a.count > b.count ? a : b).name;
-
-    // 가장 오래된/최신 레코드
-    var oldestRecord = records.map((r) => r.releaseYear ?? 0).reduce((a, b) => a < b ? a : b);
-    var newestRecord = records.map((r) => r.releaseYear ?? 0).reduce((a, b) => a > b ? a : b);
-
-    analytics = CollectionAnalytics(
-      totalRecords: totalRecords,
-      genres: genres,
-      decades: decades,
-      mostCollectedGenre: mostCollectedGenre,
-      mostCollectedArtist: mostCollectedArtist,
-      oldestRecord: oldestRecord,
-      newestRecord: newestRecord,
-    );
-    notifyListeners();
-  }
+  CollectionViewModel({
+    required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
+    required DiscogsRepository discogs_repository,
+    required CollectionRepository this.collectionRepository,
+  });
 
   Future<void> addToCollection(DiscogsSearchItem record,
     String condition,
@@ -270,12 +222,6 @@ class CollectionViewModel extends ChangeNotifier {
 
   CollectionClassification? classification;
 
-  CollectionViewModel({
-    required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
-    required DiscogsRepository discogs_repository,
-    required CollectionRepository this.collectionRepository,
-  });
-
   Future<void> fetchUserCollectionsWithRecords() async {
     _isLoading = true;
     notifyListeners();
@@ -294,70 +240,9 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  void analyzeCollection() {
-    final records = _collectionRecords;
-    int totalRecords = records.length;
-
-    // 1. 장르별 집계 (예: 각 레코드의 첫 번째 장르 기준)
-    Map<String, int> genreCounts = {};
-    for (final record in records) {
-      if (record.record.genre.isNotEmpty) {
-        String genre = record.record.genre;
-        genreCounts[genre] = (genreCounts[genre] ?? 0) + 1;
-      }
-    }
-    String mostCollectedGenre = genreCounts.isNotEmpty
-        ? genreCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
-        : '';
-
-    // 2. 아티스트별 집계 (예: 각 레코드의 첫 번째 아티스트 기준)
-    Map<String, int> artistCounts = {};
-    for (final record in records) {
-      if (record.record.artists.isNotEmpty) {
-        String artistName = record.record.artists[0].name;
-        artistCounts[artistName] = (artistCounts[artistName] ?? 0) + 1;
-      }
-    }
-    String mostCollectedArtist = artistCounts.isNotEmpty
-        ? artistCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
-        : '';
-
-    // 3. 연대별 집계 (releaseYear 값 기준)
-    Map<String, int> decadeCounts = {};
-    for (final record in records) {
-      if (record.record.releaseYear > 0) {
-        int decadeStart = (record.record.releaseYear ~/ 10) * 10;
-        String decadeLabel = "${decadeStart}'s";
-        decadeCounts[decadeLabel] = (decadeCounts[decadeLabel] ?? 0) + 1;
-      }
-    }
-
-    // 4. 가장 오래된/최신 연도 계산
-    int oldestRecord = records.isNotEmpty
-        ? records
-            .map((r) => r.record.releaseYear)
-            .reduce((a, b) => a < b ? a : b)
-        : 0;
-    int newestRecord = records.isNotEmpty
-        ? records
-            .map((r) => r.record.releaseYear)
-            .reduce((a, b) => a > b ? a : b)
-        : 0;
-
-    // 5. CollectionAnalytics 객체 생성 (모델 생성자는 상황에 맞게 정의)
-    analytics = CollectionAnalytics(
-      totalRecords: totalRecords,
-      mostCollectedGenre: mostCollectedGenre,
-      mostCollectedArtist: mostCollectedArtist,
-      oldestRecord: oldestRecord,
-      newestRecord: newestRecord,
-      genres: genreCounts.entries
-          .map((entry) => GenreAnalytics(name: entry.key, count: entry.value))
-          .toList(),
-      decades: decadeCounts.entries
-          .map((entry) => DecadeAnalytics(decade: entry.key, count: entry.value))
-          .toList(),
-    );
+  /// 컬렉션 데이터가 변경되었을 때 분류 결과를 업데이트합니다.
+  void updateClassification() {
+    classification = classifyCollections(_collectionRecords);
     notifyListeners();
   }
 }

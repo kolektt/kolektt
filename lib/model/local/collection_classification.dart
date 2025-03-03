@@ -24,23 +24,23 @@ CollectionClassification classifyCollections(
     final discogsRecord = collection.record;
 
     // 장르 분류: List<String> 형식
-    // for (var genre in discogsRecord.genre) {
-    //   if (genre.isNotEmpty) {
-    //     genreMap.putIfAbsent(genre, () => []).add(collection);
-    //   }
-    // }
-    //
-    // // 레이블 분류: List<Label> 형식
-    // for (var label in discogsRecord.labels) {
-    //   if (label.name.isNotEmpty) {
-    //     labelMap.putIfAbsent(label.name, () => []).add(collection);
-    //   }
-    // }
+    for (var genre in discogsRecord.genre.split(", ")) {
+      if (genre.isNotEmpty) {
+        genreMap.putIfAbsent(genre, () => []).add(collection);
+      }
+    }
+
+    // 레이블 분류: List<Label> 형식
+    for (var label in discogsRecord.label.split(", ")) {
+      if (label.isNotEmpty) {
+        labelMap.putIfAbsent(label, () => []).add(collection);
+      }
+    }
 
     // 아티스트 분류: List<Artist> 형식
-    for (var artist in discogsRecord.artists) {
-      if (artist.name.isNotEmpty) {
-        artistMap.putIfAbsent(artist.name, () => []).add(collection);
+    for (var artist in discogsRecord.artist.split(", ")) {
+      if (artist.isNotEmpty) {
+        artistMap.putIfAbsent(artist, () => []).add(collection);
       }
     }
   }

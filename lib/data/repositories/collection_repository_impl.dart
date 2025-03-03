@@ -28,7 +28,6 @@ class CollectionRepositoryImpl implements CollectionRepository {
             id: recordJson['id'],
             title: recordJson['title'],
             resourceUrl: '',
-            artists: [],
             notes: recordJson['notes'],
             genre: recordJson['genre'],
             coverImage: recordJson['cover_image'],

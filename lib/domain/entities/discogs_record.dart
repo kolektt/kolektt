@@ -4,7 +4,6 @@ class DiscogsRecord {
   final String artist;
   final int releaseYear;
   String resourceUrl;
-  final List<dynamic> artists;
   final String notes;
   final String genre;
   final String coverImage;
@@ -21,7 +20,6 @@ class DiscogsRecord {
     required this.id,
     required this.title,
     required this.resourceUrl,
-    required this.artists,  // TODO: artists, artist 필드 중복 해결
     required this.notes,
     required this.genre,
     required this.coverImage,
@@ -42,7 +40,6 @@ class DiscogsRecord {
       id: 1,
       title: 'Sample Record',
       resourceUrl: 'https://www.discogs.com/release/1',
-      artists: [],
       notes: '',
       genre: '',
       coverImage: '',
