@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../components/seller_row.dart';
-import '../data/models/discogs_search_response.dart';
 import '../view_models/record_detail_vm.dart';
 
 // AudioPlayerService: Swift의 AudioPlayer와 유사한 기능을 수행합니다.
@@ -136,10 +135,14 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                if (model.detailedRecord != null &&  model.detailedRecord!.artists.isNotEmpty)
-                                  Text(
-                                    model.detailedRecord!.artists.first.name,
-                                    style: const TextStyle(
+                                      if (model.detailedRecord != null &&
+                                          model.detailedRecord!.artist
+                                              .isNotEmpty)
+                                        Text(
+                                          model.detailedRecord!.artist
+                                              .split((", "))
+                                              .first,
+                                          style: const TextStyle(
                                       fontSize: 20,
                                       color: CupertinoColors.systemGrey,
                                     ),
