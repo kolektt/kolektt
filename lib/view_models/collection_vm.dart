@@ -1,8 +1,7 @@
-import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:kolektt/data/repositories/album_recognition_repository.dart';
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
@@ -12,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/models/discogs_search_response.dart';
 import '../domain/repositories/collection_repositroy.dart';
+import '../domain/repositories/discogs_record_repository.dart';
 import '../domain/repositories/discogs_repository.dart';
 import '../domain/usecases/search_and_upsert_discogs_records.dart';
 import '../model/collection_analytics.dart';
@@ -22,6 +22,7 @@ class CollectionViewModel extends ChangeNotifier {
   CollectionRepository collectionRepository;
   AlbumRecognitionRepository albumRecognitionRepository;
   ProfileRepository _profileRepository = ProfileRepository();
+  DiscogsRecordRepository discogsRecordRepository;
 
   File? selectedImage;
   RecognitionResult? recognitionResult;
@@ -67,13 +68,16 @@ class CollectionViewModel extends ChangeNotifier {
     required DiscogsRepository discogs_repository,
     required CollectionRepository this.collectionRepository,
     required AlbumRecognitionRepository this.albumRecognitionRepository,
+    required DiscogsRecordRepository this.discogsRecordRepository,
   });
 
-  Future<void> addToCollection(DiscogsSearchItem record,
+  Future<void> addToCollection(
+    DiscogsSearchItem record,
     String condition,
     double purchasePrice,
-      DateTime purchaseDate,
-      List<String> _tagList) async {
+    DateTime purchaseDate,
+    List<String> _tagList,
+  ) async {
     _isAdding = true;
     _errorMessage = null;
     notifyListeners();
@@ -89,7 +93,6 @@ class CollectionViewModel extends ChangeNotifier {
         'record_id': record.id.toInt(),
         'condition': condition,
         'purchase_price': purchasePrice,
-        // 'notes': record.notes ?? '', // DiscogsRecord notes
         'purchase_date': purchaseDate.toIso8601String(),
         'tags': _tagList,
       };
@@ -101,8 +104,6 @@ class CollectionViewModel extends ChangeNotifier {
       }
 
       await collectionRepository.insertUserCollection(insertData);
-      // insertData['purchase_date'] = DateTime.now().toIso8601String();
-
     } catch (e) {
       _errorMessage = '컬렉션 추가 실패: $e';
     } finally {
@@ -168,21 +169,14 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> addDiscogsRecordToDB(DiscogsSearchItem record) async {
     try {
       // TODO: DiscogsRecord → Record 변환
-      // Supabase insert
-      // final response = await supabase
-      //     .from('records')
-      //     .insert(record.toJson())
-      //     .single(); // single() → 단일 row 반환
-      //
-      // print('Record inserted successfully: $response');
+      await discogsRecordRepository.addDiscogsRecord(record);
     } catch (e) {
-      print('Error inserting record: $e');
-      rethrow; // 필요하면 에러를 상위로 던짐
+      log('Error inserting record: $e');
+      rethrow;
     }
   }
 
-  CollectionClassification? classification;
-
+  /// 컬렉션을 불러온 후, CollectionClassification 함수를 호출하여 분류 결과를 저장합니다.
   Future<void> fetchUserCollectionsWithRecords() async {
     _isLoading = true;
     notifyListeners();

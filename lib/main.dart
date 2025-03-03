@@ -1,4 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/data/datasources/google_vision_data_source.dart';
+import 'package:kolektt/data/repositories/album_recognition_repository.dart';
+import 'package:kolektt/data/repositories/discogs_record_repository_impl.dart';
 import 'package:kolektt/view_models/analytics_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,6 +32,8 @@ import 'package:kolektt/view_models/search_vm.dart';
 
 // Views
 import 'package:kolektt/view/content_view.dart';
+
+import 'data/datasources/record_data_source.dart';
 
 /// 기본 색상 (Primary Blue: #0036FF)
 final Color primaryColor = const Color(0xFF0036FF);
@@ -135,6 +140,16 @@ class KolekttApp extends StatelessWidget {
               remoteDataSource: CollectionRemoteDataSource(
                 supabase: Supabase.instance.client,
               ),
+            ),
+            albumRecognitionRepository: AlbumRecognitionRepository(
+                dataSource: GoogleVisionDataSource(
+                    apiKey: 'ya29.a0AeXRPp7EhJzihIXjaDG_3qY6XyIodza2VNoZfzRqGbhz9og4RJ7RK_fjpNQiu_uPGeWEOXiEcUqY8dj77X2uw8LYyZWg0mGKygG_iNDdRAHMvHBk5z1x4dZceCkXgnsmnRV_B5ryszspV_HE8wCKVphv124iJ2LfmSv-ZmDQq6UaFsgaCgYKAd4SARESFQHGX2Mio6NV5xvu8mS0SBaxBbg1HA0182'
+                )
+            ),
+            discogsRecordRepository: DiscogsRecordRepositoryImpl(
+                recordDataSource: RecordDataSource(
+                    supabase: Supabase.instance.client
+                )
             ),
           ),
         ),
