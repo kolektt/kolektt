@@ -27,7 +27,7 @@ class AuthViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   /// 현재 로그인된 User
-  get currentUser async => profileRepository.getCurrentUser();
+  User get currentUser => profileRepository.getCurrentUser();
 
   Future<void> fetchCurrentUser() async {
     _setLoading(true);

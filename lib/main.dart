@@ -1,27 +1,24 @@
 import 'package:flutter/cupertino.dart';
-import 'package:kolektt/data/datasources/google_vision_data_source.dart';
-import 'package:kolektt/data/repositories/album_recognition_repository_impl.dart';
-import 'package:kolektt/data/repositories/discogs_record_repository_impl.dart';
-import 'package:kolektt/view_models/analytics_vm.dart';
-import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 // Data sources
 import 'package:kolektt/data/datasources/collection_remote_data_source.dart';
 import 'package:kolektt/data/datasources/discogs_remote_data_source.dart';
+import 'package:kolektt/data/datasources/google_vision_data_source.dart';
 import 'package:kolektt/data/datasources/recent_search_local_data_source.dart';
-
+import 'package:kolektt/data/repositories/album_recognition_repository_impl.dart';
 // Repositories
 import 'package:kolektt/data/repositories/collection_repository_impl.dart';
+import 'package:kolektt/data/repositories/discogs_record_repository_impl.dart';
 import 'package:kolektt/data/repositories/discogs_repository_impl.dart';
 import 'package:kolektt/data/repositories/discogs_storage_repository_impl.dart';
 import 'package:kolektt/data/repositories/recent_search_repository_impl.dart';
-import 'package:kolektt/repository/sale_repository.dart';
-
 // Domain UseCases
 import 'package:kolektt/domain/usecases/search_and_upsert_discogs_records.dart';
+import 'package:kolektt/repository/sale_repository.dart';
 
+// Views
+import 'package:kolektt/view/content_view.dart';
+import 'package:kolektt/view/login_view.dart';
+import 'package:kolektt/view_models/analytics_vm.dart';
 // ViewModels
 import 'package:kolektt/view_models/auth_vm.dart';
 import 'package:kolektt/view_models/collection_vm.dart';
@@ -29,9 +26,9 @@ import 'package:kolektt/view_models/home_vm.dart';
 import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:kolektt/view_models/sale_vm.dart';
 import 'package:kolektt/view_models/search_vm.dart';
-
-// Views
-import 'package:kolektt/view/content_view.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data/datasources/record_data_source.dart';
 
@@ -205,8 +202,24 @@ class KolekttApp extends StatelessWidget {
             textStyle: AppTextStyles.bodyL,
           ),
         ),
-        home: const ContentView(),
+        home: const AuthenticationWrapper(),
       ),
     );
+  }
+}
+
+/// 인증 상태에 따라 적절한 화면을 표시하는 래퍼 위젯
+class AuthenticationWrapper extends StatelessWidget {
+  const AuthenticationWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final supabase = Supabase.instance.client;
+
+    if (supabase.auth.currentUser != null) {
+      return const ContentView();
+    } else {
+      return LoginView();
+    }
   }
 }

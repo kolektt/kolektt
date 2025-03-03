@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../../main.dart';
 import '../../view_models/auth_vm.dart';
 import 'chage_password_view.dart';
 import 'delete_account_view.dart';
@@ -303,6 +304,22 @@ class _EditProfileViewState extends State<EditProfileView> {
                                 );
                               },
                             ),
+                            _buildActionButton(
+                              icon: CupertinoIcons.arrow_left_right,
+                              label: "로그아웃",
+                              onPressed: () async {
+                                final auth = context.read<AuthViewModel>();
+                                await auth.signOut();
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => KolekttApp(),
+                                    maintainState: false,
+                                  ),
+                                  (route) => true,
+                                );
+                              },
+                            )
                           ],
                         ),
                       ),

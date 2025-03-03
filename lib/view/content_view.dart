@@ -10,48 +10,43 @@ class ContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-      theme: CupertinoThemeData(
-        primaryColor: primaryColor,
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        activeColor: primaryColor,
+        inactiveColor: CupertinoColors.systemGrey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.home),
+            label: "홈",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.square_grid_2x2_fill),
+            label: "컬렉션",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.person_fill),
+            label: "프로필",
+          ),
+        ],
       ),
-      home: CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          activeColor: primaryColor,
-          inactiveColor: CupertinoColors.systemGrey,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.home),
-              label: "홈",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.square_grid_2x2_fill),
-              label: "컬렉션",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person_fill),
-              label: "프로필",
-            ),
-          ],
-        ),
-        tabBuilder: (context, index) {
-          switch (index) {
-            case 0:
-              return CupertinoTabView(
-                builder: (context) => HomeView(),
-              );
-            case 1:
-              return CupertinoTabView(
-                builder: (context) => coll.CollectionView(),
-              );
-            case 2:
-              return CupertinoTabView(
-                builder: (context) => const ProfileView(),
-              );
-            default:
-              return Container();
-          }
-        },
-      ),
+      tabBuilder: (context, index) {
+        switch (index) {
+          case 0:
+            return CupertinoTabView(
+              builder: (context) => HomeView(),
+            );
+          case 1:
+            return CupertinoTabView(
+              builder: (context) => coll.CollectionView(),
+            );
+          case 2:
+            return CupertinoTabView(
+              builder: (context) => const ProfileView(),
+            );
+          default:
+            return Container();
+        }
+      },
     );
   }
 }

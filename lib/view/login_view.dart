@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
 import '../view_models/auth_vm.dart';
 
 class LoginView extends StatefulWidget {
@@ -233,7 +234,8 @@ class _LoginViewState extends State<LoginView> {
                         _pwController.text.trim(),
                       );
                       if (authVM.currentUser != null) {
-                        Navigator.pop(context);
+                        Navigator.pushAndRemoveUntil(
+                            context, CupertinoPageRoute(builder: (context) => AuthenticationWrapper()), (route) => false);
                       }
                     },
                     child: authVM.isLoading

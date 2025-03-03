@@ -165,7 +165,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   Future<void> addDiscogsRecordToDB(DiscogsSearchItem record) async {
     try {
-      // TODO: DiscogsRecord → Record 변환
+      // TODO: DiscogsSearchItem → Record 변환
       await discogsRecordRepository.addDiscogsRecord(record);
     } catch (e) {
       log('Error inserting record: $e');
