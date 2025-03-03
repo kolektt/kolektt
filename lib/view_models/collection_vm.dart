@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kolektt/data/repositories/album_recognition_repository.dart';
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
 import 'package:kolektt/model/supabase/user_collection.dart';
@@ -19,6 +20,7 @@ import '../model/local/collection_classification.dart'; // classifyCollections �
 class CollectionViewModel extends ChangeNotifier {
   final SearchAndUpsertDiscogsRecords searchAndUpsertUseCase;
   CollectionRepository collectionRepository;
+  AlbumRecognitionRepository albumRecognitionRepository;
   ProfileRepository _profileRepository = ProfileRepository();
 
   File? selectedImage;
@@ -64,6 +66,7 @@ class CollectionViewModel extends ChangeNotifier {
     required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
     required DiscogsRepository discogs_repository,
     required CollectionRepository this.collectionRepository,
+    required AlbumRecognitionRepository this.albumRecognitionRepository,
   });
 
   Future<void> addToCollection(DiscogsSearchItem record,
@@ -136,49 +139,12 @@ class CollectionViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final base64Image = base64Encode(await image.readAsBytes());
-      final url = Uri.parse('https://vision.googleapis.com/v1/images:annotate');
-
-      // Google Vision API 요청 바디
-      final requestBody = {
-        'requests': [
-          {
-            'image': {'content': base64Image},
-            'features': [
-              {'type': 'WEB_DETECTION'}
-            ]
-          }
-        ]
-      };
-
-      // Vision API 호출
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': "Bearer " + _googleVisionApiKey,
-          'x-goog-user-project': 'kolektt',
-          'Content-Type': 'application/json; charset=utf-8'
-        },
-        body: jsonEncode(requestBody),
-      );
-
-      debugPrint('Google Vision API Response: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final bestGuessLabels =
-            data['responses']?[0]?['webDetection']?['bestGuessLabels'];
-
-        if (bestGuessLabels != null && bestGuessLabels.isNotEmpty) {
-          _lastRecognizedLabel = bestGuessLabels.first['label'] as String?;
-          // Discogs 검색
-          await _searchOnDiscogs(_lastRecognizedLabel ?? '');
-        } else {
-          _errorMessage = '앨범 라벨을 인식하지 못했습니다.';
-        }
+      final label = await albumRecognitionRepository.recognizeAlbumLabel(image);
+      if (label != null && label.isNotEmpty) {
+        _lastRecognizedLabel = label;
+        await _searchOnDiscogs(label);
       } else {
-        _errorMessage =
-            'Google Vision API 호출 실패 (Status: ${response.statusCode})';
+        _errorMessage = '앨범 라벨을 인식하지 못했습니다.';
       }
     } catch (e) {
       _errorMessage = '네트워크 오류: $e';
