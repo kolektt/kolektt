@@ -50,8 +50,8 @@ class DiscogsRemoteDataSource {
 
       final Map<String, dynamic> data = json.decode(response.body);
       debugPrint("Discogs search results: ${data}");
-      final DiscogsSearchResponse discogs_search_response =
-          DiscogsSearchResponse.fromJson(data);
+      final DiscogsSearchResponse discogs_search_response = DiscogsSearchResponse.fromJson(data);
+      debugPrint('Discogs search response: ${discogs_search_response}');
       final List<DiscogsSearchItem> results = discogs_search_response.results;
       debugPrint('Discogs search results: ${results[0].title}');
       return results;

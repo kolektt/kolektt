@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/view_models/analytics_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -137,6 +138,8 @@ class KolekttApp extends StatelessWidget {
             ),
           ),
         ),
+
+        ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
 
         // 검색 관련 뷰모델
         ChangeNotifierProvider(
