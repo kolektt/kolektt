@@ -2,14 +2,15 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:kolektt/data/repositories/album_recognition_repository_impl.dart';
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
 import 'package:kolektt/model/supabase/user_collection.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../components/filter_cupertino_sheet.dart';
 import '../data/models/discogs_search_response.dart';
+import '../data/models/user_collection_classification.dart';
 import '../domain/repositories/album_recognition_repository.dart';
 import '../domain/repositories/collection_repositroy.dart';
 import '../domain/repositories/discogs_record_repository.dart';
@@ -29,25 +30,36 @@ class CollectionViewModel extends ChangeNotifier {
   RecognitionResult? recognitionResult;
   CollectionAnalytics? analytics;
 
+  late UserCollectionClassification _userCollectionClassification;
+
+  UserCollectionClassification get userCollectionClassification =>
+      _userCollectionClassification;
+
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isAdding = false;
+
   bool get isAdding => _isAdding;
 
   String? _errorMessage;
+
   String? get errorMessage => _errorMessage;
 
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
+
   String? get lastRecognizedLabel => _lastRecognizedLabel;
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   List<DiscogsSearchItem> _searchResults = [];
+
   List<DiscogsSearchItem> get searchResults => _searchResults;
 
   // Private backing field
   List<CollectionRecord> _collectionRecords = [];
+
   // Public getter
   List<CollectionRecord> get collectionRecords => _collectionRecords;
 
@@ -112,7 +124,8 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> removeRecord(CollectionRecord record) async {
     try {
       collectionRepository.deleteUserCollection(record.user_collection.id);
-      _collectionRecords.removeWhere((r) => r.user_collection.id == record.user_collection.id);
+      _collectionRecords.removeWhere(
+          (r) => r.user_collection.id == record.user_collection.id);
       notifyListeners();
       debugPrint('Record removed successfully.');
     } catch (e) {
@@ -192,9 +205,25 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  /// 컬렉션 데이터가 변경되었을 때 분류 결과를 업데이트합니다.
-  void updateClassification() {
-    classification = classifyCollections(_collectionRecords);
-    notifyListeners();
+  Future<void> fetchUserCollectionsUniqueProperties() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final userId = _profileRepository.getCurrentUserId();
+      _userCollectionClassification = await collectionRepository.fetchUniqueProperties(userId);
+    } catch (e) {
+      _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
+      debugPrint('Error fetching user collection: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+
+    /// 컬렉션 데이터가 변경되었을 때 분류 결과를 업데이트합니다.
+    void updateClassification() {
+      classification = classifyCollections(_collectionRecords);
+      notifyListeners();
+    }
   }
 }

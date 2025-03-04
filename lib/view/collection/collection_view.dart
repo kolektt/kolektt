@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/analytics_section.dart';
 import '../../components/collection_grid_item.dart';
+import '../../components/filter_cupertino_sheet.dart';
 import '../../model/local/collection_record.dart';
 import '../../view_models/collection_vm.dart';
 import '../auto_album_detection_view.dart';
@@ -20,7 +20,9 @@ class _CollectionViewState extends State<CollectionView> {
   void initState() {
     super.initState();
     // Fetch collection records on initialization.
-    Provider.of<CollectionViewModel>(context, listen: false).fetchUserCollectionsWithRecords();
+    Provider.of<CollectionViewModel>(context, listen: false)
+      ..fetchUserCollectionsWithRecords()
+      ..fetchUserCollectionsUniqueProperties();
   }
 
   @override
@@ -59,6 +61,13 @@ class _CollectionViewState extends State<CollectionView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AnalyticsSection(records: model.collectionRecords),
+                  const SizedBox(height: 16),
+                  FilterButton(
+                      classification: model.userCollectionClassification,
+                      onFilterResult: (result) {
+                        // model.filterCollection(result);
+                      }
+                  ),
                   const SizedBox(height: 16),
                   GridView.builder(
                     shrinkWrap: true,

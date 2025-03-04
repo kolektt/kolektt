@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:provider/provider.dart';
 
 import '../model/local/collection_record.dart';
 import '../view/collection/collection_edit_page.dart';
 import '../view_models/collection_vm.dart';
 
 Widget buildGridItem(
-    context, CollectionRecord record, CollectionViewModel model) {
+    BuildContext context, CollectionRecord record, CollectionViewModel model) {
   final currencyFormat = NumberFormat.currency(symbol: '₩', decimalDigits: 0);
 
   return GestureDetector(
@@ -54,35 +55,59 @@ Widget buildGridItem(
         await Provider.of<CollectionViewModel>(context, listen: false).fetchUserCollectionsWithRecords();
       }
     },
-    child: Card(
-      elevation: 2,
+    child: Container(
+      margin: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemBackground,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.systemGrey4.withOpacity(0.5),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Album cover image
+          // 앨범 커버 이미지
           Expanded(
             child: record.record.coverImage.isNotEmpty
-                ? FadeInImage.memoryNetwork(
-                    placeholder: kTransparentImage,
-                    image: record.record.coverImage,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    imageErrorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 50,
-                        height: 50,
-                        color: CupertinoColors.systemGrey5,
-                        child: const Icon(
-                          CupertinoIcons.music_note,
-                          color: CupertinoColors.systemGrey2,
-                        ),
-                      );
-                    },
-                  )
+                ? ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
+              child: FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: record.record.coverImage,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 50,
+                    height: 50,
+                    color: CupertinoColors.systemGrey5,
+                    child: const Icon(
+                      CupertinoIcons.music_note,
+                      color: CupertinoColors.systemGrey2,
+                    ),
+                  );
+                },
+              ),
+            )
                 : Container(
-                    color: Colors.grey,
-                    child: const Icon(Icons.image),
-                  ),
+              decoration: BoxDecoration(
+                color: CupertinoColors.systemGrey5,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                CupertinoIcons.photo,
+                size: 50,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -91,6 +116,7 @@ Widget buildGridItem(
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: CupertinoColors.black,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

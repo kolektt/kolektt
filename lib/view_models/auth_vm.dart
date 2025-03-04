@@ -29,16 +29,51 @@ class AuthViewModel with ChangeNotifier {
   /// 현재 로그인된 User
   User get currentUser => profileRepository.getCurrentUser();
 
+  // Modified to avoid notifyListeners during build
   Future<void> fetchCurrentUser() async {
-    _setLoading(true);
+    // Set loading state without notifying listeners immediately
+    _isLoading = true;
     _errorMessage = null;
-    notifyListeners();
+    
+    try {
+      // Fetch data without notifying during each operation
+      final profileFuture = fetchProfileSilently();
+      final statsFuture = fetchUserStatsSilently();
+      
+      await Future.wait([profileFuture, statsFuture]);
+      
+      // Notify listeners only once at the end
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = 'Error fetching user data: $e';
+      notifyListeners();
+    }
+  }
 
-    await Future.wait([
-      fetchProfile(),
-      fetchUserStats(),
-    ]);
-    notifyListeners();
+  // Silent version that doesn't call notifyListeners
+  Future<void> fetchProfileSilently() async {
+    try {
+      _profiles = await profileRepository.getCurrentProfile();
+      if (_profiles == null) {
+        throw Exception('프로필 조회 실패: 사용자 정보를 찾을 수 없습니다.');
+      }
+    } catch (e) {
+      _errorMessage = '프로필 조회 오류: $e';
+      debugPrint('프로필 조회 오류: $e');
+      rethrow;
+    }
+  }
+
+  // Silent version that doesn't call notifyListeners
+  Future<void> fetchUserStatsSilently() async {
+    try {
+      _userStats = await profileRepository.getCurrentUserStats();
+    } catch (e) {
+      _errorMessage = '사용자 통계 조회 오류: $e';
+      rethrow;
+    }
   }
 
   /// 이메일/비밀번호 로그인

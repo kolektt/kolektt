@@ -19,7 +19,7 @@ dependencies:
   cached_network_image: ^3.4.1
   fl_chart: ^0.70.2
   audioplayers: ^6.2.0
-  modal_bottom_sheet: ^3.0.0
+  flutter_cupernino_bottom_sheet: ^1.0.8
   webview_flutter: ^4.10.0
   supabase_flutter: ^2.8.4
   transparent_image: ^2.0.1

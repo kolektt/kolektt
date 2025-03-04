@@ -6,6 +6,7 @@ import '../../domain/entities/discogs_record.dart';
 import '../../domain/repositories/collection_repositroy.dart';
 import '../../model/supabase/user_collection.dart';
 import '../datasources/collection_remote_data_source.dart';
+import '../models/user_collection_classification.dart';
 
 class CollectionRepositoryImpl implements CollectionRepository {
   final CollectionRemoteDataSource remoteDataSource;
@@ -14,41 +15,7 @@ class CollectionRepositoryImpl implements CollectionRepository {
 
   @override
   Future<List<CollectionRecord>> fetchUserCollection(String userId) async {
-    final collectionJsonList = await remoteDataSource.fetchUserCollection(userId);
-
-    List<CollectionRecord> _collectionRecords =
-        collectionJsonList.map<CollectionRecord>((item) {
-      final recordId = item['record_id'];
-      final recordJson = item['records'] as Map<String, dynamic>?;
-      debugPrint('recordJson: $recordJson');
-      if (recordJson != null) {
-        recordJson['id'] = recordId;
-        return CollectionRecord(
-          record: DiscogsRecord(
-            id: recordJson['id'],
-            title: recordJson['title'],
-            resourceUrl: '',
-            notes: recordJson['notes'],
-            genre: recordJson['genre'],
-            coverImage: recordJson['cover_image'],
-            catalogNumber: recordJson['catalog_number'],
-            label: recordJson['label'],
-            format: recordJson['format'],
-            country: recordJson['country'],
-            style: recordJson['style'],
-            condition: recordJson['condition'],
-            conditionNotes: recordJson['condition_notes'],
-            recordId: recordJson['record_id'],
-            artist: recordJson['artist'],
-            releaseYear: recordJson['release_year'],
-          ),
-          user_collection: UserCollection.fromJson(item),
-        );
-      } else {
-        return CollectionRecord.sampleData[0];
-      }
-    }).toList();
-
+    List<CollectionRecord> _collectionRecords = await remoteDataSource.fetchUserCollection(userId);
     return _collectionRecords;
   }
 
@@ -65,5 +32,11 @@ class CollectionRepositoryImpl implements CollectionRepository {
   @override
   Future<void> deleteUserCollection(String id) {
     return remoteDataSource.deleteUserCollection(id);
+  }
+
+  @override
+  Future<UserCollectionClassification> fetchUniqueProperties(String userId) async {
+    List<CollectionRecord> _collectionRecords = await remoteDataSource.fetchUserCollection(userId);
+    return CollectionRecord.getUniqueProperties(_collectionRecords);
   }
 }

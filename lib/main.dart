@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 // Data sources
 import 'package:kolektt/data/datasources/collection_remote_data_source.dart';
 import 'package:kolektt/data/datasources/discogs_remote_data_source.dart';
@@ -192,17 +194,20 @@ class KolekttApp extends StatelessWidget {
           ),
         ),
       ],
-      child: CupertinoApp(
-        title: 'Kolektt',
-        theme: CupertinoThemeData(
-          primaryColor: primaryColor,
-          scaffoldBackgroundColor: CupertinoColors.systemBackground,
-          barBackgroundColor: CupertinoColors.systemGrey6,
-          textTheme: CupertinoTextThemeData(
-            textStyle: AppTextStyles.bodyL,
+      child: CupertinoBottomSheetRepaintBoundary(
+        child: CupertinoApp(
+          title: 'Kolektt',
+          theme: CupertinoThemeData(
+            primaryColor: primaryColor,
+            scaffoldBackgroundColor: CupertinoColors.systemBackground,
+            barBackgroundColor: CupertinoColors.systemGrey6,
+            textTheme: CupertinoTextThemeData(
+              textStyle: AppTextStyles.bodyL,
+            ),
           ),
+          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[DefaultMaterialLocalizations.delegate],
+          home: const AuthenticationWrapper(),
         ),
-        home: const AuthenticationWrapper(),
       ),
     );
   }

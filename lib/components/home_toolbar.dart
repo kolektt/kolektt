@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 
 import '../view/SearchView.dart';
 import '../view/notification.dart';
@@ -15,22 +15,16 @@ class HomeToolbar extends StatelessWidget {
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.search),
           onPressed: () async {
-            await showCupertinoModalBottomSheet(
-              context: context,
-              builder: (_) => SearchView(),
-              useRootNavigator: true,
-            );
+            Navigator.of(context).push(
+                CupertinoBottomSheetRoute(builder: (context) => SearchView()));
           },
         ),
         CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.bell),
           onPressed: () async {
-            await showCupertinoModalBottomSheet(
-              context: context,
-              builder: (_) => NotificationsView(),
-              useRootNavigator: true,
-            );
+            Navigator.of(context).push(
+                CupertinoBottomSheetRoute(builder: (context) => NotificationsView()));
           },
         ),
       ],
