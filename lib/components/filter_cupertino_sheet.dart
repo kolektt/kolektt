@@ -118,22 +118,26 @@ class FilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      color: CupertinoColors.activeBlue,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      onPressed: () => _openFilterSheet(context),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          Icon(CupertinoIcons.slider_horizontal_3, color: Colors.white),
-          SizedBox(width: 8),
-          Text(
-            'Filter',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          CupertinoButton(
+            onPressed: () => _openFilterSheet(context),
+            padding: EdgeInsets.zero,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Filter',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(width: 4),
+                Icon(CupertinoIcons.chevron_down),
+              ],
             ),
-          ),
+          )
         ],
       ),
     );
