@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // Data sources
 import 'package:kolektt/data/datasources/collection_remote_data_source.dart';
 import 'package:kolektt/data/datasources/discogs_remote_data_source.dart';
@@ -16,7 +18,6 @@ import 'package:kolektt/data/repositories/recent_search_repository_impl.dart';
 // Domain UseCases
 import 'package:kolektt/domain/usecases/search_and_upsert_discogs_records.dart';
 import 'package:kolektt/repository/sale_repository.dart';
-
 // Views
 import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view/login_view.dart';
@@ -52,6 +53,15 @@ Future<void> main() async {
     anonKey:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3ZG5qZHVjd3F3Zm1iZmlndWdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MDQ4OTk5MywiZXhwIjoyMDU2MDY1OTkzfQ.S6u5gaLR5JeL76aJa0jRXzvTGeIYsXU4qPJ63QEEY1I',
   );
+
+  // Load different files based on environment
+  if (kReleaseMode) {
+    // In production, load the production environment file
+    await dotenv.load(fileName: ".env.prod");
+  } else {
+    // In development, load the default .env file
+    await dotenv.load();
+  }
 
   runApp(const KolekttApp());
 }
@@ -142,9 +152,9 @@ class KolekttApp extends StatelessWidget {
             ),
             albumRecognitionRepository: AlbumRecognitionRepositoryImpl(
                 dataSource: GoogleVisionDataSource(
-                    apiKey: 'ya29.a0AeXRPp7EhJzihIXjaDG_3qY6XyIodza2VNoZfzRqGbhz9og4RJ7RK_fjpNQiu_uPGeWEOXiEcUqY8dj77X2uw8LYyZWg0mGKygG_iNDdRAHMvHBk5z1x4dZceCkXgnsmnRV_B5ryszspV_HE8wCKVphv124iJ2LfmSv-ZmDQq6UaFsgaCgYKAd4SARESFQHGX2Mio6NV5xvu8mS0SBaxBbg1HA0182'
-                )
-            ),
+              apiKey: dotenv.env["GOOGLE_CLOUD_API_KEY"] ?? "",
+              project: dotenv.env["GOOGLE_CLOUD_PROJECT_ID"] ?? "",
+            )),
             discogsRecordRepository: DiscogsRecordRepositoryImpl(
                 recordDataSource: RecordDataSource(
                     supabase: Supabase.instance.client

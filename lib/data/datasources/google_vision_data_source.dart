@@ -11,12 +11,12 @@ class GoogleVisionDataSource {
 
   GoogleVisionDataSource({
     required this.apiKey,
-    this.project = 'kolektt',
+    required this.project,
   });
 
   Future<String?> recognizeAlbumLabel(File image) async {
     final base64Image = base64Encode(await image.readAsBytes());
-    final url = Uri.parse('https://vision.googleapis.com/v1/images:annotate');
+    final url = Uri.parse('https://vision.googleapis.com/v1/images:annotate?key=$apiKey');
 
     final requestBody = {
       'requests': [
@@ -32,8 +32,6 @@ class GoogleVisionDataSource {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': "Bearer $apiKey",
-        'x-goog-user-project': project,
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: jsonEncode(requestBody),
