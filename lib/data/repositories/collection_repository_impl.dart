@@ -35,7 +35,13 @@ class CollectionRepositoryImpl implements CollectionRepository {
   @override
   Future<UserCollectionClassification> fetchUniqueProperties(String userId) async {
     List<CollectionRecord> _collectionRecords = await remoteDataSource.fetchUserCollection(userId);
-    return CollectionRecord.getUniqueProperties(_collectionRecords);
+    UserCollectionClassification result = await CollectionRecord.getUniqueProperties(_collectionRecords);
+
+    // 빈 문자열 제거
+    result.genres.remove("");
+    result.artists.remove("");
+    result.labels.remove("");
+    return result;
   }
 
   @override

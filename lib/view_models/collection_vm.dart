@@ -209,8 +209,8 @@ class CollectionViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-
       _userCollectionClassification = await collectionRepository.fetchUniqueProperties(userId);
+      debugPrint('UserCollectionClassification: ${_userCollectionClassification.genres}, ${_userCollectionClassification.labels}, ${_userCollectionClassification.artists}');
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
       debugPrint('Error fetching user collection: $e');
