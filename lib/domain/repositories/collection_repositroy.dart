@@ -8,4 +8,5 @@ abstract class CollectionRepository {
   Future<void> updateUserCollection(UserCollection data);
   Future<void> deleteUserCollection(String id);
   Future<UserCollectionClassification> fetchUniqueProperties(String userId);
+  Future<List<CollectionRecord>> filterUserCollection(String userId, UserCollectionClassification classification);
 }

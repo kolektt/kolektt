@@ -39,4 +39,9 @@ class CollectionRepositoryImpl implements CollectionRepository {
     List<CollectionRecord> _collectionRecords = await remoteDataSource.fetchUserCollection(userId);
     return CollectionRecord.getUniqueProperties(_collectionRecords);
   }
+
+  @override
+  Future<List<CollectionRecord>> filterUserCollection(String userId, UserCollectionClassification classification) async {
+    return await remoteDataSource.filterUserCollection(userId, classification);
+  }
 }

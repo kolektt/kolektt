@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/model/recognition.dart';
@@ -32,8 +33,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   late UserCollectionClassification _userCollectionClassification;
 
-  UserCollectionClassification get userCollectionClassification =>
-      _userCollectionClassification;
+  UserCollectionClassification get userCollectionClassification => _userCollectionClassification;
 
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isAdding = false;
@@ -223,6 +223,27 @@ class CollectionViewModel extends ChangeNotifier {
     /// 컬렉션 데이터가 변경되었을 때 분류 결과를 업데이트합니다.
     void updateClassification() {
       classification = classifyCollections(_collectionRecords);
+      notifyListeners();
+    }
+  }
+
+  Future<void> filterCollection(UserCollectionClassification classification) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final userId = _profileRepository.getCurrentUserId();
+      _collectionRecords = await collectionRepository.filterUserCollection(userId, classification);
+
+      if (!kDebugMode) return;
+      for (var record in _collectionRecords) {
+        debugPrint('Filtered record: ${record.record.title}');
+      }
+    } catch (e) {
+      _errorMessage = '컬렉션 필터링 중 오류가 발생했습니다: $e';
+      debugPrint('Error filtering user collection: $e');
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }

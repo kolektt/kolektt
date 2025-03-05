@@ -64,8 +64,9 @@ class _CollectionViewState extends State<CollectionView> {
                   const SizedBox(height: 16),
                   FilterButton(
                       classification: model.userCollectionClassification,
-                      onFilterResult: (result) {
-                        // model.filterCollection(result);
+                      onFilterResult: (result) async {
+                        debugPrint("UserCollectionClassification: ${result.artists}, ${result.genres}, ${result.labels}");
+                        await model.filterCollection(result);
                       }
                   ),
                   const SizedBox(height: 16),
