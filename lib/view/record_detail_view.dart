@@ -167,7 +167,11 @@ class _RecordDetailViewState extends State<RecordDetailView> {
                                               .profiles[index]
                                               .display_name
                                               .toString(),
-                                          price: 50000 + (index * 5000),
+                                          price: model
+                                              .salesListingWithProfile!
+                                              .salesListing[index]
+                                              .price
+                                              .toInt(),
                                           condition: model
                                               .salesListingWithProfile!
                                               .salesListing[index].condition
