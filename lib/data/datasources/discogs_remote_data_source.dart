@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/discogs_record.dart';
@@ -9,9 +10,8 @@ import '../models/discogs_search_response.dart';
 class DiscogsRemoteDataSource {
   static const String baseUrl = 'https://api.discogs.com';
 
-  // TODO: .env 파일로 이동
-  static const String apiKey = 'AKbXcCERIpZjuzCiOBLt';
-  static const String apiSecret = 'BUDuGFBBkChCYYCiRbyWvVxEPlEbqVkX';
+  static String apiKey = dotenv.env["DISCOGS_API_KEY"] ?? "";
+  static String apiSecret = dotenv.env["DISCOGS_API_SECRET_KEY"] ?? "";
 
   Future<List<DiscogsSearchItem>> searchDiscogs(String query, {String? type}) async {
     if (query.isEmpty) {

@@ -48,12 +48,6 @@ Future<void> main() async {
   // Hive.registerAdapter(RecordAdapter());
   // await Hive.openBox<Record>('records');
 
-  await Supabase.initialize(
-    url: 'https://awdnjducwqwfmbfigugq.supabase.co',
-    anonKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3ZG5qZHVjd3F3Zm1iZmlndWdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MDQ4OTk5MywiZXhwIjoyMDU2MDY1OTkzfQ.S6u5gaLR5JeL76aJa0jRXzvTGeIYsXU4qPJ63QEEY1I',
-  );
-
   // Load different files based on environment
   if (kReleaseMode) {
     // In production, load the production environment file
@@ -62,6 +56,11 @@ Future<void> main() async {
     // In development, load the default .env file
     await dotenv.load();
   }
+
+  await Supabase.initialize(
+    url: dotenv.env["SUPABASE_URL"] ?? "",
+    anonKey:dotenv.env["SUPABASE_API_KEY"] ?? "",
+  );
 
   runApp(const KolekttApp());
 }
