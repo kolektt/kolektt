@@ -69,6 +69,8 @@ class CollectionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  String get userId => _profileRepository.getCurrentUserId();
+
   // 분류 결과 (장르/레이블/아티스트)
   CollectionClassification? classification;
 
@@ -192,9 +194,7 @@ class CollectionViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = _profileRepository.getCurrentUserId();
-      collectionRecords =
-          await collectionRepository.fetchUserCollection(userId);
+      collectionRecords = await collectionRepository.fetchUserCollection(userId);
       classification = classifyCollections(collectionRecords);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
@@ -210,7 +210,6 @@ class CollectionViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final userId = _profileRepository.getCurrentUserId();
       _userCollectionClassification = await collectionRepository.fetchUniqueProperties(userId);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
@@ -232,7 +231,6 @@ class CollectionViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final userId = _profileRepository.getCurrentUserId();
       _collectionRecords = await collectionRepository.filterUserCollection(userId, classification);
 
       if (!kDebugMode) return;
