@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data/datasources/record_data_source.dart';
+import 'firebase_options.dart';
 
 /// 기본 색상 (Primary Blue: #0036FF)
 final Color primaryColor = const Color(0xFF0036FF);
@@ -60,6 +62,10 @@ Future<void> main() async {
   await Supabase.initialize(
     url: dotenv.env["SUPABASE_URL"] ?? "",
     anonKey:dotenv.env["SUPABASE_API_KEY"] ?? "",
+  );
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(const KolekttApp());
