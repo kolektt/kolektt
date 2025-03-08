@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "418323176401",
-    "project_id": "kolektt-aa42b",
-    "storage_bucket": "kolektt-aa42b.firebasestorage.app"
+    "project_number": "996100752806",
+    "project_id": "kolektt",
+    "storage_bucket": "kolektt.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:418323176401:android:ce716c459b6dbcd1029ef0",
+        "mobilesdk_app_id": "1:996100752806:android:1c3c6e53266b3d56fafb67",
         "android_client_info": {
           "package_name": "com.kolektt.app"
         }
@@ -15,12 +15,20 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCUp9Sj5k21SbY0N_4tQsR6RYHxqerH2Tk"
+          "current_key": "AIzaSyDwsJo2TgYU4NVMN4O-E07UBJe9NiZfcY0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996100752806-8b8ulnkli19fna1rvd18hktt206h5h7k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kolektt.app"
+              }
+            }
+          ]
         }
       }
     }

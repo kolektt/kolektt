@@ -51,22 +51,22 @@ Future<void> main() async {
   // await Hive.openBox<Record>('records');
 
   // Load different files based on environment
-  if (kReleaseMode) {
-    // In production, load the production environment file
-    await dotenv.load(fileName: ".env.prod");
-  } else {
-    // In development, load the default .env file
-    await dotenv.load();
-  }
+  // if (kReleaseMode) {
+  //   // In production, load the production environment file
+  //   await dotenv.load(fileName: ".env.prod");
+  // } else {
+  //   // In development, load the default .env file
+  //   await dotenv.load();
+  // }
+  await dotenv.load();
 
   await Supabase.initialize(
     url: dotenv.env["SUPABASE_URL"] ?? "",
     anonKey:dotenv.env["SUPABASE_API_KEY"] ?? "",
   );
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  await Firebase.initializeApp();
 
   runApp(const KolekttApp());
 }

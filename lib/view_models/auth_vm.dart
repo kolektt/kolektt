@@ -3,6 +3,8 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/supabase/profile.dart';
@@ -11,6 +13,8 @@ import '../repository/profile_repository.dart';
 
 class AuthViewModel with ChangeNotifier {
   final SupabaseClient supabase = Supabase.instance.client;
+
+  // final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final ProfileRepository profileRepository = ProfileRepository();
 
   Profiles? _profiles = null;
@@ -27,7 +31,7 @@ class AuthViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   /// 현재 로그인된 User
-  User get currentUser => profileRepository.getCurrentUser();
+  get currentUser => profileRepository.getCurrentUser();
 
   // Modified to avoid notifyListeners during build
   Future<void> fetchCurrentUser() async {
@@ -99,6 +103,59 @@ class AuthViewModel with ChangeNotifier {
       _setLoading(false);
     }
   }
+
+  // 구글 로그인
+  Future<void> signInWithGoogle() async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      /// Web Client ID that you registered with Google Cloud.
+      final webClientId = dotenv.env['GOOGLE_SIGNIN_SERVICE_CLIENT_ID'] ?? '';
+
+      /// TODO: update the iOS client ID with your own.
+      ///
+      /// iOS Client ID that you registered with Google Cloud.
+      const iosClientId = '';
+      final androidClientId = dotenv.env['GOOGLE_SIGNIN_ANDROID_DEBUG_CLIENT_ID'] ?? '';
+
+      final clientId = kIsWeb ? webClientId : Platform.isAndroid ? androidClientId : iosClientId;
+      debugPrint('clientId: $clientId');
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: clientId,
+        serverClientId: webClientId,
+      );
+      final googleUser = await googleSignIn.signIn();
+      final googleAuth = await googleUser!.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+      debugPrint('accessToken: $accessToken, idToken: $idToken');
+
+      if (accessToken == null) {
+        throw 'No Access Token found.';
+      }
+      if (idToken == null) {
+        throw 'No ID Token found.';
+      }
+
+      var res = await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+      debugPrint('res: $res');
+    } catch (e) {
+      _errorMessage = '로그인 오류: ${e.toString()}';
+      debugPrint('로그인 오류: ${e}');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Apple 로그인
+  Future<void> signInWithApple() async {}
 
   /// 회원가입
   Future<void> signUp(String email, String password) async {
@@ -189,7 +246,7 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
-    // 프로필 조회
+  // 프로필 조회
   Future<void> fetchProfile() async {
     _setLoading(true);
     _errorMessage = null;

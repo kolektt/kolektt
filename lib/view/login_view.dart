@@ -287,30 +287,42 @@ class _LoginViewState extends State<LoginView> {
 
                 SizedBox(height: 24),
 
-                // // 소셜 로그인 옵션
-                // Center(
-                //   child: Text(
-                //     '또는 다음으로 계속하기',
-                //     style: TextStyle(
-                //       color: CupertinoColors.systemGrey,
-                //       fontSize: 14,
-                //     ),
-                //   ),
-                // ),
-                //
-                // SizedBox(height: 16),
-                //
-                // // 소셜 로그인 버튼
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     _buildSocialButton(CupertinoIcons.globe, Colors.grey),
-                //     SizedBox(width: 16),
-                //     _buildSocialButton(CupertinoIcons.mail, Colors.red),
-                //     SizedBox(width: 16),
-                //     _buildSocialButton(CupertinoIcons.person, Colors.blue),
-                //   ],
-                // ),
+                // 소셜 로그인 옵션
+                Center(
+                  child: Text(
+                    '또는 다음으로 계속하기',
+                    style: TextStyle(
+                      color: CupertinoColors.systemGrey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 16),
+
+                // 소셜 로그인 버튼
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildSocialButton(
+                      Icons.email,
+                      Colors.blue,
+                      () async {
+                        await context.read<AuthViewModel>().signInWithGoogle();
+                        if (authVM.currentUser != null) {
+                          Navigator.pushAndRemoveUntil(
+                              context, CupertinoPageRoute(builder: (context) => AuthenticationWrapper()), (route) => false);
+                        }
+                    },
+                    ),
+                    SizedBox(width: 16),
+                    _buildSocialButton(
+                      CupertinoIcons.app,
+                      Colors.black,
+                      () => context.read<AuthViewModel>().signInWithApple(),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -319,7 +331,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildSocialButton(IconData icon, Color color) {
+  Widget _buildSocialButton(IconData icon, Color color, VoidCallback onPressed) {
     return Container(
       width: 50,
       height: 50,
@@ -329,9 +341,7 @@ class _LoginViewState extends State<LoginView> {
       ),
       child: CupertinoButton(
         padding: EdgeInsets.zero,
-        onPressed: () {
-          // 소셜 로그인 구현
-        },
+        onPressed: onPressed,
         child: Icon(
           icon,
           color: color,

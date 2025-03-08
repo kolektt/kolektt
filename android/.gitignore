@@ -12,3 +12,4 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+/Users/brainer/Programming/kolektt_flutter/android/app/debug.keystore

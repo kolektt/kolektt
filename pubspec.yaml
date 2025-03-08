@@ -26,7 +26,9 @@ dependencies:
   image_picker: ^1.1.2
   uuid: ^4.5.1
   flutter_dotenv: ^5.2.1
+  google_sign_in: ^6.3.0
   firebase_core: ^3.12.1
+  firebase_auth: ^5.5.1
 
 flutter:
   uses-material-design: true

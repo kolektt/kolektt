@@ -41,48 +41,52 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCVJVz-DH2qLaOWAoIj4i1FCQOJPDdvVrI',
-    appId: '1:418323176401:web:686c9e8c703046bd029ef0',
-    messagingSenderId: '418323176401',
-    projectId: 'kolektt-aa42b',
-    authDomain: 'kolektt-aa42b.firebaseapp.com',
-    storageBucket: 'kolektt-aa42b.firebasestorage.app',
-    measurementId: 'G-DRE5TSGEV5',
+    apiKey: 'AIzaSyA3v3cPVpibccGzFfD8vBax4wD14NO5J8Y',
+    appId: '1:996100752806:web:afbb9171ccc3478efafb67',
+    messagingSenderId: '996100752806',
+    projectId: 'kolektt',
+    authDomain: 'kolektt.firebaseapp.com',
+    storageBucket: 'kolektt.firebasestorage.app',
+    measurementId: 'G-MZ3P7F7ZRY',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCUp9Sj5k21SbY0N_4tQsR6RYHxqerH2Tk',
-    appId: '1:418323176401:android:ce716c459b6dbcd1029ef0',
-    messagingSenderId: '418323176401',
-    projectId: 'kolektt-aa42b',
-    storageBucket: 'kolektt-aa42b.firebasestorage.app',
+    apiKey: 'AIzaSyDwsJo2TgYU4NVMN4O-E07UBJe9NiZfcY0',
+    appId: '1:996100752806:android:1c3c6e53266b3d56fafb67',
+    messagingSenderId: '996100752806',
+    projectId: 'kolektt',
+    storageBucket: 'kolektt.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCOS3zoZ0hb6oAlG_tYYe91Fxpfk0gWaOw',
-    appId: '1:418323176401:ios:fbc402a6ae759c39029ef0',
-    messagingSenderId: '418323176401',
-    projectId: 'kolektt-aa42b',
-    storageBucket: 'kolektt-aa42b.firebasestorage.app',
+    apiKey: 'AIzaSyAJHSRQjnmY2KtoTyV1cf7HWL1aPz58vB0',
+    appId: '1:996100752806:ios:2e9f4834caae22cffafb67',
+    messagingSenderId: '996100752806',
+    projectId: 'kolektt',
+    storageBucket: 'kolektt.firebasestorage.app',
+    androidClientId: '996100752806-88rp4jvf00lqj6a3m0h432mrsctv645p.apps.googleusercontent.com',
+    iosClientId: '996100752806-8b8ulnkli19fna1rvd18hktt206h5h7k.apps.googleusercontent.com',
     iosBundleId: 'com.kolektt.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCOS3zoZ0hb6oAlG_tYYe91Fxpfk0gWaOw',
-    appId: '1:418323176401:ios:812a8fd0770c5c74029ef0',
-    messagingSenderId: '418323176401',
-    projectId: 'kolektt-aa42b',
-    storageBucket: 'kolektt-aa42b.firebasestorage.app',
+    apiKey: 'AIzaSyAJHSRQjnmY2KtoTyV1cf7HWL1aPz58vB0',
+    appId: '1:996100752806:ios:16370484e949e41efafb67',
+    messagingSenderId: '996100752806',
+    projectId: 'kolektt',
+    storageBucket: 'kolektt.firebasestorage.app',
+    androidClientId: '996100752806-88rp4jvf00lqj6a3m0h432mrsctv645p.apps.googleusercontent.com',
     iosBundleId: 'com.example.kolektt',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCVJVz-DH2qLaOWAoIj4i1FCQOJPDdvVrI',
-    appId: '1:418323176401:web:643577a72580dd32029ef0',
-    messagingSenderId: '418323176401',
-    projectId: 'kolektt-aa42b',
-    authDomain: 'kolektt-aa42b.firebaseapp.com',
-    storageBucket: 'kolektt-aa42b.firebasestorage.app',
-    measurementId: 'G-4MLTZHKRSW',
+    apiKey: 'AIzaSyA3v3cPVpibccGzFfD8vBax4wD14NO5J8Y',
+    appId: '1:996100752806:web:3d97758c020002e5fafb67',
+    messagingSenderId: '996100752806',
+    projectId: 'kolektt',
+    authDomain: 'kolektt.firebaseapp.com',
+    storageBucket: 'kolektt.firebasestorage.app',
+    measurementId: 'G-0NPJE4X7QX',
   );
+
 }
