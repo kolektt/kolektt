@@ -1,4 +1,4 @@
-package com.example.kolektt
+package com.kolektt.app
 
 import io.flutter.embedding.android.FlutterActivity
 
