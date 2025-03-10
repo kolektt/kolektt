@@ -317,9 +317,15 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     SizedBox(width: 16),
                     _buildSocialButton(
-                      CupertinoIcons.app,
+                      CupertinoIcons.alt,
                       Colors.black,
-                      () => context.read<AuthViewModel>().signInWithApple(),
+                      () async {
+                        await context.read<AuthViewModel>().signInWithApple();
+                        if (authVM.currentUser != null) {
+                          Navigator.pushAndRemoveUntil(
+                              context, CupertinoPageRoute(builder: (context) => AuthenticationWrapper()), (route) => false);
+                        }
+                      },
                     ),
                   ],
                 ),

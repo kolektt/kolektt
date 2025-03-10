@@ -1,10 +1,13 @@
 // auth_view_model.dart
 
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/supabase/profile.dart';
@@ -153,7 +156,51 @@ class AuthViewModel with ChangeNotifier {
   }
 
   // Apple 로그인
-  Future<void> signInWithApple() async {}
+  Future<void> signInWithApple() async {
+    _setLoading(true);
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final rawNonce = supabase.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+        // Android에서는 webAuthenticationOptions가 필수입니다.
+        webAuthenticationOptions: WebAuthenticationOptions(
+          clientId: 'com.kolkett.app.android', // Apple Developer에서 생성한 서비스 ID 입력
+          redirectUri: Uri.parse('https://awdnjducwqwfmbfigugq.supabase.co/auth/v1/callback'),
+        ),
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException('Could not find ID Token from generated credential.');
+      }
+
+      await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      );
+
+      // await supabase.auth.signInWithOAuth(
+      //   OAuthProvider.apple,
+      //   redirectTo: kIsWeb ? null : 'https://awdnjducwqwfmbfigugq.supabase.co/auth/v1/callback', // Optionally set the redirect link to bring back the user via deeplink.
+      //   authScreenLaunchMode: kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+      // );
+    } catch (error) {
+      _errorMessage = 'Sign in failed: $error';
+      debugPrint('Sign in failed: $error');
+    } finally {
+      _setLoading(false);
+    }
+  }
 
   /// 회원가입
   Future<void> signUp(String email, String password) async {
