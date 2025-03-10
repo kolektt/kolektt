@@ -114,10 +114,8 @@ class AuthViewModel with ChangeNotifier {
       /// Web Client ID that you registered with Google Cloud.
       final webClientId = dotenv.env['GOOGLE_SIGNIN_SERVICE_CLIENT_ID'] ?? '';
 
-      /// TODO: update the iOS client ID with your own.
-      ///
       /// iOS Client ID that you registered with Google Cloud.
-      const iosClientId = '';
+      final iosClientId = dotenv.env['GOOGLE_SIGNIN_IOS_CLIENT_ID'] ?? '';
       final androidClientId = dotenv.env['GOOGLE_SIGNIN_ANDROID_DEBUG_CLIENT_ID'] ?? '';
 
       final clientId = kIsWeb ? webClientId : Platform.isAndroid ? androidClientId : iosClientId;

@@ -305,7 +305,7 @@ class _LoginViewState extends State<LoginView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildSocialButton(
-                      Icons.email,
+                      Icons.g_mobiledata,
                       Colors.blue,
                       () async {
                         await context.read<AuthViewModel>().signInWithGoogle();
