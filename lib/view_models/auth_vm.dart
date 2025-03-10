@@ -173,7 +173,7 @@ class AuthViewModel with ChangeNotifier {
         nonce: hashedNonce,
         // Android에서는 webAuthenticationOptions가 필수입니다.
         webAuthenticationOptions: WebAuthenticationOptions(
-          clientId: 'com.kolkett.app.android', // Apple Developer에서 생성한 서비스 ID 입력
+          clientId: 'com.kolektt.android', // Apple Developer에서 생성한 서비스 ID 입력
           redirectUri: Uri.parse('https://awdnjducwqwfmbfigugq.supabase.co/auth/v1/callback'),
         ),
       );
