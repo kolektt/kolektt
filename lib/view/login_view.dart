@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -315,18 +317,22 @@ class _LoginViewState extends State<LoginView> {
                         }
                     },
                     ),
-                    SizedBox(width: 16),
-                    _buildSocialButton(
-                      CupertinoIcons.alt,
-                      Colors.black,
-                      () async {
-                        await context.read<AuthViewModel>().signInWithApple();
-                        if (authVM.currentUser != null) {
-                          Navigator.pushAndRemoveUntil(
-                              context, CupertinoPageRoute(builder: (context) => AuthenticationWrapper()), (route) => false);
-                        }
-                      },
-                    ),
+                    Platform.isIOS ? Column(
+                      children: [
+                        SizedBox(width: 16),
+                        _buildSocialButton(
+                          CupertinoIcons.alt,
+                          Colors.black,
+                          () async {
+                            await context.read<AuthViewModel>().signInWithApple();
+                            if (authVM.currentUser != null) {
+                              Navigator.pushAndRemoveUntil(
+                                  context, CupertinoPageRoute(builder: (context) => AuthenticationWrapper()), (route) => false);
+                            }
+                          },
+                        ),
+                      ],
+                    ) : Container(),
                   ],
                 ),
               ],
