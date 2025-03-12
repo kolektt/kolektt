@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:kolektt/data/models/discogs_search_response.dart';
 import 'package:provider/provider.dart';
 
-import '../domain/entities/discogs_record.dart';
 import '../view_models/collection_vm.dart';
 
 class AddToCollectionScreen extends StatefulWidget {

@@ -44,6 +44,11 @@ class CollectionViewModel extends ChangeNotifier {
 
   String? get errorMessage => _errorMessage;
 
+  set errorMessage(String? message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
   // Vision API로부터 가져온 라벨
   String? _lastRecognizedLabel;
 
