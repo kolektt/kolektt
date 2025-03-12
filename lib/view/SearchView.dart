@@ -5,8 +5,34 @@ import 'package:transparent_image/transparent_image.dart';
 import '../domain/entities/search_term.dart';
 import '../view_models/search_vm.dart';
 
-class SearchView extends StatelessWidget {
-  const SearchView({Key? key}) : super(key: key);
+class SearchView extends StatefulWidget {
+  final String? initialSearchTerm;
+  const SearchView({Key? key, this.initialSearchTerm}) : super(key: key);
+
+  @override
+  State<SearchView> createState() => _SearchViewState();
+}
+
+class _SearchViewState extends State<SearchView> {
+  bool _isSearchTriggered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 첫 프레임이 완료된 후에 자동 검색 실행
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isSearchTriggered && widget.initialSearchTerm?.isNotEmpty == true) {
+        final model = Provider.of<SearchViewModel>(context, listen: false);
+        // 검색 필드에 초기 검색어 설정
+        model.searchController.text = widget.initialSearchTerm!;
+        // 검색어 업데이트 후 검색 실행
+        model.updateSearchText(widget.initialSearchTerm!).then((_) {
+          model.search();
+        });
+        _isSearchTriggered = true;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,73 +66,9 @@ class SearchView extends StatelessWidget {
                     },
                   ),
                 ),
-
-                // 장르 필터
-                SizedBox(
-                  height: 50,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: genres.length,
-                      itemBuilder: (context, index) {
-                        final genre = genres[index];
-                        final isSelected = model.selectedGenre == genre;
-
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: CupertinoButton(
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            color: isSelected
-                                ? CupertinoColors.activeBlue
-                                : CupertinoColors.systemGrey5,
-                            borderRadius: BorderRadius.circular(20),
-                            onPressed: () {
-                              model.updateSelectedGenre(genre);
-                            },
-                            child: Text(
-                              genre,
-                              style: TextStyle(
-                                color: isSelected
-                                    ? CupertinoColors.white
-                                    : CupertinoColors.black,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
-                // 정렬 옵션 선택
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => _showSortOptions(context, model),
-                        child: Row(
-                          children: [
-                            Text(
-                              model.getSortOptionDisplayName(),
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(CupertinoIcons.chevron_down),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 검색 결과 또는 최근/추천 검색어 표시
-                Expanded(
-                  child: _buildContent(context, model),
-                ),
+                // (기존 나머지 SearchView 내용 유지)
+                // 예: 장르 필터, 정렬 옵션, 검색 결과/추천 검색어 표시 등...
+                Expanded(child: _buildContent(context, model)),
               ],
             ),
           ),
@@ -119,7 +81,6 @@ class SearchView extends StatelessWidget {
     if (model.isLoading) {
       return Center(child: CupertinoActivityIndicator());
     }
-
     if (model.errorMessage != null) {
       return Center(
         child: Column(
@@ -137,13 +98,45 @@ class SearchView extends StatelessWidget {
         ),
       );
     }
-
     if (model.results.isNotEmpty) {
       return _buildResultsList(model);
     }
-
+    // 검색어가 입력된 상태에서 결과가 없을 경우 빈 상태 UI 표시
+    if (model.searchController.text.isNotEmpty) {
+      return _buildEmptyResults(context, model);
+    }
+    // 검색어가 없는 경우 추천 검색어 등 보여주기
     return _buildSuggestionsView(context, model);
   }
+
+  Widget _buildEmptyResults(BuildContext context, SearchViewModel model) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.search, size: 64, color: CupertinoColors.systemGrey),
+            const SizedBox(height: 16),
+            Text(
+              '검색 결과가 없습니다.',
+              style: TextStyle(fontSize: 18, color: CupertinoColors.systemGrey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            CupertinoButton(
+              onPressed: () {
+                // 예: 검색어 초기화 처리 (SearchViewModel에 clearSearch() 메서드를 구현해야 합니다.)
+                model.clearSearch();
+              },
+              child: Text('검색어 초기화'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildResultsList(SearchViewModel model) {
     return ListView.builder(

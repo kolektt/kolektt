@@ -81,6 +81,7 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   Future<void> search() async {
+    errorMessage = null;
     if (searchText.isEmpty) {
       results = [];
       notifyListeners();
@@ -112,6 +113,12 @@ class SearchViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> clearSearch() async {
+    searchController.clear();
+    results = [];
+    notifyListeners();
   }
 
   Future<void> updateSearchText(String text) async {

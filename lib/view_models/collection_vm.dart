@@ -166,6 +166,10 @@ class CollectionViewModel extends ChangeNotifier {
       if (result.bestGuessLabel != null && result.bestGuessLabel!.isNotEmpty) {
         _lastRecognizedLabel = result.bestGuessLabel;
         _partialMatchingImages = result.partialMatchingImages;
+        // _partialMatchingImages 각 element의 `-` 뒷 부분 제거
+        _partialMatchingImages = _partialMatchingImages
+            .map((e) => e.split('-').first)
+            .toList();
         await _searchOnDiscogs(result.bestGuessLabel!);
       } else {
         _errorMessage = '앨범 라벨을 인식하지 못했습니다.';

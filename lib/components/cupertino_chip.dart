@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'dart:ui';
 
 class CupertinoChip extends StatefulWidget {
   final String label;

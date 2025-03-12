@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 import 'package:flutter_doc_scanner/flutter_doc_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'package:transparent_image/transparent_image.dart';
 // CollectionViewModel에서 recognizeAlbum() 사용 (Google Vision + Discogs)
 import '../components/cupertino_chip.dart';
 import '../view_models/collection_vm.dart';
+import 'SearchView.dart';
 import 'add_to_collection_view.dart';
 
 class AutoAlbumDetectionScreen extends StatefulWidget {
@@ -87,7 +89,12 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
           children: vm.partialMatchingImages.map((e) {
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: CupertinoChip(label: e, onTap: () {},),
+              child: CupertinoChip(label: e, onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoBottomSheetRoute(builder: (context) => SearchView(initialSearchTerm: e)),
+                );
+              },),
             );
           }).toList(),
         ),
