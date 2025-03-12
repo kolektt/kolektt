@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import '../entities/album_recognition_result.dart';
+
 abstract class AlbumRecognitionRepository {
-  Future<String?> recognizeAlbumLabel(File image);
+  Future<AlbumRecognitionResult> analyzeAlbumCover(File image);
 }

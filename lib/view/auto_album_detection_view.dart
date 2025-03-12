@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 // CollectionViewModel에서 recognizeAlbum() 사용 (Google Vision + Discogs)
+import '../components/cupertino_chip.dart';
 import '../view_models/collection_vm.dart';
 import 'add_to_collection_view.dart';
 
@@ -66,12 +67,31 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
                     ),
                   ),
                 // 검색 결과
+                _buildPartialMatchingImagesRow(vm),
                 Expanded(child: _buildResultsList(context, vm)),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  /// 예상 이미지 이름 Chip Row
+  Widget _buildPartialMatchingImagesRow(CollectionViewModel vm) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: vm.partialMatchingImages.map((e) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: CupertinoChip(label: e, onTap: () {},),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -113,7 +133,8 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: FadeInImage.memoryNetwork(
-                      placeholder: kTransparentImage, // 투명한 1px GIF를 플레이스홀더로 사용
+                      placeholder: kTransparentImage,
+                      // 투명한 1px GIF를 플레이스홀더로 사용
                       image: record.coverImage,
                       width: 60,
                       height: 60,
@@ -149,12 +170,12 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
     );
   }
 
-
   /// 카메라를 실행하고 사진을 촬영한 후 앨범 인식(= Google Vision + Discogs 검색)
   /// 문서 스캐너를 실행하고 스캔된 이미지로 앨범 인식
   Future<void> _takePhotoAndDetect() async {
     try {
-      final dynamic scannedDocs = await FlutterDocScanner().getScannedDocumentAsImages(page: 1);
+      final dynamic scannedDocs =
+          await FlutterDocScanner().getScannedDocumentAsImages(page: 1);
       if (scannedDocs == null || scannedDocs.isEmpty) {
         Navigator.pop(context); // 사용자가 스캔 취소 시 화면 닫기
         return;
@@ -169,7 +190,8 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
       debugPrint('scannedDocs: ${match?.group(1)}');
 
       final collectionVM = context.read<CollectionViewModel>();
-      await collectionVM.recognizeAlbum(File.fromUri(Uri.parse(match!.group(1).toString())));
+      await collectionVM
+          .recognizeAlbum(File.fromUri(Uri.parse(match!.group(1).toString())));
     } catch (e) {
       final collectionVM = context.read<CollectionViewModel>();
       collectionVM.errorMessage = '문서 스캔 또는 인식 중 오류 발생: ${e.toString()}';

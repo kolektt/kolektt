@@ -12,6 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../components/filter_cupertino_sheet.dart';
 import '../data/models/discogs_search_response.dart';
 import '../data/models/user_collection_classification.dart';
+import '../domain/entities/album_recognition_result.dart';
 import '../domain/repositories/album_recognition_repository.dart';
 import '../domain/repositories/collection_repositroy.dart';
 import '../domain/repositories/discogs_record_repository.dart';
@@ -61,6 +62,10 @@ class CollectionViewModel extends ChangeNotifier {
   List<DiscogsSearchItem> _searchResults = [];
 
   List<DiscogsSearchItem> get searchResults => _searchResults;
+
+  List<String> _partialMatchingImages = [];
+
+  List<String> get partialMatchingImages => _partialMatchingImages;
 
   // Private backing field
   List<CollectionRecord> _collectionRecords = [];
@@ -157,10 +162,11 @@ class CollectionViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final label = await albumRecognitionRepository.recognizeAlbumLabel(image);
-      if (label != null && label.isNotEmpty) {
-        _lastRecognizedLabel = label;
-        await _searchOnDiscogs(label);
+      final result = await albumRecognitionRepository.analyzeAlbumCover(image);
+      if (result.bestGuessLabel != null && result.bestGuessLabel!.isNotEmpty) {
+        _lastRecognizedLabel = result.bestGuessLabel;
+        _partialMatchingImages = result.partialMatchingImages;
+        await _searchOnDiscogs(result.bestGuessLabel!);
       } else {
         _errorMessage = '앨범 라벨을 인식하지 못했습니다.';
       }

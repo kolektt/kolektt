@@ -14,7 +14,7 @@ class GoogleVisionDataSource {
     required this.project,
   });
 
-  Future<String?> recognizeAlbumLabel(File image) async {
+  Future<Map<String, dynamic>> analyzeAlbumCover(File image) async {
     final base64Image = base64Encode(await image.readAsBytes());
     final url = Uri.parse('https://vision.googleapis.com/v1/images:annotate?key=$apiKey');
 
@@ -45,12 +45,31 @@ class GoogleVisionDataSource {
     }
 
     final data = json.decode(response.body);
-    final bestGuessLabels =
-        data['responses']?[0]?['webDetection']?['bestGuessLabels'];
-    if (bestGuessLabels != null && bestGuessLabels.isNotEmpty) {
-      return bestGuessLabels.first['label'] as String?;
-    } else {
-      return null;
+    final respones = data['responses'];
+    final webDetection = respones?[0]?['webDetection'];
+    
+    final bestGuessLabels = webDetection?['bestGuessLabels'];
+    final pagesWithMatching = webDetection?['pagesWithMatchingImages'];
+
+    List<String> partialMatchingImagesList = [];
+    if (pagesWithMatching != null) {
+      for (var page in pagesWithMatching) {
+        final title = page['pageTitle'] as String?;
+        if (title != null) {
+          partialMatchingImagesList.add(title);
+        }
+      }
+      debugPrint("partialMatchingImagesList: $partialMatchingImagesList");
     }
+
+    String? bestGuessLabel;
+    if (bestGuessLabels != null && bestGuessLabels.isNotEmpty) {
+      bestGuessLabel = bestGuessLabels.first['label'] as String?;
+    }
+
+    return {
+      'bestGuessLabel': bestGuessLabel,
+      'partialMatchingImages': partialMatchingImagesList,
+    };
   }
 }
