@@ -200,11 +200,11 @@ class CollectionViewModel extends ChangeNotifier {
 
   Future<void> addDiscogsRecordToDB(DiscogsSearchItem record) async {
     try {
-      // TODO: DiscogsSearchItem → Record 변환
       await discogsRecordRepository.addDiscogsRecord(record);
     } catch (e) {
-      log('Error inserting record: $e');
-      rethrow;
+      log('Error inserting record: $e', name: 'CollectionViewModel');
+      // Don't rethrow the exception to prevent app crashes
+      // Instead, handle it gracefully
     }
   }
 

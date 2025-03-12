@@ -16,6 +16,31 @@ class DiscogsRecordRepositoryImpl extends DiscogsRecordRepository {
 
   Map<String, dynamic> _convertDiscogsSearchItemToRecordJson(
       DiscogsSearchItem item) {
-    return item.toJson();
+    // Create a map with only the fields that exist in your database schema
+    return {
+      'title': item.title,
+      'release_year': item.year,
+      'genre': item.genre ?? '',
+      'cover_image': item.coverImage ?? '',
+      'label': item.label ?? '',
+      'format': item.format ?? '',
+      'country': item.country ?? '',
+      'style': item.style ?? '',
+      'record_id': item.id,
+      // Fix: Extract artist name from title or use a default value
+      'artist': _extractArtistFromTitle(item.title),
+      // Remove or comment out any fields that don't exist in your database
+      // 'barcode': item.barcode, // This field is causing the error
+    };
+  }
+
+  // Helper method to extract artist from title (Format: "Artist - Title")
+  String _extractArtistFromTitle(String title) {
+    // Check if title contains a hyphen (common format: "Artist - Title")
+    if (title.contains(' - ')) {
+      return title.split(' - ')[0].trim();
+    }
+    // If no hyphen, return the whole title or a default value
+    return title;
   }
 }
