@@ -89,11 +89,8 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
           children: vm.partialMatchingImages.map((e) {
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: CupertinoChip(label: e, onTap: () {
-                Navigator.push(
-                  context,
-                  CupertinoBottomSheetRoute(builder: (context) => SearchView(initialSearchTerm: e)),
-                );
+              child: CupertinoChip(label: e, onTap: () async {
+                await vm.searchOnDiscogs(e);
               },),
             );
           }).toList(),
@@ -106,8 +103,10 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
   Widget _buildResultsList(BuildContext context, CollectionViewModel vm) {
     if (!vm.isLoading && vm.errorMessage == null && vm.searchResults.isEmpty) {
       return const Center(
-        child: Text('인식된 앨범이 없습니다.\n사진 촬영 후 결과가 여기 표시됩니다.',
-            textAlign: TextAlign.center),
+        child: Text(
+          '인식된 앨범이 없습니다.\n사진 촬영 후 결과가 여기 표시됩니다.',
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
@@ -116,60 +115,74 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
       itemBuilder: (context, index) {
         final record = vm.searchResults[index];
 
-        return CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // AddToCollectionScreen으로 이동
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (_) => AddToCollectionScreen(record: record),
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 300),
+          builder: (context, value, child) {
+            return Opacity(
+              opacity: value,
+              child: Transform.translate(
+                offset: Offset(0, 20 * (1 - value)), // 슬라이드 업 효과
+                child: child,
               ),
             );
           },
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: CupertinoColors.systemGrey4),
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              // AddToCollectionScreen으로 이동
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => AddToCollectionScreen(record: record),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: CupertinoColors.systemGrey4),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                if (record.coverImage.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: FadeInImage.memoryNetwork(
-                      placeholder: kTransparentImage,
-                      // 투명한 1px GIF를 플레이스홀더로 사용
-                      image: record.coverImage,
+              child: Row(
+                children: [
+                  if (record.coverImage.isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: FadeInImage.memoryNetwork(
+                        placeholder: kTransparentImage,
+                        image: record.coverImage,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  else
+                    Container(
                       width: 60,
                       height: 60,
-                      fit: BoxFit.cover,
+                      decoration: BoxDecoration(
+                        color: CupertinoColors.systemGrey5,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Icon(CupertinoIcons.music_note),
                     ),
-                  )
-                else
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: CupertinoColors.systemGrey5,
-                      borderRadius: BorderRadius.circular(4),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          record.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                    child: const Icon(CupertinoIcons.music_note),
                   ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(record.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const Icon(CupertinoIcons.add),
-              ],
+                  const Icon(CupertinoIcons.add),
+                ],
+              ),
             ),
           ),
         );

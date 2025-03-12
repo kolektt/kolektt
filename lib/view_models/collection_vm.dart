@@ -170,7 +170,7 @@ class CollectionViewModel extends ChangeNotifier {
         _partialMatchingImages = _partialMatchingImages
             .map((e) => e.split('-').first)
             .toList();
-        await _searchOnDiscogs(result.bestGuessLabel!);
+        await searchOnDiscogs(result.bestGuessLabel!);
       } else {
         _errorMessage = '앨범 라벨을 인식하지 못했습니다.';
       }
@@ -183,13 +183,18 @@ class CollectionViewModel extends ChangeNotifier {
   }
 
   /// Discogs API로 검색
-  Future<void> _searchOnDiscogs(String query) async {
+  Future<void> searchOnDiscogs(String query) async {
     if (query.isEmpty) return;
     try {
+      // _isLoading = true;
+      // notifyListeners();
       final results = await searchAndUpsertUseCase.call(query, type: 'release');
       _searchResults = results;
     } catch (e) {
       _errorMessage = 'Discogs 검색 오류: $e';
+    } finally {
+      // _isLoading = false;
+      notifyListeners();
     }
   }
 
