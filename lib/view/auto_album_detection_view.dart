@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 import 'package:flutter_doc_scanner/flutter_doc_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +9,6 @@ import 'package:transparent_image/transparent_image.dart';
 // CollectionViewModel에서 recognizeAlbum() 사용 (Google Vision + Discogs)
 import '../components/cupertino_chip.dart';
 import '../view_models/collection_vm.dart';
-import 'SearchView.dart';
 import 'add_to_collection_view.dart';
 
 class AutoAlbumDetectionScreen extends StatefulWidget {
@@ -194,8 +192,7 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
   /// 문서 스캐너를 실행하고 스캔된 이미지로 앨범 인식
   Future<void> _takePhotoAndDetect() async {
     try {
-      final dynamic scannedDocs =
-          await FlutterDocScanner().getScannedDocumentAsImages(page: 1);
+      final dynamic scannedDocs = await FlutterDocScanner().getScannedDocumentAsImages(page: 1);
       if (scannedDocs == null || scannedDocs.isEmpty) {
         Navigator.pop(context); // 사용자가 스캔 취소 시 화면 닫기
         return;
@@ -210,8 +207,7 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
       debugPrint('scannedDocs: ${match?.group(1)}');
 
       final collectionVM = context.read<CollectionViewModel>();
-      await collectionVM
-          .recognizeAlbum(File.fromUri(Uri.parse(match!.group(1).toString())));
+      await collectionVM.recognizeAlbum(File.fromUri(Uri.parse(match!.group(1).toString())));
     } catch (e) {
       final collectionVM = context.read<CollectionViewModel>();
       collectionVM.errorMessage = '문서 스캔 또는 인식 중 오류 발생: ${e.toString()}';

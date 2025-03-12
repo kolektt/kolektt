@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/repositories/discogs_storage_repository.dart';
@@ -11,7 +13,6 @@ class DiscogsStorageRepositoryImpl implements DiscogsStorageRepository {
   @override
   Future<void> upsertDiscogsRecord(DiscogsSearchItem record) async {
     final response = await supabase.from('records').upsert({
-      'id': record.id,
       'title': record.title,
       'release_year': record.year,
       'genre': record.genre,
@@ -21,9 +22,6 @@ class DiscogsStorageRepositoryImpl implements DiscogsStorageRepository {
       'country': record.country,
       'style': record.style,
       'record_id': record.id,
-    });
-    if (response.error != null) {
-      throw Exception('Upsert failed: ${response.error!.message}');
-    }
+    }, onConflict: 'record_id').select();
   }
 }

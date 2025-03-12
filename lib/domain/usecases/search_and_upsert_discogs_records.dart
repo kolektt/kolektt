@@ -14,10 +14,11 @@ class SearchAndUpsertDiscogsRecords {
   Future<List<DiscogsSearchItem>> call(String query, {String? type}) async {
     // Discogs API를 통해 검색 수행
     final results = await discogsRepository.searchDiscogs(query, type: type);
-    // 검색 결과를 Supabase에 자동 upsert TODO: 이 부분은 추후 개선이 필요합니다.
-    // for (final record in results) {
-    //   await discogsStorageRepository.upsertDiscogsRecord(record);
-    // }
+
+    // 검색 결과를 Supabase에 비동기로 병렬 upsert 처리
+    await Future.wait(
+        results.map((record) => discogsStorageRepository.upsertDiscogsRecord(record))
+    );
     return results;
   }
 }
