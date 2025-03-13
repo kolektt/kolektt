@@ -55,4 +55,23 @@ class DiscogsRecord {
       releaseYear: 2021,
     )
   ];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'record_id': recordId.toString(),
+      'title': title,
+      'artist': artist,
+      'release_year': releaseYear,
+      'genre': genre,
+      'cover_image': coverImage,
+      'catalog_number': catalogNumber,
+      'label': label,
+      'format': format,
+      'country': country,
+      'style': style,
+      'condition': condition ?? '',
+      'condition_notes': conditionNotes ?? '',
+      'notes': notes ?? '',
+    };
+  }
 }

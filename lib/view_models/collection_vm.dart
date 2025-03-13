@@ -120,6 +120,7 @@ class CollectionViewModel extends ChangeNotifier {
 
       try {
         await addDiscogsRecordToDB(record);
+        print('Discogs record added successfully.');
       } catch (e) {
         print('Error adding Discogs record: $e');
       }
@@ -136,8 +137,7 @@ class CollectionViewModel extends ChangeNotifier {
   Future<void> removeRecord(CollectionRecord record) async {
     try {
       collectionRepository.deleteUserCollection(record.user_collection.id);
-      _collectionRecords.removeWhere(
-          (r) => r.user_collection.id == record.user_collection.id);
+      _collectionRecords.removeWhere((r) => r.user_collection.id == record.user_collection.id);
       notifyListeners();
       debugPrint('Record removed successfully.');
     } catch (e) {
@@ -202,6 +202,7 @@ class CollectionViewModel extends ChangeNotifier {
     try {
       // TODO: DiscogsSearchItem → Record 변환
       await discogsRecordRepository.addDiscogsRecord(record);
+      print('Discogs record added successfully.');
     } catch (e) {
       log('Error inserting record: $e');
       rethrow;
