@@ -12,10 +12,20 @@ class AlbumRecognitionRepositoryImpl implements AlbumRecognitionRepository {
 
   @override
   Future<AlbumRecognitionResult> analyzeAlbumCover(File image) async {
-    final result = await dataSource.analyzeAlbumCover(image);
+    final webDetectFuture = dataSource.analyzeAlbumCover(image); // Future<Map<String, dynamic>>
+    final textDetectFuture = dataSource.analyzeTextDetection(image); // Future<String?>
+
+    final results = await Future.wait([webDetectFuture, textDetectFuture]);
+    final webDetectResult = results[0] as Map<String, dynamic>;
+    final textDetectResult = results[1] as String?;
+
     return AlbumRecognitionResult(
-      bestGuessLabel: result['bestGuessLabel'],
-      partialMatchingImages: result['partialMatchingImages'] ?? [],
+      bestGuessLabel: webDetectResult['bestGuessLabel'] as String?,
+      partialMatchingImages: (webDetectResult['partialMatchingImages'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+          [],
+      fullDetectedText: textDetectResult,
     );
   }
 }
