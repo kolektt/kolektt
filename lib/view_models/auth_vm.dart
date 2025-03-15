@@ -70,6 +70,8 @@ class AuthViewModel with ChangeNotifier {
       _errorMessage = '프로필 조회 오류: $e';
       debugPrint('프로필 조회 오류: $e');
       rethrow;
+    } finally {
+      notifyListeners();
     }
   }
 

@@ -220,13 +220,13 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                 // Profile Image with Edit Button
                 Stack(
                   children: [
-                    ClipRRect(
+                    profile_image != null ? ClipRRect(
                       borderRadius: BorderRadius.circular(50),
                       child: FadeInImage.memoryNetwork(
                         width: 86,
                         height: 86,
                         placeholder: kTransparentImage,
-                        image: profile_image!,
+                        image: profile_image,
                         fit: BoxFit.cover,
                         imageErrorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -240,6 +240,10 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                           );
                         },
                       ),
+                    ) : Icon(
+                      CupertinoIcons.person_alt_circle,
+                      size: 86,
+                      color: primaryColor,
                     ),
                     Positioned(
                       right: 0,

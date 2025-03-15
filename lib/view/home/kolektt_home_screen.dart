@@ -72,7 +72,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                         title: 'Most\nGenre',
                         value: 'Drum & Bass',
                         color: CupertinoColors.white,
-                        strokeColor: Color(0xB2C2FF),
+                        strokeColor: Color(0xffB2C2FF),
                         textColor: FigmaColors.grey100,
                         valueSize: 24,
                         context: context,
@@ -136,6 +136,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                             );
                           },
                         ),
+                        const SizedBox(height: 32),
                       ],
                     );
                   },
@@ -207,9 +208,10 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: CupertinoColors.black,
+        border: Border.all(color: FigmaColors.grey90),
         borderRadius: BorderRadius.circular(12),
         image: const DecorationImage(
-          image: NetworkImage('https://via.placeholder.com/400x200'),
+          image: NetworkImage('https://www.shutterstock.com/image-vector/no-image-available-icon-template-260nw-1036735678.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             Color.fromRGBO(0, 0, 0, 0.5),
