@@ -512,11 +512,10 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
     final model = context.watch<CollectionViewModel>();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
@@ -526,8 +525,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
         itemCount: model.collectionRecords.length,
         itemBuilder: (context, index) {
           CollectionRecord record = model.collectionRecords[index];
-          record.record.resourceUrl =
-          "https://api.discogs.com/releases/${record.record.id}";
+          record.record.resourceUrl = "https://api.discogs.com/releases/${record.record.id}";
           return buildGridItem(context, record, model);
         },
       ),
