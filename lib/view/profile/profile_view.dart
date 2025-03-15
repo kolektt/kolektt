@@ -195,7 +195,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                       genre,
                     ),
                     AnalyticsSection(records: collection.collectionRecords),
-                    _buildTabMenu(),
+                    // _buildTabMenu(),
                     // _buildTabContent(),
                   ],
                 ),

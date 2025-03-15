@@ -60,7 +60,8 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                       child: _buildStatCard(
                         title: 'Total\nRecords',
                         value: '360',
-                        color: FigmaColors.primary70,
+                        color: FigmaColors.primary60,
+                        strokeColor: FigmaColors.primary70,
                         textColor: CupertinoColors.white,
                         context: context,
                       ),
@@ -71,7 +72,8 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                         title: 'Most\nGenre',
                         value: 'Drum & Bass',
                         color: CupertinoColors.white,
-                        textColor: CupertinoColors.black,
+                        strokeColor: Color(0xB2C2FF),
+                        textColor: FigmaColors.grey100,
                         valueSize: 24,
                         context: context,
                       ),
@@ -150,6 +152,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
     required String title,
     required String value,
     required Color color,
+    required Color strokeColor,
     required Color textColor,
     required BuildContext context,
     double valueSize = 40,
@@ -160,7 +163,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
       decoration: ShapeDecoration(
         color: color,
         shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Color(0xFFB1C1FF)),
+          side: BorderSide(width: 1, color: strokeColor),
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -189,8 +192,8 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
             alignment: Alignment.centerRight,
             child: Text(
               value,
-              style:
-                  FigmaTextStyles().headingheading1.copyWith(color: textColor),
+              style: FigmaTextStyles().headingheading1.copyWith(color: textColor),
+              textDirection: TextDirection.rtl,
             ),
           ),
         ],
@@ -251,25 +254,23 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: FigmaColors.grey20,
+          color: FigmaColors.grey10,
           borderRadius: BorderRadius.circular(9999),
+          border: Border.all(color: FigmaColors.grey20),
         ),
         child: Row(
           children: [
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
             const Icon(
               CupertinoIcons.search,
               color: CupertinoColors.systemGrey,
               size: 20,
             ),
             const SizedBox(width: 8),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Search',
-                style: TextStyle(
-                  color: FigmaColors.grey50,
-                  fontSize: 16,
-                ),
+                style: FigmaTextStyles().bodymd.copyWith(color: FigmaColors.grey50),
               ),
             ),
             filterButton

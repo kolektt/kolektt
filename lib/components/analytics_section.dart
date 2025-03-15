@@ -51,6 +51,7 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                       decoration: BoxDecoration(
                         color: FigmaColors.primary60,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: FigmaColors.primary70),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,15 +104,9 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: FigmaColors.primary10,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        border: Border.all(color: FigmaColors.primary30),
                       ),
                       child: GenreDistributionView(genres: analyticsVM.analytics!.genres),
                     ),
@@ -217,8 +212,9 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: FigmaColors.grey10,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: FigmaColors.grey20),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
