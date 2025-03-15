@@ -63,7 +63,7 @@ Widget buildGridItem(
       children: [
         // 앨범 커버 이미지 영역
         Container(
-          width: double.infinity,
+          width: MediaQuery.of(context).size.width / 2 - 16,
           height: 171,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
@@ -72,11 +72,9 @@ Widget buildGridItem(
                 ? DecorationImage(
               image: NetworkImage(record.record.coverImage),
               fit: BoxFit.cover,
-            )
-                : null,
+            ) : null,
           ),
-          child: record.record.coverImage.isEmpty
-              ? Center(
+          child: record.record.coverImage.isEmpty ? Center(
             child: Icon(
               CupertinoIcons.photo,
               size: 50,
