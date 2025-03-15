@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/components/seller_row.dart';
+import 'package:kolektt/figma_colors.dart';
 import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -13,7 +14,6 @@ import '../../model/supabase/profile.dart';
 import '../../model/supabase/user_stats.dart';
 import '../../view_models/auth_vm.dart';
 import '../../view_models/collection_vm.dart';
-import '../collectino_summary_view.dart';
 import '../login_view.dart';
 import 'edit_profile_view.dart';
 
@@ -126,37 +126,6 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text("프로필"),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: const Icon(CupertinoIcons.news),
-              onPressed: () {
-                // TODO: 판매 히스토리
-              },
-            ),
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: const Icon(CupertinoIcons.pencil),
-              onPressed: () {
-                if (isLoadingProfile) {
-                  return;
-                }
-
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (_) => const EditProfileView(),
-                  ),
-                ).then((value) async {
-                  await auth.fetchProfile();
-                  _loadProfileData();
-                });
-              },
-            ),
-          ],
-        ),
       ),
       child: SafeArea(
         child: CustomScrollView(
@@ -221,17 +190,115 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                 opacity: _isRefreshing ? 0.5 : 1.0,
                 child: Column(
                   children: [
-                    _buildProfileHeader(),
-                    // _buildStatCards(),
+                    _buildProfile(
+                      displayName,
+                      genre,
+                    ),
                     AnalyticsSection(records: collection.collectionRecords),
                     _buildTabMenu(),
-                    _buildTabContent(),
+                    // _buildTabContent(),
                   ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfile(String name, String genre) {
+    final profile_image = context.watch<AuthViewModel>().profiles?.profile_image;
+
+    return Container(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                // Profile Image with Edit Button
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: FadeInImage.memoryNetwork(
+                        width: 86,
+                        height: 86,
+                        placeholder: kTransparentImage,
+                        image: profile_image!,
+                        fit: BoxFit.cover,
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 86,
+                            height: 86,
+                            color: CupertinoColors.systemGrey5,
+                            child: const Icon(
+                              CupertinoIcons.person_alt_circle,
+                              color: CupertinoColors.systemGrey2,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: FigmaColors.primary70,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        child: GestureDetector(
+                          onTap: () {
+                            final auth = context.read<AuthViewModel>();
+                            if (isLoadingProfile) {
+                              return;
+                            }
+
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (_) => const EditProfileView(),
+                              ),
+                            ).then((value) async {
+                              await auth.fetchProfile();
+                              _loadProfileData();
+                            });
+                          },
+                          child: const Icon(
+                            CupertinoIcons.pencil,
+                            color: CupertinoColors.white,
+                            size: 32,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 17),
+                // Name and Genre
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: FigmaTextStyles().headingheading2.copyWith(color: FigmaColors.grey100),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        genre,
+                        style: FigmaTextStyles().bodyxs.copyWith(color: FigmaColors.grey50),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

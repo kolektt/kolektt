@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import '../main.dart';
 import 'collection/collection_view.dart' as coll;
 import 'home/kolektt_home_screen.dart';
-import 'profile/profile_vew.dart';
+import 'profile/profile_view.dart';
 
 class ContentView extends StatelessWidget {
   const ContentView({super.key});

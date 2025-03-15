@@ -68,7 +68,7 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                               Text(
                                 "Analyzed by Kolektt",
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: FigmaColors.primary30,
                                   fontSize: 12,
                                 ),
                               ),
