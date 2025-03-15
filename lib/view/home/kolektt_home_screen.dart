@@ -9,6 +9,7 @@ import '../../components/filter_cupertino_sheet.dart';
 import '../../model/local/collection_record.dart';
 import '../../view_models/collection_vm.dart';
 import '../SearchView.dart';
+import '../auto_album_detection_view.dart';
 import '../collection/collection_view.dart';
 
 class KolekttHomeScreen extends StatefulWidget {
@@ -37,8 +38,13 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        trailing: Icon(CupertinoIcons.add_circled_solid,
-            color: FigmaColors.primary70),
+        trailing: IconButton(onPressed: () { Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (_) => AutoAlbumDetectionScreen(),
+          ),
+        ); },
+        icon: Icon(CupertinoIcons.add_circled_solid, color: FigmaColors.primary70)),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
