@@ -11,8 +11,27 @@ import '../../view_models/collection_vm.dart';
 import '../SearchView.dart';
 import '../collection/collection_view.dart';
 
-class KolekttHomeScreen extends StatelessWidget {
+class KolekttHomeScreen extends StatefulWidget {
   const KolekttHomeScreen({super.key});
+
+  @override
+  State<KolekttHomeScreen> createState() => _KolekttHomeScreenState();
+}
+
+class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
+  bool _isRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCollectionData();
+  }
+
+  Future<void> _loadCollectionData() async {
+    final model = context.read<CollectionViewModel>();
+    await model.fetchUserCollectionsWithRecords();
+    await model.fetchUserCollectionsUniqueProperties();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,11 +85,8 @@ class KolekttHomeScreen extends StatelessWidget {
                 // _buildAlbumGrid(),
                 Consumer<CollectionViewModel>(
                   // key 값에 상태 변화에 따른 값(로딩 여부 + 데이터 개수)을 반영하여 전환이 발생하도록 함
-                  key: ValueKey<int>(context.read<CollectionViewModel>().collectionRecords.length +
-                      (context.read<CollectionViewModel>().isLoading ? 1 : 0)),
+                  key: ValueKey<int>(context.read<CollectionViewModel>().collectionRecords.length + (context.read<CollectionViewModel>().isLoading ? 1 : 0)),
                   builder: (context, model, child) {
-                    bool _isRefreshing = false;
-
                     if (model.isLoading) {
                       if (_isRefreshing) return const SizedBox.shrink();
                       return const Center(child: CupertinoActivityIndicator());
