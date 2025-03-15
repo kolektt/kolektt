@@ -5,6 +5,7 @@ import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+import '../../components/analytics_section.dart';
 import '../../components/collection_grid_item.dart';
 import '../../main.dart';
 import '../../model/local/collection_record.dart';
@@ -12,6 +13,7 @@ import '../../model/supabase/profile.dart';
 import '../../model/supabase/user_stats.dart';
 import '../../view_models/auth_vm.dart';
 import '../../view_models/collection_vm.dart';
+import '../collectino_summary_view.dart';
 import '../login_view.dart';
 import 'edit_profile_view.dart';
 
@@ -108,6 +110,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthViewModel>();
+    final collection = context.read<CollectionViewModel>();
     final user = auth.currentUser;
 
     if (user == null) {
@@ -219,7 +222,8 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                 child: Column(
                   children: [
                     _buildProfileHeader(),
-                    _buildStatCards(),
+                    // _buildStatCards(),
+                    AnalyticsSection(records: collection.collectionRecords),
                     _buildTabMenu(),
                     _buildTabContent(),
                   ],

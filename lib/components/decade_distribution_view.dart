@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:kolektt/figma_colors.dart';
 
 import '../model/decade_analytics.dart';
 
@@ -88,8 +89,8 @@ class DecadeDistributionView extends StatelessWidget {
                 BarChartRodData(
                   toY: decade.count.toDouble(),
                   width: 20,
-                  borderRadius: BorderRadius.circular(4),
-                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(99),
+                  color: FigmaColors.primary60,
                 ),
               ],
             );

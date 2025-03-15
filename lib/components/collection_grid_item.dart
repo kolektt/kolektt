@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:provider/provider.dart';
 
 import '../figma_colors.dart';

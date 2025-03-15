@@ -1,6 +1,7 @@
 // views/analytics_section.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kolektt/figma_colors.dart';
 import 'package:kolektt/model/local/collection_record.dart';
 import 'package:provider/provider.dart';
 
@@ -28,86 +29,233 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
     super.initState();
     // 프레임 완료 후 viewmodel에 컬렉션 분석 실행
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AnalyticsViewModel>(context, listen: false)
-          .analyzeRecords(widget.records);
+      Provider.of<AnalyticsViewModel>(context, listen: false).analyzeRecords(widget.records);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // 카드 너비: 화면 너비에서 좌우 여백(16*2)을 뺀 값
-    final double cardWidth = MediaQuery.of(context).size.width - 32;
-    const double cardHeight = 340;
-
     return Consumer<AnalyticsViewModel>(
       builder: (context, analyticsVM, child) {
         return Padding(
-          padding: const EdgeInsets.only(top: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: analyticsVM.hasData && analyticsVM.analytics != null
               ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: cardHeight,
-                      child: PageView(
-                        onPageChanged: (int page) {
-                          setState(() {
-                            currentPage = page;
-                          });
-                        },
+                    // Total Records Card
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 100,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: FigmaColors.primary60,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // 컬렉션 현황 카드
-                          AnalyticCard(
-                            title: "컬렉션 현황",
-                            width: cardWidth,
-                            height: cardHeight,
-                            content: CollectionSummaryView(
-                                analytics: analyticsVM.analytics!),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Total\nRecords",
+                                style: FigmaTextStyles()
+                                    .headingheading3
+                                    .copyWith(color: CupertinoColors.white),
+                              ),
+                              Text(
+                                "Analyzed by Kolektt",
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
-                          // 장르별 분포 카드
-                          AnalyticCard(
-                            title: "장르별 분포",
-                            width: cardWidth,
-                            height: cardHeight,
-                            content: GenreDistributionView(
-                                genres: analyticsVM.analytics!.genres),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox.shrink(),
+                              Text(
+                                "${analyticsVM.analytics!.totalRecords}",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
                           ),
-                          // 연도별 분포 카드
-                          AnalyticCard(
-                            title: "연도별 분포",
-                            width: cardWidth,
-                            height: cardHeight,
-                            content: DecadeDistributionView(
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Most Genre Section
+                    Text(
+                      "Most Genre",
+                      style: FigmaTextStyles().headingheading2.copyWith(color: FigmaColors.grey100),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: GenreDistributionView(genres: analyticsVM.analytics!.genres),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Favorite Artists Section
+                    Text(
+                      "Favorite Artists",
+                      style: FigmaTextStyles().headingheading2.copyWith(color: FigmaColors.grey100),
+                    ),
+                    const SizedBox(height: 16),
+                    // Artist list with rankings
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 3, // Show top 3 artists
+                      itemBuilder: (context, index) {
+                        // This is a placeholder - you would need to modify your analytics model
+                        // to track artist album counts for a more accurate implementation
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${index + 1}",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      index == 0
+                                          ? CupertinoIcons.arrow_up
+                                          : index == 1
+                                              ? CupertinoIcons.minus
+                                              : CupertinoIcons.arrow_down,
+                                      size: 12,
+                                      color: index == 0
+                                          ? Colors.blue
+                                          : index == 1
+                                              ? Colors.grey
+                                              : Colors.red,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      index == 0
+                                          ? "BTS"
+                                          : index == 1
+                                              ? "BLACKPINK"
+                                              : "TWICE",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${index == 0 ? 52 : index == 1 ? 34 : 28} Albums",
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      height: 4,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Collection Period Section
+                    Text(
+                      "Collection Period",
+                      style: FigmaTextStyles().headingheading2.copyWith(color: FigmaColors.grey100),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "My favorite\nera",
+                                style: FigmaTextStyles().headingheading3.copyWith(color: FigmaColors.grey100),
+                              ),
+                              Text(
+                                "${analyticsVM.analytics!.oldestRecord}~${analyticsVM.analytics!.newestRecord}",
+                                style: FigmaTextStyles().headingheading2.copyWith(color: FigmaColors.grey100),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            height: 150,
+                            child: DecadeDistributionView(
                                 decades: analyticsVM.analytics!.decades),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // 페이지 인디케이터
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (index) {
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: currentPage == index
-                                ? CupertinoColors.activeBlue
-                                : Colors.grey.withOpacity(0.3),
-                          ),
-                        );
-                      }),
-                    ),
                   ],
                 )
-              : AnalyticCard(
-                  title: "컬렉션 분석",
-                  width: cardWidth,
-                  height: cardHeight,
-                  content: Column(
+              : Center(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(

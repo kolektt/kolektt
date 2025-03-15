@@ -1,14 +1,18 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:kolektt/figma_colors.dart';
 
 import '../model/genre_analytics.dart';
 
 class GenreDistributionView extends StatelessWidget {
   final List<GenreAnalytics> genres;
   const GenreDistributionView({Key? key, required this.genres}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     Color primaryColor = const Color(0xFF0036FF);
+    
     if (genres.isEmpty) {
       return Center(
         child: Text(
@@ -17,85 +21,111 @@ class GenreDistributionView extends StatelessWidget {
         ),
       );
     }
+    
     List<GenreAnalytics> sortedGenres = List.from(genres)
       ..sort((a, b) => b.count.compareTo(a.count));
-    List<GenreAnalytics> topGenres = sortedGenres.take(6).toList();
-    double maxY = topGenres.map((e) => e.count).reduce((a, b) => a > b ? a : b).toDouble() + 2;
+    
+    // Calculate total records
+    int totalRecords = sortedGenres.fold(0, (sum, genre) => sum + genre.count);
+    
+    // Take top 4 genres and combine the rest as "etc."
+    List<GenreAnalytics> displayGenres = [];
+    if (sortedGenres.length > 4) {
+      displayGenres = sortedGenres.take(3).toList();
+      int otherCount = sortedGenres.skip(3).fold(0, (sum, genre) => sum + genre.count);
+      displayGenres.add(GenreAnalytics(name: "etc.", count: otherCount));
+    } else {
+      displayGenres = sortedGenres;
+    }
+    
+    // Generate colors for pie chart sections
+    List<Color> sectionColors = [
+      primaryColor,
+      const Color(0xFFAAAAAA),
+      const Color(0xFFCCCCCC),
+      const Color(0xFFDDDDDD),
+    ];
+    
     return Container(
-      height: 200,
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxY,
-          barTouchData: BarTouchData(
-            enabled: true,
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final genre = topGenres[group.x.toInt()];
-                return BarTooltipItem(
-                  "${genre.count}장",
-                  TextStyle(color: CupertinoColors.white, fontSize: 12),
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  int index = value.toInt();
-                  if (index < topGenres.length) {
-                    String label = topGenres[index].name == "기타" ? "미분류" : topGenres[index].name;
-                    return SideTitleWidget(
-                      space: 4,
-                      meta: meta,
-                      child: Text(
-                        label,
-                        style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
-                      ),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 28,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 0,
+                centerSpaceRadius: 40,
+                sections: displayGenres.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  GenreAnalytics genre = entry.value;
+                  double percentage = (genre.count / totalRecords) * 100;
+                  
+                  return PieChartSectionData(
+                    color: index < sectionColors.length ? sectionColors[index] : Colors.grey,
+                    value: genre.count.toDouble(),
+                    title: '',
+                    radius: 60,
+                    titleStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   );
-                },
+                }).toList(),
               ),
             ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-          barGroups: topGenres.asMap().entries.map((entry) {
-            int index = entry.key;
-            final genre = entry.value;
-            return BarChartGroupData(
-              x: index,
-              barRods: [
-                BarChartRodData(
-                  toY: genre.count.toDouble(),
-                  width: 20,
-                  borderRadius: BorderRadius.circular(4),
-                  color: primaryColor,
+          const SizedBox(height: 16),
+          Text(
+            displayGenres.first.name,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            "${(displayGenres.first.count / totalRecords * 100).toInt()}% ${displayGenres.first.count} records",
+            style: const TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Divider(),
+          Column(
+            children: displayGenres.map((genre) {
+              double percentage = (genre.count / totalRecords) * 100;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      genre.name,
+                      style: FigmaTextStyles().headingheading4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "${percentage.toInt()}%",
+                          style: FigmaTextStyles().bodysm,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          "${genre.count} Records",
+                          style: FigmaTextStyles().bodysm,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            );
-          }).toList(),
-        ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
