@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
 import 'collection/collection_view.dart' as coll;
-import 'home/home_view.dart';
+import 'home/kolektt_home_screen.dart';
 import 'profile/profile_vew.dart';
 
 class ContentView extends StatelessWidget {
@@ -20,10 +20,6 @@ class ContentView extends StatelessWidget {
             label: "홈",
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.square_grid_2x2_fill),
-            label: "컬렉션",
-          ),
-          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person_fill),
             label: "프로필",
           ),
@@ -33,13 +29,9 @@ class ContentView extends StatelessWidget {
         switch (index) {
           case 0:
             return CupertinoTabView(
-              builder: (context) => HomeView(),
+              builder: (context) => KolekttHomeScreen(),
             );
           case 1:
-            return CupertinoTabView(
-              builder: (context) => coll.CollectionView(),
-            );
-          case 2:
             return CupertinoTabView(
               builder: (context) => const ProfileView(),
             );
