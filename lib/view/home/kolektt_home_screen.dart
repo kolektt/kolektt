@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../components/collection_grid_item.dart';
 import '../../components/filter_cupertino_sheet.dart';
 import '../../model/local/collection_record.dart';
+import '../../view_models/analytics_vm.dart';
 import '../../view_models/collection_vm.dart';
 import '../SearchView.dart';
 import '../auto_album_detection_view.dart';
@@ -20,6 +21,7 @@ class KolekttHomeScreen extends StatefulWidget {
 }
 
 class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
+  late AnalyticsViewModel analytics_model;
   bool _isRefreshing = false;
 
   @override
@@ -32,9 +34,12 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   }
 
   Future<void> _loadCollectionData() async {
-    final model = context.read<CollectionViewModel>();
-    await model.fetchUserCollectionsWithRecords();
-    await model.fetchUserCollectionsUniqueProperties();
+    final collection_model = context.read<CollectionViewModel>();
+    analytics_model = context.read<AnalyticsViewModel>();
+    await collection_model.fetchUserCollectionsWithRecords();
+    await collection_model.fetchUserCollectionsUniqueProperties();
+
+    analytics_model.analyzeRecords(collection_model.collectionRecords);
   }
 
   @override
@@ -52,13 +57,19 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildStatCard(
-                        title: 'Total\nRecords',
-                        value: '360',
-                        color: FigmaColors.primary60,
-                        strokeColor: FigmaColors.primary70,
-                        textColor: CupertinoColors.white,
-                        context: context,
+                      child: Consumer<AnalyticsViewModel>(
+                        builder: (context, analyticsModel, child) {
+                          return _buildStatCard(
+                            title: 'Total\nRecords',
+                            value: analyticsModel.analytics != null
+                                ? analyticsModel.analytics!.totalRecords.toString()
+                                : '0',
+                            color: FigmaColors.primary60,
+                            strokeColor: FigmaColors.primary70,
+                            textColor: CupertinoColors.white,
+                            context: context,
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 16),
