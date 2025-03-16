@@ -74,14 +74,20 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _buildStatCard(
-                        title: 'Most\nGenre',
-                        value: 'Drum & Bass',
-                        color: CupertinoColors.white,
-                        strokeColor: Color(0xffB2C2FF),
-                        textColor: FigmaColors.grey100,
-                        valueSize: 24,
-                        context: context,
+                      child: Consumer<AnalyticsViewModel>(
+                        builder: (BuildContext context, AnalyticsViewModel analyticsModel, Widget? child) {
+                          return _buildStatCard(
+                            title: 'Most\nGenre',
+                            value: analyticsModel.analytics != null
+                                ? analyticsModel.analytics!.mostCollectedGenre.toString()
+                                : '0',
+                            color: CupertinoColors.white,
+                            strokeColor: Color(0xffB2C2FF),
+                            textColor: FigmaColors.grey100,
+                            valueSize: 24,
+                            context: context,
+                          );
+                        },
                       ),
                     ),
                   ],
