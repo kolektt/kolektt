@@ -23,7 +23,6 @@ class RecordDetailsPage extends StatelessWidget {
         leading: Navigator.canPop(context)
             ? const CupertinoNavigationBarBackButton(previousPageTitle: '')
             : null,
-        middle: Text(record.title),
         trailing: const Icon(CupertinoIcons.pencil),
       ),
       child: ListView(
