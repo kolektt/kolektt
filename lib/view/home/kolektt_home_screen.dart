@@ -53,7 +53,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SafeArea(child: HomePageTitle()),
+                HomePageTitle(),
                 Row(
                   children: [
                     Expanded(
@@ -375,6 +375,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   Widget HomePageTitle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Column(
           children: [
@@ -392,7 +393,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
           ],
         ),
         IconButton(
-            iconSize: 32,
+            iconSize: 48,
             onPressed: () {
               Navigator.push(
                 context,
@@ -401,8 +402,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                 ),
               );
             },
-            icon: Icon(CupertinoIcons.add_circled_solid,
-                color: FigmaColors.primary70))
+            icon: Icon(CupertinoIcons.add_circled_solid, color: FigmaColors.primary70))
       ],
     );
   }
