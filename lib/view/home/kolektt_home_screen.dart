@@ -25,6 +25,9 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCollectionData();
+    });
     _loadCollectionData();
   }
 
