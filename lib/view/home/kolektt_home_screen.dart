@@ -224,48 +224,54 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   }
 
   Widget _buildFavoriteArtistCard(context) {
-    return Container(
-      height: 171,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: CupertinoColors.black,
-        border: Border.all(color: FigmaColors.grey90),
-        borderRadius: BorderRadius.circular(12),
-        image: const DecorationImage(
-          image: NetworkImage(
-              'https://www.shutterstock.com/image-vector/no-image-available-icon-template-260nw-1036735678.jpg'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Color.fromRGBO(0, 0, 0, 0.5),
-            BlendMode.darken,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Favorite\nArtist',
-            style: FigmaTextStyles()
-                .headingheading3
-                .copyWith(color: CupertinoColors.white),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              'Tyler the\nCreator',
-              style: TextStyle(
-                color: CupertinoColors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
+    return Consumer<AnalyticsViewModel>(
+      builder: (BuildContext context, AnalyticsViewModel analyticsModel, Widget? child) {
+        return Container(
+          height: 171,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: CupertinoColors.black,
+            border: Border.all(color: FigmaColors.grey90),
+            borderRadius: BorderRadius.circular(12),
+            image: const DecorationImage(
+              image: NetworkImage(
+                  'https://www.shutterstock.com/image-vector/no-image-available-icon-template-260nw-1036735678.jpg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Color.fromRGBO(0, 0, 0, 0.5),
+                BlendMode.darken,
               ),
-              textAlign: TextAlign.end,
             ),
           ),
-        ],
-      ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Favorite\nArtist',
+                style: FigmaTextStyles()
+                    .headingheading3
+                    .copyWith(color: CupertinoColors.white),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  analyticsModel.analytics != null
+                      ? analyticsModel.analytics!.mostCollectedArtist.replaceFirst(" ", "\n")
+                      : '0',
+                  style: TextStyle(
+                    color: CupertinoColors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
