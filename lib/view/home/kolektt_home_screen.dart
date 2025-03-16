@@ -37,15 +37,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        trailing: IconButton(onPressed: () { Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (_) => AutoAlbumDetectionScreen(),
-          ),
-        ); },
-        icon: Icon(CupertinoIcons.add_circled_solid, color: FigmaColors.primary70)),
-      ),
+      navigationBar: CupertinoNavigationBar(),
       child: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -93,7 +85,11 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                 // _buildAlbumGrid(),
                 Consumer<CollectionViewModel>(
                   // key 값에 상태 변화에 따른 값(로딩 여부 + 데이터 개수)을 반영하여 전환이 발생하도록 함
-                  key: ValueKey<int>(context.read<CollectionViewModel>().collectionRecords.length + (context.read<CollectionViewModel>().isLoading ? 1 : 0)),
+                  key: ValueKey<int>(context
+                          .read<CollectionViewModel>()
+                          .collectionRecords
+                          .length +
+                      (context.read<CollectionViewModel>().isLoading ? 1 : 0)),
                   builder: (context, model, child) {
                     if (model.isLoading) {
                       if (_isRefreshing) return const SizedBox.shrink();
@@ -105,20 +101,23 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSearchBar(context, FilterLineButton(
-                            classification: model.userCollectionClassification,
-                            onFilterResult: (result) async {
-                              debugPrint("UserCollectionClassification: ${result.artists}, ${result.genres}, ${result.labels}");
-                              await model.filterCollection(result);
-                            },
-                          )
-                        ),
+                        _buildSearchBar(
+                            context,
+                            FilterLineButton(
+                              classification:
+                                  model.userCollectionClassification,
+                              onFilterResult: (result) async {
+                                debugPrint(
+                                    "UserCollectionClassification: ${result.artists}, ${result.genres}, ${result.labels}");
+                                await model.filterCollection(result);
+                              },
+                            )),
                         const SizedBox(height: 16),
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
@@ -127,8 +126,9 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                           itemCount: model.collectionRecords.length,
                           itemBuilder: (context, index) {
                             CollectionRecord record =
-                            model.collectionRecords[index];
-                            record.record.resourceUrl = "https://api.discogs.com/releases/${record.record.id}";
+                                model.collectionRecords[index];
+                            record.record.resourceUrl =
+                                "https://api.discogs.com/releases/${record.record.id}";
                             // 각 그리드 아이템에 애니메이션 적용
                             return AnimatedGridItem(
                               index: index,
@@ -193,7 +193,8 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
             alignment: Alignment.centerRight,
             child: Text(
               value,
-              style: FigmaTextStyles().headingheading1.copyWith(color: textColor),
+              style:
+                  FigmaTextStyles().headingheading1.copyWith(color: textColor),
               textDirection: TextDirection.rtl,
             ),
           ),
@@ -211,7 +212,8 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
         border: Border.all(color: FigmaColors.grey90),
         borderRadius: BorderRadius.circular(12),
         image: const DecorationImage(
-          image: NetworkImage('https://www.shutterstock.com/image-vector/no-image-available-icon-template-260nw-1036735678.jpg'),
+          image: NetworkImage(
+              'https://www.shutterstock.com/image-vector/no-image-available-icon-template-260nw-1036735678.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             Color.fromRGBO(0, 0, 0, 0.5),
@@ -272,7 +274,9 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
             Expanded(
               child: Text(
                 'Search',
-                style: FigmaTextStyles().bodymd.copyWith(color: FigmaColors.grey50),
+                style: FigmaTextStyles()
+                    .bodymd
+                    .copyWith(color: FigmaColors.grey50),
               ),
             ),
             filterButton
@@ -343,19 +347,36 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   }
 
   Widget HomePageTitle() {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'Kolektt',
-          style: FigmaTextStyles()
-              .displaydisplay2
-              .copyWith(color: CupertinoColors.black),
+        Column(
+          children: [
+            Text(
+              'Kolektt',
+              style: FigmaTextStyles()
+                  .displaydisplay2
+                  .copyWith(color: CupertinoColors.black),
+            ),
+            Text(
+              'All about your records',
+              style: FigmaTextStyles().labelxsregular,
+            ),
+            SizedBox(height: 16)
+          ],
         ),
-        Text(
-          'All about your records',
-          style: FigmaTextStyles().labelxsregular,
-        ),
-        SizedBox(height: 16)
+        IconButton(
+            iconSize: 32,
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => AutoAlbumDetectionScreen(),
+                ),
+              );
+            },
+            icon: Icon(CupertinoIcons.add_circled_solid,
+                color: FigmaColors.primary70))
       ],
     );
   }

@@ -14,6 +14,7 @@ import '../../model/supabase/profile.dart';
 import '../../model/supabase/user_stats.dart';
 import '../../view_models/auth_vm.dart';
 import '../../view_models/collection_vm.dart';
+import '../SettingsView.dart';
 import '../login_view.dart';
 import 'edit_profile_view.dart';
 
@@ -124,9 +125,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
     }
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text("프로필"),
-      ),
+      navigationBar: CupertinoNavigationBar(),
       child: SafeArea(
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -190,6 +189,26 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
                 opacity: _isRefreshing ? 0.5 : 1.0,
                 child: Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "프로필",
+                            style: FigmaTextStyles().displaydisplay2.copyWith(color: FigmaColors.grey100)
+                          ),
+                          IconButton(icon: Icon(CupertinoIcons.gear, color: CupertinoColors.black), onPressed: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (_) => SettingsView(),
+                              ),
+                            );
+                          }, iconSize:32)
+                        ],
+                      ),
+                    ),
                     _buildProfile(
                       displayName,
                       genre,

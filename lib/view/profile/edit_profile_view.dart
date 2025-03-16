@@ -303,22 +303,6 @@ class _EditProfileViewState extends State<EditProfileView> {
                                   CupertinoPageRoute(builder: (_) => const DeleteAccountView()),
                                 );
                               },
-                            ),
-                            _buildActionButton(
-                              icon: CupertinoIcons.arrow_left_right,
-                              label: "로그아웃",
-                              onPressed: () async {
-                                final auth = context.read<AuthViewModel>();
-                                await auth.signOut();
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => KolekttApp(),
-                                    maintainState: false,
-                                  ),
-                                  (route) => true,
-                                );
-                              },
                             )
                           ],
                         ),
