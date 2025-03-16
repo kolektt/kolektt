@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../figma_colors.dart';
 import '../model/local/collection_record.dart';
+import '../view/collection/collection_detail_page.dart';
 import '../view/collection/collection_edit_page.dart';
 import '../view_models/collection_vm.dart';
 
@@ -17,15 +18,7 @@ Widget buildGridItem(
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => CollectionEditPage(
-            collection: record,
-            onSave: (editedCollection) {
-              model.updateRecord(editedCollection).then((_) {
-                model.fetchUserCollectionsWithRecords();
-                Navigator.pop(context);
-              });
-            },
-          ),
+          builder: (_) => RecordDetailsPage(collectionRecord: record),
         ),
       );
     },
