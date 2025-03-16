@@ -1,5 +1,4 @@
 // datasource/collection_remote_data_source.dart
-import 'dart:developer';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,30 +18,32 @@ class CollectionRemoteDataSource {
         .from(tableName)
         .select('*, records(*)')
         .eq('user_id', userId.toString());
-    List<CollectionRecord> _collectionRecords =
-        response.map<CollectionRecord>((item) {
+
+    print("recordJson: ${response}");
+
+    List<CollectionRecord> _collectionRecords = response.map<CollectionRecord>((item) {
       final recordId = item['record_id'];
-      final recordJson = item['records'] as Map<String, dynamic>?;
-      if (recordJson != null) {
-        recordJson['id'] = recordId;
+      final recordMap = item['records'];
+      if (recordMap != null) {
+        recordMap['id'] = recordId;
         return CollectionRecord(
           record: DiscogsRecord(
-            id: recordJson['id'] ?? 0,
-            title: recordJson['title'] ?? '',
+            id: recordMap['id'] ?? 0,
+            title: recordMap['title'] ?? '',
             resourceUrl: '',
-            notes: recordJson['notes'] ?? '',
-            genre: recordJson['genre'] ?? '',
-            coverImage: recordJson['cover_image'] ?? '',
-            catalogNumber: recordJson['catalog_number'] ?? '',
-            label: recordJson['label'] ?? '',
-            format: recordJson['format'] ?? '',
-            country: recordJson['country'] ?? '',
-            style: recordJson['style'] ?? '',
-            condition: recordJson['condition'] ?? '',
-            conditionNotes: recordJson['condition_notes'] ?? '',
-            recordId: recordJson['record_id'] ?? 0,
-            artist: recordJson['artist'] ?? 'Unknown Artist',
-            releaseYear: recordJson['release_year'] ?? 0,
+            notes: recordMap['notes'] ?? '',
+            genre: parseToList(recordMap['genre']).join(", "),
+            coverImage: recordMap['cover_image'] ?? '',
+            catalogNumber: recordMap['catalog_number'] ?? '',
+            label: parseToList(recordMap['label']).join(", "),
+            format: parseToList(recordMap['format']).join(", "),
+            country: recordMap['country'] ?? '',
+            style: parseToList(recordMap['style']).join(", "),
+            condition: recordMap['condition'] ?? '',
+            conditionNotes: recordMap['condition_notes'] ?? '',
+            recordId: recordMap['record_id'] ?? 0,
+            artist: recordMap['artist'] ?? 'Unknown Artist',
+            releaseYear: recordMap['release_year'] ?? 0,
           ),
           user_collection: UserCollection.fromJson(item),
         );
@@ -51,6 +52,15 @@ class CollectionRemoteDataSource {
       }
     }).toList();
     return _collectionRecords;
+  }
+
+  List<String> parseToList(dynamic value) {
+    if (value is List) {
+      return List<String>.from(value);
+    } else if (value is String) {
+      return [value];
+    }
+    return [];
   }
 
   Future<List<CollectionRecord>> filterUserCollection(String userId, UserCollectionClassification classification) async {

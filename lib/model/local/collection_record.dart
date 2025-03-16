@@ -29,12 +29,15 @@ class CollectionRecord {
     // 각 컬렉션의 record 리스트를 순회하며 값 추출
     for (var collection in collections) {
       final records = collection.record;
+      print("records.genre: ${records.genre}");
+      print("records.label: ${records.label}");
+      print("records.artist: ${records.artist}");
       for (var genre in records.genre.split(", ")) {
         genres.add(genre);
       }
-      for (var label in records.label.split(", ")) {
-        labels.add(label);
-      }
+      // for (var label in records.label.split(", ")) {
+      //   labels.add(label);
+      // }
       for (var artist in records.artist.split(", ")) {
         artists.add(artist);
       }

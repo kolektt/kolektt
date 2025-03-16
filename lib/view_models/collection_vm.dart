@@ -259,7 +259,6 @@ class CollectionViewModel extends ChangeNotifier {
 
       _collectionRecords = await collectionRepository.filterUserCollection(userId, classification);
 
-      if (!kDebugMode) return;
       for (var record in _collectionRecords) {
         debugPrint('Filtered record: ${record.record.title}');
       }
