@@ -42,18 +42,21 @@ class RecordDetailsViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  set isLoading(bool isLoading) {
+    _isLoading = isLoading;
+    notifyListeners();
+  }
+
   Future<void> getRecordDetails() async {
     try {
-      _isLoading = true;
-      notifyListeners();
+      isLoading = true;
       final releaseId = int.parse(_collectionRecord.record.resourceUrl.split("/").last);
       _modelRecord = await searchById.call(releaseId);
       print("List<DiscogsSearchItem>: ${_modelRecord.toJson()}");
     } catch (e) {
       errorMessage = e.toString();
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      isLoading = false;
     }
   }
 }
