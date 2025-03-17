@@ -79,6 +79,18 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
                   padding: EdgeInsets.all(0),
                   onPressed: () {
                     final List<Artist> artistList = model.entityRecord.artists;
+
+                    if (artistList.length == 1) {
+                      // artist 페이지로 이동
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => ArtistDetailView(artist: artistList.first),
+                        ),
+                      );
+                      return;
+                    }
+
                     // 아티스트 이름을 누르면 아티스트 페이지로 이동
                     showCupertinoModalPopup(context: context, builder: (BuildContext context) {
                       return CupertinoActionSheet(
@@ -99,6 +111,14 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
                               },
                               child: Text(artist.name),
                             ),
+
+                          // Close 버튼
+                          CupertinoActionSheetAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('닫기', style: TextStyle(color: CupertinoColors.systemRed)),
+                          ),
                         ]
                       );
                     });

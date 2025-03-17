@@ -22,7 +22,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
   @override
   void initState() {
     super.initState();
-    model = context.read<ArtistDetailViewModel>();
+    model = Provider.of<ArtistDetailViewModel>(context, listen: false);
     model.artist = widget.artist;
     model.fetchArtistRelease().then((_) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -36,8 +36,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
   @override
   Widget build(BuildContext context) {
     if (model.isLoading) {
-      return CupertinoPageScaffold(
-          child: const Center(child: CircularProgressIndicator()));
+      return CupertinoPageScaffold(child: const Center(child: CircularProgressIndicator()));
     }
 
     return CupertinoPageScaffold(
