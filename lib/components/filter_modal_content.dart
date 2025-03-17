@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/figma_colors.dart';
+import 'package:provider/provider.dart';
 
 import '../data/models/user_collection_classification.dart';
+import '../view_models/collection_vm.dart';
 
 /// 필터 화면 위젯
 class FilterScreen extends StatefulWidget {
@@ -20,7 +22,7 @@ class FilterScreen extends StatefulWidget {
 }
 
 class _FilterScreenState extends State<FilterScreen> {
-  late UserCollectionClassification _filter;
+  UserCollectionClassification _filter = UserCollectionClassification.initial();
 
   @override
   void initState() {
@@ -280,7 +282,14 @@ class _FilterScreenState extends State<FilterScreen> {
                 ),
                 onPressed: () {
                   setState(() {
-                    _filter = UserCollectionClassification.initial();
+                    _filter = _filter.copyWith(
+                      mediaCondition: 'All',
+                      sleeveCondition: 'All',
+                      genre: 'All',
+                      startYear: 1900,
+                      endYear: 2025,
+                      sortOption: '최신순',
+                    );
                   });
                 },
               ),
