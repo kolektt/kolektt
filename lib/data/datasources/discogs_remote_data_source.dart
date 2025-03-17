@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-import '../../domain/entities/discogs_record.dart' as domain;
+import '../models/artist_release.dart';
 import '../models/discogs_record.dart';
 import '../models/discogs_record.dart' as data;
 import '../models/discogs_search_response.dart';
@@ -118,6 +118,65 @@ class DiscogsRemoteDataSource {
       }
     } catch (e) {
       debugPrint('Error fetching release: $e');
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  Future<Artist> getArtistByUrl(String url) async {
+    final uri = Uri.parse('$url?key=$apiKey&secret=$apiSecret');
+    debugPrint('Fetching Discogs Artist: $uri');
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          'User-Agent': 'MyDiscogsApp/1.0',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final Artist artist = Artist.fromJson(data);
+        debugPrint('Discogs artist: ${artist.toJson()}');
+        return artist;
+      } else {
+        debugPrint(
+          'Failed to load artist: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception('Artist 조회 실패 (Status: ${response.statusCode})');
+      }
+    } catch (e) {
+      debugPrint('Error fetching artist: $e');
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  Future<ArtistRelease> getArtistReleaseByUrl(String url) async {
+    final uri = Uri.parse('$url?key=$apiKey&secret=$apiSecret');
+    debugPrint('Fetching Discogs Artist: $uri');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          'User-Agent': 'MyDiscogsApp/1.0',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final ArtistRelease artistRelease = ArtistRelease.fromJson(data);
+        debugPrint('Discogs artist: ${artistRelease.toJson()}');
+        return artistRelease;
+      } else {
+        debugPrint(
+          'Failed to load artist: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception('Artist 조회 실패 (Status: ${response.statusCode})');
+      }
+    } catch (e) {
+      debugPrint('Error fetching artist: $e');
       throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }

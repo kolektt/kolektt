@@ -95,6 +95,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
                                     builder: (context) => ArtistDetailView(artist: artist),
                                   ),
                                 );
+                                debugPrint('artist: ${artist.toJson()}');
                               },
                               child: Text(artist.name),
                             ),

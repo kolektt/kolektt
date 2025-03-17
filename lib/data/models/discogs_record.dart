@@ -203,7 +203,7 @@ class DiscogsRecord {
           tracks: "",
           id: 1,
           resourceUrl: "https://api.discogs.com/artists/1",
-          thumbnailUrl: "https://example.com/thumb_artist.jpg",
+          thumbnailUrl: "https://example.com/thumb_artist.jpg", releasesUrl: '',
         ),
       ],
       artistsSort: "Sample Artist",
@@ -241,7 +241,7 @@ class DiscogsRecord {
           tracks: "",
           id: 2,
           resourceUrl: "https://api.discogs.com/artists/2",
-          thumbnailUrl: "https://example.com/thumb_submitter.jpg",
+          thumbnailUrl: "https://example.com/thumb_submitter.jpg", releasesUrl: '',
         ),
         contributors: [
           Artist(
@@ -252,7 +252,7 @@ class DiscogsRecord {
             tracks: "",
             id: 3,
             resourceUrl: "https://api.discogs.com/artists/3",
-            thumbnailUrl: "https://example.com/thumb_contributor.jpg",
+            thumbnailUrl: "https://example.com/thumb_contributor.jpg", releasesUrl: '',
           )
         ],
         dataQuality: "High",
@@ -321,6 +321,7 @@ class Artist {
   final String tracks;
   final int id;
   final String resourceUrl;
+  final String releasesUrl;
   final String thumbnailUrl;
 
   Artist({
@@ -332,9 +333,11 @@ class Artist {
     required this.id,
     required this.resourceUrl,
     required this.thumbnailUrl,
+    required this.releasesUrl,
   });
 
   factory Artist.fromJson(Map<String, dynamic> json) {
+    print("Artist.fromJson: $json");
     return Artist(
       name: json['name'] ?? '',
       anv: json['anv'] ?? '',
@@ -346,7 +349,22 @@ class Artist {
           : int.tryParse(json['id']?.toString() ?? '') ?? 0,
       resourceUrl: json['resource_url'] ?? '',
       thumbnailUrl: json['thumbnail_url'] ?? '',
+      releasesUrl: json['releases_url'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'anv': anv,
+      'join': join,
+      'role': role,
+      'tracks': tracks,
+      'id': id,
+      'resource_url': resourceUrl,
+      'thumbnail_url': thumbnailUrl,
+      'releases_url': releasesUrl,
+    };
   }
 }
 
@@ -479,7 +497,7 @@ class Community {
               tracks: '',
               id: 0,
               resourceUrl: '',
-              thumbnailUrl: ''),
+              thumbnailUrl: '', releasesUrl: ''),
       contributors: (json['contributors'] as List<dynamic>?)
               ?.map((e) => Artist.fromJson(e))
               .toList() ??
@@ -502,7 +520,7 @@ class Community {
           tracks: '',
           id: 0,
           resourceUrl: '',
-          thumbnailUrl: ''),
+          thumbnailUrl: '', releasesUrl: ''),
       contributors: [],
       dataQuality: '',
       status: '',

@@ -25,6 +25,7 @@ import 'package:kolektt/view/collection/record_detail_view.dart';
 import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view/login_view.dart';
 import 'package:kolektt/view_models/analytics_vm.dart';
+import 'package:kolektt/view_models/artist_detail_vm.dart';
 // ViewModels
 import 'package:kolektt/view_models/auth_vm.dart';
 import 'package:kolektt/view_models/collection_vm.dart';
@@ -188,6 +189,10 @@ class KolekttApp extends StatelessWidget {
               supabase: Supabase.instance.client,
             )
           )
+        )),
+
+        ChangeNotifierProvider(create: (_) => ArtistDetailViewModel(
+            remoteDataSource: DiscogsRemoteDataSource(),
         )),
 
         // 검색 관련 뷰모델
