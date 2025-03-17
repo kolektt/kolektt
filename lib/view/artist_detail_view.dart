@@ -55,22 +55,6 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                     ),
                     child: Stack(
                       children: [
-                        // 투명한 뒤로가기 버튼
-                        Positioned(
-                          top: 16,
-                          left: 16,
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(
-                              CupertinoIcons.back,
-                              color: CupertinoColors.white,
-                              size: 32,
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
                         // 텍스트 가독성을 위한 그라데이션 오버레이
                         Container(
                           decoration: BoxDecoration(
@@ -109,6 +93,22 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                                 ],
                               ),
                             ],
+                          ),
+                        ),
+                        // 투명한 뒤로가기 버튼
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              CupertinoIcons.back,
+                              color: CupertinoColors.white,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
                           ),
                         ),
                       ],
