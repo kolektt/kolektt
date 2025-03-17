@@ -124,12 +124,11 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                         _buildSearchBar(
                             context,
                             FilterLineButton(
-                              classification:
-                                  model.userCollectionClassification,
+                              classification: model.userCollectionClassification,
                               onFilterResult: (result) async {
-                                debugPrint(
-                                    "UserCollectionClassification: ${result.artists}, ${result.genres}, ${result.labels}");
-                                await model.filterCollection(result);
+                                debugPrint("UserCollectionClassification: ${result.genres}");
+                                model.userCollectionClassification = result;
+                                await model.filterCollection();
                               },
                             )),
                         const SizedBox(height: 16),

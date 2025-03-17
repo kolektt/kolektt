@@ -34,6 +34,11 @@ class CollectionViewModel extends ChangeNotifier {
 
   UserCollectionClassification get userCollectionClassification => _userCollectionClassification;
 
+  set userCollectionClassification(UserCollectionClassification classification) {
+    _userCollectionClassification = classification;
+    notifyListeners();
+  }
+
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isAdding = false;
 
@@ -234,7 +239,7 @@ class CollectionViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
       _userCollectionClassification = await collectionRepository.fetchUniqueProperties(userId);
-      debugPrint('UserCollectionClassification: ${_userCollectionClassification.genres}, ${_userCollectionClassification.labels}, ${_userCollectionClassification.artists}');
+      debugPrint('UserCollectionClassification: ${_userCollectionClassification.genres}, mediaCondition: ${_userCollectionClassification.mediaCondition}');
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
       debugPrint('Error fetching user collection: $e');
@@ -250,12 +255,12 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> filterCollection(UserCollectionClassification classification) async {
+  Future<void> filterCollection() async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      _collectionRecords = await collectionRepository.filterUserCollection(userId, classification);
+      _collectionRecords = await collectionRepository.filterUserCollection(userId, _userCollectionClassification);
 
       for (var record in _collectionRecords) {
         debugPrint('Filtered record: ${record.record.title}');

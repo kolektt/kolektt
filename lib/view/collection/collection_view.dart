@@ -150,14 +150,14 @@ class _CollectionViewState extends State<CollectionView> {
                       children: [
                         AnalyticsSection(records: model.collectionRecords),
                         const SizedBox(height: 16),
-                        FilterButton(
-                          classification: model.userCollectionClassification,
-                          onFilterResult: (result) async {
-                            debugPrint(
-                                "UserCollectionClassification: ${result.artists}, ${result.genres}, ${result.labels}");
-                            await model.filterCollection(result);
-                          },
-                        ),
+                        // FilterButton(
+                        //   classification: model.userCollectionClassification,
+                        //   onFilterResult: (result) async {
+                        //     debugPrint(
+                        //         "UserCollectionClassification: ${result.artists}, ${result.genres}, ${result.labels}");
+                        //     await model.filterCollection(result);
+                        //   },
+                        // ),
                         const SizedBox(height: 16),
                         GridView.builder(
                           shrinkWrap: true,

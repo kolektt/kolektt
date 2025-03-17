@@ -39,8 +39,6 @@ class CollectionRepositoryImpl implements CollectionRepository {
 
     // 빈 문자열 제거
     result.genres.remove("");
-    result.artists.remove("");
-    result.labels.remove("");
     return result;
   }
 

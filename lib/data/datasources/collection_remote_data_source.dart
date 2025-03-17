@@ -19,8 +19,6 @@ class CollectionRemoteDataSource {
         .select('*, records(*)')
         .eq('user_id', userId.toString());
 
-    print("recordJson: ${response}");
-
     List<CollectionRecord> _collectionRecords = response.map<CollectionRecord>((item) {
       final recordId = item['record_id'];
       final recordMap = item['records'];
@@ -39,7 +37,7 @@ class CollectionRemoteDataSource {
             format: parseToList(recordMap['format']).join(", "),
             country: recordMap['country'] ?? '',
             style: parseToList(recordMap['style']).join(", "),
-            condition: recordMap['condition'] ?? '',
+            condition: item['condition'],
             conditionNotes: recordMap['condition_notes'] ?? '',
             recordId: recordMap['record_id'] ?? 0,
             artist: recordMap['artist'] ?? 'Unknown Artist',
@@ -65,26 +63,27 @@ class CollectionRemoteDataSource {
 
   Future<List<CollectionRecord>> filterUserCollection(String userId, UserCollectionClassification classification) async {
     // 기본 쿼리 생성: user_id 기준 필터 및 records 임베딩
-    var query = supabase
+    PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
         .from(tableName)
         .select('*, records(*)')
         .eq('user_id', userId.toString());
 
-    // classification에 값이 있을 경우, records 테이블의 컬럼으로 ilike 조건 추가
-    if (classification.genres.isNotEmpty) {
-      final genreFilter = classification.genres.first;
-      // 값이 여러 개 포함될 수 있으므로 ilike 연산자로 부분 일치 처리
-      query = query.ilike('records.genre', '%$genreFilter%');
+    // mediaCondition, genre, startYear, endYear, sortOption에 따라 필터링
+    // `All`이 아닌 경우에만 필터링
+    if (classification.mediaCondition != 'All') {
+      query = query.eq('condition', classification.mediaCondition);
     }
 
-    if (classification.labels.isNotEmpty) {
-      final labelFilter = classification.labels.first;
-      query = query.ilike('records.label', '%$labelFilter%');
+    if (classification.genre != 'All') {
+      query = query.ilike('records.genre', '%${classification.genre}%');
     }
 
-    if (classification.artists.isNotEmpty) {
-      final artistFilter = classification.artists.first;
-      query = query.ilike('records.artist', '%$artistFilter%');
+    if (classification.startYear != 1900) {
+      query = query.gte('records.release_year', classification.startYear);
+    }
+
+    if (classification.endYear != 2025) {
+      query = query.lte('records.release_year', classification.endYear);
     }
 
     final response = await query;
@@ -120,6 +119,20 @@ class CollectionRemoteDataSource {
         );
       }
     }
+
+    // Order by sortOption
+      collectionRecords.sort((a, b) {
+      switch (classification.sortOption) {
+        case '최신순':
+          return b.record.releaseYear.compareTo(a.record.releaseYear);
+        case '오래된순':
+          return a.record.releaseYear.compareTo(b.record.releaseYear);
+        case '이름순':
+          return a.record.title.compareTo(b.record.title);
+        default:
+          return 0;
+      }
+    });
     return collectionRecords;
   }
 

@@ -12,11 +12,6 @@ class SettingsView extends StatelessWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text('설정'),
-        leading: CupertinoNavigationBarBackButton(
-          onPressed: () {
-            // Handle back button action
-          },
-        ),
       ),
       child: SafeArea(
         child: Column(

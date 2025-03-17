@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
 import '../model/record.dart';
-import '../view/record_detail_view.dart';
 
 class DJRecordCard extends StatelessWidget {
   final Record record;

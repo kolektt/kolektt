@@ -213,6 +213,7 @@ class KolekttApp extends StatelessWidget {
         child: CupertinoApp(
           title: 'Kolektt',
           theme: CupertinoThemeData(
+            brightness: Brightness.light,
             primaryColor: primaryColor,
             scaffoldBackgroundColor: CupertinoColors.systemBackground,
             barBackgroundColor: CupertinoColors.systemGrey6,

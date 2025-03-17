@@ -22,27 +22,36 @@ class CollectionRecord {
 
   static Future<UserCollectionClassification> getUniqueProperties(
       List<CollectionRecord> collections) async {
-    final genres = <String>{};
-    final labels = <String>{};
-    final artists = <String>{};
+    List<String> mediaConditions = ["All"];
+    List<String> sleeveConditions = ["All"];
+    List<String> genres = ["All"];
+    List<String> sortOptions = ["최신순", "오래된순", "이름순"];
 
     // 각 컬렉션의 record 리스트를 순회하며 값 추출
     for (var collection in collections) {
       final records = collection.record;
-      print("records.genre: ${records.genre}");
-      print("records.label: ${records.label}");
-      print("records.artist: ${records.artist}");
+      for (var mediaCondition in records.condition.split(", ")) {
+        mediaConditions.add(mediaCondition);
+      }
+      for (var sleeveCondition in records.conditionNotes.split(", ")) {
+        sleeveConditions.add(sleeveCondition);
+      }
       for (var genre in records.genre.split(", ")) {
         genres.add(genre);
       }
-      // for (var label in records.label.split(", ")) {
-      //   labels.add(label);
-      // }
-      for (var artist in records.artist.split(", ")) {
-        artists.add(artist);
-      }
     }
+
     return UserCollectionClassification(
-        genres: genres, labels: labels, artists: artists);
+      mediaConditions: mediaConditions.toSet().toList(),
+      sleeveConditions: sleeveConditions.toSet().toList(),
+      genres: genres.toSet().toList(),
+      sortOptions: sortOptions.toSet().toList(),
+      mediaCondition: 'All',
+      sleeveCondition: 'All',
+      genre: 'All',
+      startYear: 1900,
+      endYear: 2025,
+      sortOption: '최신순',
+    );
   }
 }

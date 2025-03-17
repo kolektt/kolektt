@@ -441,7 +441,7 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
                       );
 
                       if (collectionVM.errorMessage == null) {
-                        collectionVM.fetchUserCollectionsWithRecords();
+                        collectionVM..fetchUserCollectionsWithRecords()..fetchUserCollectionsUniqueProperties();
                         Navigator.pop(context);
                       }
                     },
