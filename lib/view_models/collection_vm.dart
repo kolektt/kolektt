@@ -12,7 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/models/discogs_search_response.dart';
 import '../data/models/user_collection_classification.dart';
 import '../domain/repositories/album_recognition_repository.dart';
-import '../domain/repositories/collection_repositroy.dart';
+import '../domain/repositories/collection_repository.dart';
 import '../domain/repositories/discogs_record_repository.dart';
 import '../domain/repositories/discogs_repository.dart';
 import '../domain/usecases/search_and_upsert_discogs_records.dart';

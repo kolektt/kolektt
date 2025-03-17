@@ -73,7 +73,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
 
     try {
       final auth = context.read<AuthViewModel>();
-      final profile = context.read<ProfileViweModel>();
+      final profile = context.read<ProfileViewModel>();
       final collection = context.read<CollectionViewModel>();
 
       await auth.fetchCurrentUser();
@@ -627,7 +627,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
   }
 
   Widget _buildSaleTab() {
-    final profile = context.watch<ProfileViweModel>();
+    final profile = context.watch<ProfileViewModel>();
     final mySales = profile.mySales;
 
     return Column(
@@ -686,7 +686,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
   }
 
   Widget _buildPurchaseTab() {
-    final profile = context.watch<ProfileViweModel>();
+    final profile = context.watch<ProfileViewModel>();
     final myPurchases = profile.myPurchases;
 
     if (profile.isLoading) {
@@ -765,7 +765,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
               child: const Text("취소하기"),
               isDestructiveAction: true,
               onPressed: () {
-                context.read<ProfileViweModel>().deleteSale(id);
+                context.read<ProfileViewModel>().deleteSale(id);
                 Navigator.pop(context);
               },
             ),

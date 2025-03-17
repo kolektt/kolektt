@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../model/interview_content.dart';
 import '../model/interview_content_type.dart';
-import 'dj_record_sectino.dart';
+import 'dj_record_section.dart';
 
 class DJContentSection extends StatelessWidget {
   final InterviewContent content;

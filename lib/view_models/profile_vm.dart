@@ -4,12 +4,12 @@ import 'package:kolektt/model/local/collection_record.dart';
 import 'package:kolektt/repository/profile_repository.dart';
 import 'package:kolektt/repository/sale_repository.dart';
 
-import '../domain/repositories/collection_repositroy.dart';
-import '../model/local/purhcase_with_profile.dart';
+import '../domain/repositories/collection_repository.dart';
+import '../model/local/purchase_with_profile.dart';
 import '../model/local/sales_listing_with_profile.dart';
-import '../repository/purcahse_respository.dart';
+import '../repository/purchase_repository.dart';
 
-class ProfileViweModel extends ChangeNotifier {
+class ProfileViewModel extends ChangeNotifier {
   CollectionRepository collectionRepository;
   ProfileRepository _profileRepository = ProfileRepository();
   PurchaseRepository _purchaseRepository = PurchaseRepository();
@@ -40,7 +40,7 @@ class ProfileViweModel extends ChangeNotifier {
 
   String? _userId;
 
-  ProfileViweModel(
+  ProfileViewModel(
       {required CollectionRepositoryImpl this.collectionRepository}) {
     fetchAll();
   }

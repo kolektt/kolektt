@@ -218,7 +218,7 @@ class KolekttApp extends StatelessWidget {
 
         // 프로필 관련 뷰모델
         ChangeNotifierProvider(
-          create: (_) => ProfileViweModel(
+          create: (_) => ProfileViewModel(
             collectionRepository: CollectionRepositoryImpl(
               remoteDataSource: CollectionRemoteDataSource(
                 supabase: Supabase.instance.client,
