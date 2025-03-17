@@ -217,8 +217,39 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> fetch() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      await _fetchUserCollectionsWithRecords();
+      await _fetchUserCollectionsUniqueProperties();
+    } catch (e) {
+      _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
+      debugPrint('Error fetching user collection: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> reset() async {
+    _collectionRecords = [];
+    _userCollectionClassification = _userCollectionClassification.copyWith(
+      mediaCondition: "All",
+      sleeveCondition: "All",
+      genre: 'All',
+      startYear: 1900,
+      endYear: 2025,
+      sortOption: '최신순',
+    );
+    _isLoading = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   /// 컬렉션을 불러온 후, CollectionClassification 함수를 호출하여 분류 결과를 저장합니다.
-  Future<void> fetchUserCollectionsWithRecords() async {
+  Future<void> _fetchUserCollectionsWithRecords() async {
     _isLoading = true;
     notifyListeners();
 
@@ -234,10 +265,11 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchUserCollectionsUniqueProperties() async {
+  Future<void> _fetchUserCollectionsUniqueProperties() async {
     try {
       _isLoading = true;
       notifyListeners();
+
       _userCollectionClassification = await collectionRepository.fetchUniqueProperties(userId);
       debugPrint('UserCollectionClassification: ${_userCollectionClassification.genres}, mediaCondition: ${_userCollectionClassification.mediaCondition}');
     } catch (e) {
@@ -245,12 +277,6 @@ class CollectionViewModel extends ChangeNotifier {
       debugPrint('Error fetching user collection: $e');
     } finally {
       _isLoading = false;
-      notifyListeners();
-    }
-
-    /// 컬렉션 데이터가 변경되었을 때 분류 결과를 업데이트합니다.
-    void updateClassification() {
-      classification = classifyCollections(_collectionRecords);
       notifyListeners();
     }
   }

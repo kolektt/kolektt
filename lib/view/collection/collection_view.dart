@@ -29,8 +29,7 @@ class _CollectionViewState extends State<CollectionView> {
 
   Future<void> _loadCollectionData() async {
     final model = context.read<CollectionViewModel>();
-    await model.fetchUserCollectionsWithRecords();
-    await model.fetchUserCollectionsUniqueProperties();
+    await model.fetch();
   }
 
   Future<void> _handleRefresh() async {

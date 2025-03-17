@@ -36,8 +36,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
   Future<void> _loadCollectionData() async {
     final collection_model = context.read<CollectionViewModel>();
     analytics_model = context.read<AnalyticsViewModel>();
-    await collection_model.fetchUserCollectionsWithRecords();
-    await collection_model.fetchUserCollectionsUniqueProperties();
+    await collection_model.fetch();
 
     analytics_model.analyzeRecords(collection_model.collectionRecords);
   }

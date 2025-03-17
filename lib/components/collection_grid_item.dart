@@ -45,8 +45,7 @@ Widget buildGridItem(
       if (confirmed == true) {
         await Provider.of<CollectionViewModel>(context, listen: false)
             .removeRecord(record);
-        await Provider.of<CollectionViewModel>(context, listen: false)
-            .fetchUserCollectionsWithRecords();
+        await Provider.of<CollectionViewModel>(context, listen: false).fetch();
       }
     },
     child: Column(

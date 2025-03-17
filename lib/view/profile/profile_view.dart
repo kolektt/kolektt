@@ -78,7 +78,7 @@ class _ProfileViewState extends State<ProfileView> with TickerProviderStateMixin
 
       await auth.fetchCurrentUser();
       await profile.fetchAll();
-      await collection.fetchUserCollectionsWithRecords();
+      await collection.fetch();
 
       final Profiles profileData = auth.profiles!;
 
