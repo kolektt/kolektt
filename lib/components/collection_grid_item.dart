@@ -43,9 +43,9 @@ Widget buildGridItem(
         },
       );
       if (confirmed == true) {
-        await Provider.of<CollectionViewModel>(context, listen: false)
-            .removeRecord(record);
-        await Provider.of<CollectionViewModel>(context, listen: false).fetch();
+        final model = context.read<CollectionViewModel>();
+        await model.removeRecord(record);
+        await model.fetch();
       }
     },
     child: Column(
