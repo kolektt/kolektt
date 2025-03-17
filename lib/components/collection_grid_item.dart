@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../figma_colors.dart';
 import '../model/local/collection_record.dart';
-import '../view/collection/collection_detail_page.dart';
+import '../view/collection/record_detail_view.dart';
 import '../view_models/collection_vm.dart';
 
 Widget buildGridItem(
@@ -17,7 +17,7 @@ Widget buildGridItem(
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => RecordDetailsPage(collectionRecord: record),
+          builder: (_) => RecordDetailsView(collectionRecord: record),
         ),
       );
     },

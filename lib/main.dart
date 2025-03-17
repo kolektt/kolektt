@@ -18,7 +18,9 @@ import 'package:kolektt/data/repositories/discogs_storage_repository_impl.dart';
 import 'package:kolektt/data/repositories/recent_search_repository_impl.dart';
 // Domain UseCases
 import 'package:kolektt/domain/usecases/search_and_upsert_discogs_records.dart';
+import 'package:kolektt/domain/usecases/search_by_id.dart';
 import 'package:kolektt/repository/sale_repository.dart';
+import 'package:kolektt/view/collection/record_detail_view.dart';
 // Views
 import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view/login_view.dart';
@@ -28,6 +30,7 @@ import 'package:kolektt/view_models/auth_vm.dart';
 import 'package:kolektt/view_models/collection_vm.dart';
 import 'package:kolektt/view_models/home_vm.dart';
 import 'package:kolektt/view_models/profile_vm.dart';
+import 'package:kolektt/view_models/record_details_vm.dart';
 import 'package:kolektt/view_models/sale_vm.dart';
 import 'package:kolektt/view_models/search_vm.dart';
 import 'package:path_provider/path_provider.dart';
@@ -35,6 +38,8 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data/datasources/record_data_source.dart';
+import 'domain/usecases/search_artist.dart';
+import 'domain/usecases/search_by_id_data.dart';
 import 'firebase_options.dart';
 
 /// 기본 색상 (Primary Blue: #0036FF)
@@ -169,6 +174,21 @@ class KolekttApp extends StatelessWidget {
         ),
 
         ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
+
+        ChangeNotifierProvider(create: (_) => RecordDetailsViewModel(
+          SearchArtist(
+            DiscogsRepositoryImpl(
+              remoteDataSource: DiscogsRemoteDataSource(),
+              supabase: Supabase.instance.client,
+            ),
+          ),
+          SearchByIdData(
+            DiscogsRepositoryImpl(
+              remoteDataSource: DiscogsRemoteDataSource(),
+              supabase: Supabase.instance.client,
+            )
+          )
+        )),
 
         // 검색 관련 뷰모델
         ChangeNotifierProvider(

@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/entities/discogs_record.dart';
 import '../../domain/repositories/discogs_repository.dart';
 import '../../domain/value_objects/criteria.dart';
 import '../datasources/discogs_remote_data_source.dart';
+import '../models/discogs_record.dart' as data;
 import '../models/discogs_search_response.dart';
 
 class DiscogsRepositoryImpl implements DiscogsRepository {
@@ -93,5 +93,11 @@ class DiscogsRepositoryImpl implements DiscogsRepository {
         recordId: e['record_id'],
       );
     }).toList();
+  }
+
+  @override
+  Future<data.DiscogsRecord> getDomainReleaseById(int releaseId) async {
+    data.DiscogsRecord domainRecord = await remoteDataSource.getDomainReleaseById(releaseId);
+    return domainRecord;
   }
 }

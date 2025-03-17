@@ -56,6 +56,28 @@ class DiscogsRecord {
     )
   ];
 
+  // From Json
+  factory DiscogsRecord.fromJson(Map<String, dynamic> json) {
+    return DiscogsRecord(
+      id: json['id'],
+      title: json['title'],
+      artist: json['artist'],
+      releaseYear: json['release_year'],
+      resourceUrl: json['resource_url'],
+      notes: json['notes'],
+      genre: json['genre'],
+      coverImage: json['cover_image'],
+      catalogNumber: json['catalog_number'],
+      label: json['label'],
+      format: json['format'],
+      country: json['country'],
+      style: json['style'],
+      condition: json['condition'],
+      conditionNotes: json['condition_notes'],
+      recordId: json['record_id'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'record_id': recordId.toString(),

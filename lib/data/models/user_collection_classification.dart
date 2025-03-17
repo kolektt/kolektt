@@ -29,9 +29,9 @@ class UserCollectionClassification {
   /// 초기값 및 기본 옵션들을 설정한 인스턴스를 반환하는 팩토리 생성자
   factory UserCollectionClassification.initial() {
     return UserCollectionClassification(
-      mediaConditions: ['All', 'Mint', 'Near Mint', 'Good', 'Poor'],
-      sleeveConditions: ['All', 'Mint', 'Near Mint', 'Good', 'Poor'],
-      genres: ['All', 'Pop', 'Rock', 'Jazz', 'Classical'],
+      mediaConditions: ['All'],
+      sleeveConditions: ['All'],
+      genres: ['All'],
       sortOptions: ['최신순', '오래된순', '이름순'],
       mediaCondition: 'All',
       sleeveCondition: 'All',
