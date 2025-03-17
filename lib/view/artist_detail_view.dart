@@ -34,6 +34,21 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (model == null) {
+      // Provider로부터 모델을 안전하게 가져옴
+      model = Provider.of<ArtistDetailViewModel>(context, listen: false);
+      model!.artist = widget.artist;
+      model!.fetchArtistRelease().then((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       child: SafeArea(
