@@ -127,17 +127,6 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
 
   void _onArtistPressed(RecordDetailsViewModel model) {
     final List<Artist> artistList = model.entityRecord.artists;
-    if (artistList.length == 1) {
-      // 단일 아티스트인 경우 바로 상세 페이지로 이동
-      Navigator.push(
-        context,
-        CupertinoPageRoute(
-          builder: (context) => ArtistDetailView(artist: artistList.first),
-        ),
-      );
-      return;
-    }
-    // 복수 아티스트인 경우, 액션시트를 통해 선택
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {

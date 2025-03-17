@@ -23,12 +23,14 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
   void initState() {
     super.initState();
     model = Provider.of<ArtistDetailViewModel>(context, listen: false);
-    model.artist = widget.artist;
-    model.fetchArtistRelease().then((_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          setState(() {});
-        }
+    model.reset().then((_) {
+      model.artist = widget.artist;
+      model.fetchArtistRelease().then((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        });
       });
     });
   }
@@ -146,8 +148,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                                       ? const Text('연도 선택')
                                       : Text('선택된 연도: ${model.selectedYear}'),
                                   actions: [
-                                    for (final year
-                                        in model.artistRelease!.releases
+                                    for (final year in model.artistRelease!.releases
                                             .map((e) => e.year)
                                             .toSet()
                                             .toList()
@@ -207,42 +208,46 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                     },
                   ),
                   // 앨범 그리드
-                  model.filterRelease == null
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Column(
-                            children: List.generate(
-                              (model.filterRelease!.releases.length / 2).ceil(),
-                              (index) {
-                                final firstIndex = index * 2;
-                                final secondIndex = firstIndex + 1;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildAlbumItem(model
-                                            .filterRelease!
-                                            .releases[firstIndex]),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: secondIndex <
-                                                model.filterRelease!.releases
-                                                    .length
-                                            ? _buildAlbumItem(model
-                                                .filterRelease!
-                                                .releases[secondIndex])
-                                            : Container(),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                  Consumer<ArtistDetailViewModel>(
+                    builder: (BuildContext context, ArtistDetailViewModel model, Widget? child) {
+                      return model.filterRelease == null
+                          ? const Center(child: CupertinoActivityIndicator())
+                          : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          children: List.generate(
+                            (model.filterRelease!.releases.length / 2).ceil(),
+                                (index) {
+                              final firstIndex = index * 2;
+                              final secondIndex = firstIndex + 1;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildAlbumItem(model
+                                          .filterRelease!
+                                          .releases[firstIndex]),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: secondIndex <
+                                          model.filterRelease!.releases
+                                              .length
+                                          ? _buildAlbumItem(model
+                                          .filterRelease!
+                                          .releases[secondIndex])
+                                          : Container(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -299,7 +304,6 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
               style: FigmaTextStyles()
                   .headingheading5
                   .copyWith(color: CupertinoColors.black),
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

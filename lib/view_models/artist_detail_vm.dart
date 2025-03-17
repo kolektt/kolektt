@@ -52,9 +52,21 @@ class ArtistDetailViewModel extends ChangeNotifier {
 
   int get selectedYear => _selectedYear;
 
+  set selectedYear(int year) {
+    _selectedYear = year;
+    notifyListeners();
+  }
+
   set artist(Artist artist) {
     _artist = artist;
     fetchArtistRelease();
+  }
+
+  Future<void> reset() async {
+    _artistRelease = null;
+    _filterRelease = null;
+    _selectedYear = -1;
+    isLoading = false;
   }
 
   Future<void> _fetchArtistDetail() async {
@@ -86,9 +98,9 @@ class ArtistDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> selectYear(int year) async {
-    isLoading = true;
-    _selectedYear = year;
     try {
+      isLoading = true;
+      _selectedYear = year;
       final url = _artist.releasesUrl;
       _artistRelease = await remoteDataSource.getArtistReleaseByUrl(url);
       _filterRelease = ArtistRelease(
@@ -99,6 +111,7 @@ class ArtistDetailViewModel extends ChangeNotifier {
       log(e.toString());
     } finally {
       isLoading = false;
+      debugPrint('Selected year: $_selectedYear');
       notifyListeners();
     }
   }
