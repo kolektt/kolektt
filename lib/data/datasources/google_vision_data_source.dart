@@ -2,10 +2,35 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart'; // debugPrint
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
+import '../models/exceptions.dart';
 
 class GoogleVisionDataSource {
+  final Logger logger = Logger();
+
+  Future<T> _retryRequest<T>(Future<T> Function() fn, {int retries = 3}) async {
+    for (var i = 0; i < retries; i++) {
+      try {
+        return await fn().timeout(const Duration(seconds: 10));
+      } on ApiException {
+        rethrow;
+      } catch (e) {
+        if (i == retries - 1) throw NetworkException('요청 재시도 실패: ${e.toString()}');
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    }
+    throw NetworkException('알 수 없는 네트워크 오류');
+  }
+
+  Map<String, dynamic> _parseJsonResponse(String body) {
+    try {
+      return json.decode(body);
+    } catch (e) {
+      throw JsonParseException('JSON 파싱 실패: ${e.toString()}');
+    }
+  }
   final String apiKey;
   final String project;
 
@@ -30,20 +55,25 @@ class GoogleVisionDataSource {
       ]
     };
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json; charset=utf-8'},
-      body: jsonEncode(requestBody),
+    final response = await _retryRequest(
+      () => http.post(
+        url,
+        headers: {'Content-Type': 'application/json; charset=utf-8'},
+        body: jsonEncode(requestBody),
+      ),
+      retries: 3,
     );
 
     // debugPrint('Google Vision API Response: ${response.body}');
 
     if (response.statusCode != 200) {
-      throw Exception(
-          'Google Vision API 호출 실패 (Status: ${response.statusCode})');
+      throw ApiException(
+        'Google Vision API 호출 실패',
+        {'status': response.statusCode, 'body': response.body},
+      );
     }
 
-    final data = json.decode(response.body);
+    final data = _parseJsonResponse(response.body);
     final responses = data['responses'];
     if (responses == null || responses.isEmpty) {
       throw Exception('Google Vision API로부터 응답이 없습니다.');
