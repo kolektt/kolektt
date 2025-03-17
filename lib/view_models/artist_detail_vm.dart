@@ -31,7 +31,17 @@ class ArtistDetailViewModel extends ChangeNotifier {
 
   ArtistRelease? get artistRelease => _artistRelease;
 
+  set artistRelease(ArtistRelease? artistRelease) {
+    _artistRelease = artistRelease;
+    notifyListeners();
+  }
+
   ArtistRelease? get filterRelease => _filterRelease;
+
+  set filterRelease(ArtistRelease? filterRelease) {
+    _filterRelease = filterRelease;
+    notifyListeners();
+  }
 
   List<int> get years {
     if (_artistRelease == null) {
