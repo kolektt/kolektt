@@ -104,57 +104,56 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                 const SizedBox(height: 12),
                 // _buildAlbumGrid(),
                 Consumer<CollectionViewModel>(
-                  // key 값에 상태 변화에 따른 값(로딩 여부 + 데이터 개수)을 반영하여 전환이 발생하도록 함
+                  // key 값은 상태 변화에 따른 전환을 위해 그대로 유지합니다.
                   key: ValueKey<int>(context
-                          .read<CollectionViewModel>()
-                          .collectionRecords
-                          .length +
+                      .read<CollectionViewModel>()
+                      .collectionRecords
+                      .length +
                       (context.read<CollectionViewModel>().isLoading ? 1 : 0)),
                   builder: (context, model, child) {
-                    if (model.isLoading) {
-                      if (_isRefreshing) return const SizedBox.shrink();
-                      return const Center(child: CupertinoActivityIndicator());
-                    }
-                    if (model.collectionRecords.isEmpty) {
-                      return const Center(child: Text("컬렉션이 없습니다."));
-                    }
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // search bar는 항상 상단에 표시됩니다.
                         _buildSearchBar(
-                            context,
-                            FilterLineButton(
-                              classification: model.userCollectionClassification,
-                              onFilterResult: (result) async {
-                                debugPrint("UserCollectionClassification: ${result.genres}");
-                                model.userCollectionClassification = result;
-                                await model.filterCollection();
-                              },
-                            )),
-                        const SizedBox(height: 16),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.75,
+                          context,
+                          FilterLineButton(
+                            classification: model.userCollectionClassification,
+                            onFilterResult: (result) async {
+                              debugPrint("UserCollectionClassification: ${result.genres}");
+                              model.userCollectionClassification = result;
+                              await model.filterCollection();
+                            },
                           ),
-                          itemCount: model.collectionRecords.length,
-                          itemBuilder: (context, index) {
-                            CollectionRecord record =
-                                model.collectionRecords[index];
-                            record.record.resourceUrl =
-                                "https://api.discogs.com/releases/${record.record.id}";
-                            // 각 그리드 아이템에 애니메이션 적용
-                            return AnimatedGridItem(
-                              index: index,
-                              child: buildGridItem(context, record, model),
-                            );
-                          },
                         ),
+                        const SizedBox(height: 16),
+                        // 로딩 중이면 로딩 인디케이터를, 아니면 컬렉션 상태에 따라 메시지 또는 Grid를 보여줍니다.
+                        if (model.isLoading)
+                          const Center(child: CupertinoActivityIndicator())
+                        else if (model.collectionRecords.isEmpty)
+                          const Center(child: Text("컬렉션이 없습니다."))
+                        else
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.75,
+                            ),
+                            itemCount: model.collectionRecords.length,
+                            itemBuilder: (context, index) {
+                              CollectionRecord record = model.collectionRecords[index];
+                              record.record.resourceUrl =
+                              "https://api.discogs.com/releases/${record.record.id}";
+                              // 각 그리드 아이템에 애니메이션 적용
+                              return AnimatedGridItem(
+                                index: index,
+                                child: buildGridItem(context, record, model),
+                              );
+                            },
+                          ),
                         const SizedBox(height: 32),
                       ],
                     );

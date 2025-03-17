@@ -30,7 +30,7 @@ class CollectionViewModel extends ChangeNotifier {
   RecognitionResult? recognitionResult;
   CollectionAnalytics? analytics;
 
-  late UserCollectionClassification _userCollectionClassification;
+  UserCollectionClassification _userCollectionClassification = UserCollectionClassification.initial();
 
   UserCollectionClassification get userCollectionClassification => _userCollectionClassification;
 
