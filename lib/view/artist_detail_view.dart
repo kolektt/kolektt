@@ -136,7 +136,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                                     ? const Text('연도 선택')
                                     : Text('선택된 연도: ${model.selectedYear}'),
                                 actions: [
-                                  for (final year in model.artistRelease!.releases
+                                  for (final year in model.allReleases!.releases
                                           .map((e) => e.year)
                                           .toSet()
                                           .toList()
@@ -242,13 +242,18 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
             ),
           ),
           // 로딩 오버레이: isLoading이 true일 때 표시
-          if (context.read<ArtistDetailViewModel>().isLoading)
-            Container(
-              color: CupertinoColors.black.withOpacity(0.3),
-              child: const Center(
-                child: CupertinoActivityIndicator(radius: 15),
-              ),
-            ),
+          Consumer<ArtistDetailViewModel>(
+            builder: (context, model, child) {
+              return model.isLoading
+                  ? Container(
+                color: CupertinoColors.black.withOpacity(0.3),
+                child: const Center(
+                  child: CupertinoActivityIndicator(radius: 15),
+                ),
+              )
+                  : const SizedBox.shrink();
+            },
+          ),
         ],
       ),
     );

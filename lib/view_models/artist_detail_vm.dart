@@ -9,53 +9,24 @@ import '../data/models/discogs_record.dart';
 class ArtistDetailViewModel extends ChangeNotifier {
   final DiscogsRemoteDataSource remoteDataSource;
   late Artist _artist;
-  ArtistRelease? _artistRelease = null;
-  ArtistRelease? _filterRelease = null;
-
+  ArtistRelease? _allReleases;
+  ArtistRelease? _filterRelease;
   int _selectedYear = -1;
-
   bool _isLoading = false;
 
   ArtistDetailViewModel({required this.remoteDataSource});
 
   bool get isLoading => _isLoading;
-
-  set isLoading(bool isLoading) {
-    _isLoading = isLoading;
+  set isLoading(bool value) {
+    _isLoading = value;
     notifyListeners();
   }
 
   Artist get artist => _artist;
-
   String get releaseUrl => _artist.releasesUrl;
-
-  ArtistRelease? get artistRelease => _artistRelease;
-
-  set artistRelease(ArtistRelease? artistRelease) {
-    _artistRelease = artistRelease;
-    notifyListeners();
-  }
-
+  ArtistRelease? get allReleases => _allReleases;
   ArtistRelease? get filterRelease => _filterRelease;
-
-  set filterRelease(ArtistRelease? filterRelease) {
-    _filterRelease = filterRelease;
-    notifyListeners();
-  }
-
-  List<int> get years {
-    if (_artistRelease == null) {
-      return [];
-    }
-    return _artistRelease!.releases.map((release) => release.year).toSet().toList();
-  }
-
   int get selectedYear => _selectedYear;
-
-  set selectedYear(int year) {
-    _selectedYear = year;
-    notifyListeners();
-  }
 
   set artist(Artist artist) {
     _artist = artist;
@@ -63,7 +34,7 @@ class ArtistDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> reset() async {
-    _artistRelease = null;
+    _allReleases = null;
     _filterRelease = null;
     _selectedYear = -1;
     isLoading = false;
@@ -72,8 +43,7 @@ class ArtistDetailViewModel extends ChangeNotifier {
   Future<void> _fetchArtistDetail() async {
     isLoading = true;
     try {
-      final url = _artist.resourceUrl;
-      _artist = await remoteDataSource.getArtistByUrl(url);
+      _artist = await remoteDataSource.getArtistByUrl(_artist.resourceUrl);
     } catch (e) {
       log(e.toString());
     } finally {
@@ -85,10 +55,8 @@ class ArtistDetailViewModel extends ChangeNotifier {
     isLoading = true;
     try {
       await _fetchArtistDetail();
-      final url = _artist.releasesUrl;
-      debugPrint('Fetching artist release: ${_artist.toJson()}');
-      _artistRelease = await remoteDataSource.getArtistReleaseByUrl(url);
-      _filterRelease = _artistRelease;
+      _allReleases = await remoteDataSource.getArtistReleaseByUrl(_artist.releasesUrl);
+      _filterRelease = _allReleases;
     } catch (e) {
       log(e.toString());
     } finally {
@@ -98,15 +66,15 @@ class ArtistDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> selectYear(int year) async {
+    isLoading = true;
     try {
-      isLoading = true;
       _selectedYear = year;
-      final url = _artist.releasesUrl;
-      _artistRelease = await remoteDataSource.getArtistReleaseByUrl(url);
-      _filterRelease = ArtistRelease(
-        pagination: _artistRelease!.pagination,
-        releases: _artistRelease!.releases.where((release) => release.year == _selectedYear).toList(),
-      );
+      if (_allReleases != null) {
+        _filterRelease = ArtistRelease(
+          pagination: _allReleases!.pagination,
+          releases: _allReleases!.releases.where((release) => release.year == _selectedYear).toList(),
+        );
+      }
     } catch (e) {
       log(e.toString());
     } finally {
@@ -120,14 +88,17 @@ class ArtistDetailViewModel extends ChangeNotifier {
     isLoading = true;
     _selectedYear = -1;
     try {
-      final url = _artist.releasesUrl;
-      _artistRelease = await remoteDataSource.getArtistReleaseByUrl(url);
-      _filterRelease = _artistRelease;
+      _filterRelease = _allReleases;
     } catch (e) {
       log(e.toString());
     } finally {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  List<int> get years {
+    if (_allReleases == null) return [];
+    return _allReleases!.releases.map((release) => release.year).toSet().toList();
   }
 }
