@@ -79,13 +79,18 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
               const SizedBox(height: 40),
             ],
           ),
-          if (recordDetailModel.isLoading)
-            Container(
-              color: CupertinoColors.systemGrey.withOpacity(0.3),
-              child: const Center(
-                child: CupertinoActivityIndicator(radius: 15),
-              ),
-            ),
+          Consumer<RecordDetailsViewModel>(
+            builder: (context, model, child) {
+              if (model.isLoading)
+                return Container(
+                  color: CupertinoColors.systemGrey.withOpacity(0.3),
+                  child: const Center(
+                    child: CupertinoActivityIndicator(radius: 15),
+                  ),
+                );
+              return const SizedBox.shrink();
+            },
+          ),
         ],
       ),
     );
