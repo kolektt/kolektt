@@ -138,7 +138,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
   }
 
   void _onArtistPressed(RecordDetailsViewModel model) {
-    final List<Artist> artistList = model.entityRecord.artists;
+    final List<Artist> artistList = model.entityRecord!.artists;
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {

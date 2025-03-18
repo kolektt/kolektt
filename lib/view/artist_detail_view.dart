@@ -33,7 +33,6 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
           });
         });
       });
-
     });
   }
 
@@ -119,123 +118,135 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                     ],
                   ),
                 ),
-                // 연도 선택 영역
-                Consumer<ArtistDetailViewModel>(
-                  builder: (BuildContext context, ArtistDetailViewModel model,
-                      Widget? child) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          showCupertinoModalPopup(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return CupertinoActionSheet(
-                                title: model.selectedYear == -1
-                                    ? const Text('연도 선택')
-                                    : Text('선택된 연도: ${model.selectedYear}'),
-                                actions: [
-                                  for (final year in model.allReleases!.releases
-                                          .map((e) => e.year)
-                                          .toSet()
-                                          .toList()
-                                        ..sort((a, b) => b.compareTo(a)))
-                                    CupertinoActionSheetAction(
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-                                        await model.selectYear(year);
-                                      },
-                                      child: Text(year.toString()),
-                                    ),
-                                  CupertinoActionSheetAction(
-                                    onPressed: () async {
-                                      Navigator.pop(context);
-                                      await model.clearYear();
-                                    },
-                                    child: const Text('전체'),
-                                  ),
-                                  CupertinoActionSheetAction(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('취소',
-                                        style: TextStyle(
-                                            color:
-                                                CupertinoColors.systemRed)),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                color: CupertinoColors.systemGrey4),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
-                            child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                              children: [
-                                model.selectedYear == -1
-                                    ? Text(
-                                  '연도 선택',
-                                  style: FigmaTextStyles().bodymd.copyWith(color: FigmaColors.grey100),
-                                ) : Text('${model.selectedYear}'),
-                                const Icon(CupertinoIcons.chevron_down,
-                                    color: CupertinoColors.systemGrey),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
                 // 앨범 그리드
                 Consumer<ArtistDetailViewModel>(
                   builder: (BuildContext context, ArtistDetailViewModel model, Widget? child) {
                     return model.filterRelease == null
                         ? const Center(child: CupertinoActivityIndicator())
-                        : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        children: List.generate(
-                          (model.filterRelease!.releases.length / 2).ceil(),
-                              (index) {
-                            final firstIndex = index * 2;
-                            final secondIndex = firstIndex + 1;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildAlbumItem(model
-                                        .filterRelease!
-                                        .releases[firstIndex]),
+                        : Column(
+                            children: [
+                              // 연도 선택 영역
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showCupertinoModalPopup(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return CupertinoActionSheet(
+                                          title: model.selectedYear == -1
+                                              ? const Text('연도 선택')
+                                              : Text(
+                                                  '선택된 연도: ${model.selectedYear}'),
+                                          actions: [
+                                            for (final year
+                                                in model.allReleases!.releases
+                                                    .map((e) => e.year)
+                                                    .toSet()
+                                                    .toList()
+                                                  ..sort(
+                                                      (a, b) => b.compareTo(a)))
+                                              CupertinoActionSheetAction(
+                                                onPressed: () async {
+                                                  Navigator.pop(context);
+                                                  await model.selectYear(year);
+                                                },
+                                                child: Text(year.toString()),
+                                              ),
+                                            CupertinoActionSheetAction(
+                                              onPressed: () async {
+                                                Navigator.pop(context);
+                                                await model.clearYear();
+                                              },
+                                              child: const Text('전체'),
+                                            ),
+                                            CupertinoActionSheetAction(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('취소',
+                                                  style: TextStyle(
+                                                      color: CupertinoColors
+                                                          .systemRed)),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: CupertinoColors.systemGrey4),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 12),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          model.selectedYear == -1
+                                              ? Text(
+                                                  '연도 선택',
+                                                  style: FigmaTextStyles()
+                                                      .bodymd
+                                                      .copyWith(
+                                                          color: FigmaColors
+                                                              .grey100),
+                                                )
+                                              : Text('${model.selectedYear}'),
+                                          const Icon(
+                                              CupertinoIcons.chevron_down,
+                                              color:
+                                                  CupertinoColors.systemGrey),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: secondIndex <
-                                        model.filterRelease!.releases
-                                            .length
-                                        ? _buildAlbumItem(model
-                                        .filterRelease!
-                                        .releases[secondIndex])
-                                        : Container(),
-                                  ),
-                                ],
+                                ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Column(
+                                  children: List.generate(
+                                    (model.filterRelease!.releases.length / 2)
+                                        .ceil(),
+                                    (index) {
+                                      final firstIndex = index * 2;
+                                      final secondIndex = firstIndex + 1;
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildAlbumItem(model
+                                                  .filterRelease!
+                                                  .releases[firstIndex]),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: secondIndex <
+                                                      model.filterRelease!
+                                                          .releases.length
+                                                  ? _buildAlbumItem(model
+                                                      .filterRelease!
+                                                      .releases[secondIndex])
+                                                  : Container(),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
                   },
                 ),
               ],
@@ -246,11 +257,11 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
             builder: (context, model, child) {
               return model.isLoading
                   ? Container(
-                color: CupertinoColors.black.withOpacity(0.3),
-                child: const Center(
-                  child: CupertinoActivityIndicator(radius: 15),
-                ),
-              )
+                      color: CupertinoColors.black.withOpacity(0.3),
+                      child: const Center(
+                        child: CupertinoActivityIndicator(radius: 15),
+                      ),
+                    )
                   : const SizedBox.shrink();
             },
           ),
