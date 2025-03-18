@@ -17,41 +17,24 @@ class ArtistDetailView extends StatefulWidget {
 }
 
 class _ArtistDetailViewState extends State<ArtistDetailView> {
-  late ArtistDetailViewModel model;
-
   @override
   void initState() {
     super.initState();
-    model = Provider.of<ArtistDetailViewModel>(context, listen: false);
-    model.reset().then((_) {
-      model.artist = widget.artist;
-      model.fetchArtistRelease().then((_) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            setState(() {});
-          }
-        });
-      });
-    });
     // 빌드가 완료된 후에 상태 변경을 실행합니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ArtistDetailViewModel>().reset();
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (model == null) {
-      // Provider로부터 모델을 안전하게 가져옴
-      model = Provider.of<ArtistDetailViewModel>(context, listen: false);
-      model!.artist = widget.artist;
-      model!.fetchArtistRelease().then((_) {
-        if (mounted) {
-          setState(() {});
-        }
+      final model = context.read<ArtistDetailViewModel>();
+      model.reset().then((_) {
+        model.artist = widget.artist;
+        model.fetchArtistRelease().then((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {});
+            }
+          });
+        });
       });
-    }
+
+    });
   }
 
   @override
@@ -259,7 +242,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
             ),
           ),
           // 로딩 오버레이: isLoading이 true일 때 표시
-          if (model.isLoading)
+          if (context.read<ArtistDetailViewModel>().isLoading)
             Container(
               color: CupertinoColors.black.withOpacity(0.3),
               child: const Center(
