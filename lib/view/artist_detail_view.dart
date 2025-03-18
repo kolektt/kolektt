@@ -196,8 +196,10 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                                   MainAxisAlignment.spaceBetween,
                               children: [
                                 model.selectedYear == -1
-                                    ? const Text('연도 선택')
-                                    : Text('${model.selectedYear}'),
+                                    ? Text(
+                                  '연도 선택',
+                                  style: FigmaTextStyles().bodymd.copyWith(color: FigmaColors.grey100),
+                                ) : Text('${model.selectedYear}'),
                                 const Icon(CupertinoIcons.chevron_down,
                                     color: CupertinoColors.systemGrey),
                               ],
