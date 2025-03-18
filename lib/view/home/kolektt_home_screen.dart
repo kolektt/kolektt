@@ -94,11 +94,15 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                 const SizedBox(height: 12),
                 _buildFavoriteArtistCard(context),
                 const SizedBox(height: 20),
-                Text(
-                  'My Collection',
-                  style: FigmaTextStyles()
-                      .headingheading2
-                      .copyWith(color: FigmaColors.grey100),
+                Container(
+                  height: 56,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'My Collection',
+                    style: FigmaTextStyles()
+                        .headingheading2
+                        .copyWith(color: FigmaColors.grey100),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 // _buildAlbumGrid(),

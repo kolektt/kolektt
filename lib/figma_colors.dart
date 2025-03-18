@@ -124,6 +124,7 @@ class FigmaTextStyles {
   const FigmaTextStyles();
 
   TextStyle get displaydisplay1 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 64,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -133,6 +134,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get displaydisplay2 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 36,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -142,6 +144,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get headingheading1 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 32,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -151,6 +154,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get headingheading2 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 24,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -160,6 +164,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get headingheading3 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 18,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -169,6 +174,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get headingheading4 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 16,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -178,6 +184,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get headingheading5 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 14,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -187,6 +194,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get headingheading6 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 12,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -196,6 +204,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get bodylg => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 18,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -205,6 +214,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get bodymd => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 16,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -214,6 +224,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get bodysm => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 14,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -223,6 +234,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get bodyxs => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 12,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -232,6 +244,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labellgbold => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 18,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -241,6 +254,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labellgregular => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 18,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -250,6 +264,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labelmdbold => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 16,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -259,6 +274,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labelmdregular => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 16,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -268,6 +284,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labelsmbold => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 14,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -277,6 +294,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labelsmregular => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 14,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -286,6 +304,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labelxsbold => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 12,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -295,6 +314,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get labelxsregular => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 12,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -304,6 +324,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get handoffdoc140 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 140,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -313,6 +334,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get handoffdoc64 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 64,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -322,6 +344,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get handoffdoc40 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 40,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -340,6 +363,7 @@ class FigmaTextStyles {
   //     );
 
   TextStyle get handoffdoc32 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 32,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -349,6 +373,7 @@ class FigmaTextStyles {
       );
 
   TextStyle get handoffdoc24 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 24,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -376,6 +401,7 @@ class FigmaTextStyles {
   //     );
 
   TextStyle get handoffdoc18 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 18,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -394,6 +420,7 @@ class FigmaTextStyles {
   //     );
 
   TextStyle get handoffdoc16 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 16,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,
@@ -412,6 +439,7 @@ class FigmaTextStyles {
   //     );
 
   TextStyle get handoffdoc14 => const TextStyle(
+        fontFamily: 'PlusJakartaSans',
         fontSize: 14,
         decoration: TextDecoration.none,
         fontStyle: FontStyle.normal,

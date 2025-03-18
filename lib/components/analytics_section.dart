@@ -66,11 +66,21 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                                     .headingheading3
                                     .copyWith(color: CupertinoColors.white),
                               ),
-                              Text(
-                                "Analyzed by Kolektt",
-                                style: TextStyle(
-                                  color: FigmaColors.primary30,
-                                  fontSize: 12,
+                              Text.rich(
+                                TextSpan(
+                                  text: 'Analyzed by ',
+                                  style: TextStyle(
+                                    color: FigmaColors.primary30,
+                                    fontSize: 12,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Kolektt',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],

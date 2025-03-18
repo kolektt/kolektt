@@ -18,9 +18,7 @@ import 'package:kolektt/data/repositories/discogs_storage_repository_impl.dart';
 import 'package:kolektt/data/repositories/recent_search_repository_impl.dart';
 // Domain UseCases
 import 'package:kolektt/domain/usecases/search_and_upsert_discogs_records.dart';
-import 'package:kolektt/domain/usecases/search_by_id.dart';
 import 'package:kolektt/repository/sale_repository.dart';
-import 'package:kolektt/view/collection/record_detail_view.dart';
 // Views
 import 'package:kolektt/view/content_view.dart';
 import 'package:kolektt/view/login_view.dart';
@@ -41,7 +39,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data/datasources/record_data_source.dart';
 import 'domain/usecases/search_artist.dart';
 import 'domain/usecases/search_by_id_data.dart';
-import 'firebase_options.dart';
 
 /// 기본 색상 (Primary Blue: #0036FF)
 final Color primaryColor = const Color(0xFF0036FF);
@@ -71,62 +68,9 @@ Future<void> main() async {
     anonKey:dotenv.env["SUPABASE_API_KEY"] ?? "",
   );
 
-
   await Firebase.initializeApp();
 
   runApp(const KolekttApp());
-}
-
-/// 텍스트 스타일 및 타이포그래피 (SF Pro Text 기반)
-class AppTextStyles {
-  static TextStyle display = TextStyle(
-    fontSize: 34,
-    fontWeight: FontWeight.bold,
-    fontFamily: 'SF Pro Text',
-    color: primaryColor,
-  );
-  static TextStyle heading1 = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-    fontFamily: 'SF Pro Text',
-    color: primaryColor,
-  );
-  static TextStyle heading2 = TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.bold,
-    fontFamily: 'SF Pro Text',
-    color: primaryColor,
-  );
-  static TextStyle heading3 = TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    fontFamily: 'SF Pro Text',
-    color: primaryColor,
-  );
-  static const TextStyle bodyL = TextStyle(
-    fontSize: 17,
-    fontWeight: FontWeight.normal,
-    fontFamily: 'SF Pro Text',
-    color: Color(0xFF6B7280),
-  );
-  static const TextStyle bodyM = TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.normal,
-    fontFamily: 'SF Pro Text',
-    color: Color(0xFF6B7280),
-  );
-  static const TextStyle bodyS = TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.normal,
-    fontFamily: 'SF Pro Text',
-    color: Color(0xFF6B7280),
-  );
-  static const TextStyle caption = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.normal,
-    fontFamily: 'SF Pro Text',
-    color: Color(0xFF6B7280),
-  );
 }
 
 /// 앱 전체 설정 (MultiProvider 및 CupertinoApp)
@@ -244,7 +188,11 @@ class KolekttApp extends StatelessWidget {
             scaffoldBackgroundColor: CupertinoColors.systemBackground,
             barBackgroundColor: CupertinoColors.systemGrey6,
             textTheme: CupertinoTextThemeData(
-              textStyle: AppTextStyles.bodyL,
+              textStyle: TextStyle(
+                fontFamily: 'PlusJakartaSans',
+                fontSize: 17.0,
+                color: CupertinoColors.label,
+              ),
             ),
           ),
           localizationsDelegates: const <LocalizationsDelegate<dynamic>>[DefaultMaterialLocalizations.delegate],

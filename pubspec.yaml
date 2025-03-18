@@ -39,5 +39,29 @@ flutter:
   assets:
     - assets/images/
     - .env
+
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/PlusJakartaSans-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/PlusJakartaSans-Light.ttf
+          weight: 300
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/PlusJakartaSans-Black.ttf
+          weight: 900
+        - asset: assets/fonts/PlusJakartaSans-Italic.ttf
+          style: italic
 dev_dependencies:
   change_app_package_name: ^1.5.0
