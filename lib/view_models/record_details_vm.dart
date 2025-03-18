@@ -1,15 +1,19 @@
 import 'package:flutter/cupertino.dart';
 
 import '../data/models/discogs_record.dart' as data;
+import '../domain/repositories/collection_repository.dart';
 import '../domain/usecases/search_artist.dart';
 import '../domain/usecases/search_by_id_data.dart';
 import '../model/local/collection_record.dart';
+import '../model/supabase/user_collection.dart';
 
 class RecordDetailsViewModel extends ChangeNotifier {
+  final CollectionRepository collectionRepository;
+
   final SearchByIdData searchById;
   final SearchArtist searchArtist;
 
-  RecordDetailsViewModel(this.searchArtist, this.searchById);
+  RecordDetailsViewModel(this.collectionRepository, this.searchArtist, this.searchById);
 
   late CollectionRecord _collectionRecord;
 
@@ -57,6 +61,15 @@ class RecordDetailsViewModel extends ChangeNotifier {
       errorMessage = e.toString();
     } finally {
       isLoading = false;
+    }
+  }
+
+  Future<void> updateRecord(UserCollection record) async {
+    try {
+      await collectionRepository.updateUserCollection(record);
+      debugPrint("Record: ${record.toJson()}");
+    } catch (e) {
+      debugPrint('Error in updateRecord: $e');
     }
   }
 }

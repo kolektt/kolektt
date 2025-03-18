@@ -148,15 +148,6 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateRecord(UserCollection record) async {
-    try {
-      await collectionRepository.updateUserCollection(record);
-      debugPrint("Record: ${record.toJson()}");
-    } catch (e) {
-      debugPrint('Error in updateRecord: $e');
-    }
-  }
-
   /// 1) Google Vision API로 앨범 라벨 인식 → 2) Discogs 검색
   Future<void> recognizeAlbum(File image) async {
     _isLoading = true;

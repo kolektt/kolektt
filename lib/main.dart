@@ -177,6 +177,7 @@ class KolekttApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
 
         ChangeNotifierProvider(create: (_) => RecordDetailsViewModel(
+          CollectionRepositoryImpl(remoteDataSource: CollectionRemoteDataSource(supabase: Supabase.instance.client)),
           SearchArtist(
             DiscogsRepositoryImpl(
               remoteDataSource: DiscogsRemoteDataSource(),

@@ -144,8 +144,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                             itemCount: model.collectionRecords.length,
                             itemBuilder: (context, index) {
                               CollectionRecord record = model.collectionRecords[index];
-                              record.record.resourceUrl =
-                              "https://api.discogs.com/releases/${record.record.id}";
+                              record.record.resourceUrl = "https://api.discogs.com/releases/${record.record.id}";
                               // 각 그리드 아이템에 애니메이션 적용
                               return AnimatedGridItem(
                                 index: index,

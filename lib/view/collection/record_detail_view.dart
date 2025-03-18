@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kolektt/figma_colors.dart';
+import 'package:kolektt/view_models/collection_vm.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/discogs_record.dart';
@@ -8,6 +9,7 @@ import '../../model/local/collection_record.dart';
 import '../../model/supabase/user_collection.dart';
 import '../../view_models/record_details_vm.dart';
 import '../artist_detail_view.dart';
+import 'collection_edit_page.dart';
 
 class RecordDetailsView extends StatefulWidget {
   final CollectionRecord collectionRecord;
@@ -22,10 +24,11 @@ class RecordDetailsView extends StatefulWidget {
 }
 
 class _RecordDetailsViewState extends State<RecordDetailsView> {
+  final FigmaTextStyles _textStyles = FigmaTextStyles();
+
   @override
   void initState() {
     super.initState();
-    // 모델에 초기 소장 레코드를 설정
     final model = context.read<RecordDetailsViewModel>();
     model.collectionRecord = widget.collectionRecord;
     debugPrint("Model artist: ${model.collectionRecord.record.artist}");
@@ -33,10 +36,8 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    // 모델 업데이트를 실시간 반영
-    final model = context.watch<RecordDetailsViewModel>();
-    final record = widget.collectionRecord.record;
-    final userCollection = widget.collectionRecord.user_collection;
+    final recordDetailModel = context.watch<RecordDetailsViewModel>();
+    final collectionModel = context.watch<CollectionViewModel>();
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -44,25 +45,41 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
         leading: Navigator.canPop(context)
             ? const CupertinoNavigationBarBackButton(previousPageTitle: '')
             : null,
-        trailing: const Icon(CupertinoIcons.pencil),
+        trailing: IconButton(
+          icon: const Icon(CupertinoIcons.pencil),
+          onPressed: () => Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (_) => CollectionEditPage(
+                collection: widget.collectionRecord,
+                onSave: (userCollection) async {
+                  await recordDetailModel.updateRecord(userCollection);
+                  await recordDetailModel.getRecordDetails();
+                  await collectionModel.fetch();
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+        ),
       ),
       child: Stack(
         children: [
-          // 메인 콘텐츠 영역
           ListView(
             padding: EdgeInsets.zero,
             children: [
-              _buildCoverImage(record),
-              _buildTitleSection(record, model),
+              _buildCoverImage(recordDetailModel.collectionRecord.record),
+              _buildTitleSection(recordDetailModel.collectionRecord.record, recordDetailModel),
               const Divider(height: 1),
               _buildRecordDetailsSection(),
               const Divider(height: 1),
-              _buildConditionSection(userCollection, record),
+              _buildConditionSection(
+                recordDetailModel.collectionRecord.user_collection,
+                recordDetailModel.collectionRecord.record,
+              ),
               const SizedBox(height: 40),
             ],
           ),
-          // 로딩 상태 오버레이 (데이터 로딩 중일 때)
-          if (model.isLoading)
+          if (recordDetailModel.isLoading)
             Container(
               color: CupertinoColors.systemGrey.withOpacity(0.3),
               child: const Center(
@@ -75,18 +92,14 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
   }
 
   Widget _buildCoverImage(dynamic record) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Image.network(
-          record.coverImage.isNotEmpty
-              ? record.coverImage
-              : 'https://via.placeholder.com/600x400',
-          height: 400,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        ),
-      ],
+    final imageUrl = record.coverImage.isNotEmpty
+        ? record.coverImage
+        : 'https://via.placeholder.com/600x400';
+    return Image.network(
+      imageUrl,
+      height: 400,
+      width: double.infinity,
+      fit: BoxFit.cover,
     );
   }
 
@@ -98,9 +111,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
         children: [
           Text(
             record.title,
-            style: FigmaTextStyles()
-                .headingheading2
-                .copyWith(color: CupertinoColors.black),
+            style: _textStyles.headingheading2.copyWith(color: CupertinoColors.black),
           ),
           const SizedBox(height: 4),
           CupertinoButton(
@@ -108,17 +119,13 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
             onPressed: () => _onArtistPressed(model),
             child: Text(
               record.artist,
-              style: FigmaTextStyles()
-                  .bodylg
-                  .copyWith(color: const Color(0xFF2563EB)),
+              style: _textStyles.bodylg.copyWith(color: const Color(0xFF2563EB)),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '${record.format.isNotEmpty ? record.format : 'N/A'} / ${record.releaseYear} / ${widget.collectionRecord.user_collection.condition ?? record.condition}',
-            style: FigmaTextStyles()
-                .bodylg
-                .copyWith(color: const Color(0xFF4B5563)),
+            style: _textStyles.bodylg.copyWith(color: const Color(0xFF4B5563)),
           ),
         ],
       ),
@@ -149,8 +156,10 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
               ),
             CupertinoActionSheetAction(
               onPressed: () => Navigator.pop(context),
-              child: const Text('닫기',
-                  style: TextStyle(color: CupertinoColors.systemRed)),
+              child: const Text(
+                '닫기',
+                style: TextStyle(color: CupertinoColors.systemRed),
+              ),
             ),
           ],
         );
@@ -166,12 +175,9 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
         children: [
           Text(
             'Record\nDetails',
-            style: FigmaTextStyles()
-                .headingheading4
-                .copyWith(color: FigmaColors.grey100),
+            style: _textStyles.headingheading4.copyWith(color: FigmaColors.grey100),
           ),
           Table(
-            // 두 칼럼의 Flex 비율로 나눔
             columnWidths: const {
               0: FlexColumnWidth(),
               1: FlexColumnWidth(),
@@ -210,16 +216,12 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
         children: [
           Text(
             label,
-            style: FigmaTextStyles()
-                .headingheading6
-                .copyWith(color: FigmaColors.grey90),
+            style: _textStyles.headingheading6.copyWith(color: FigmaColors.grey90),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: FigmaTextStyles()
-                .bodysm
-                .copyWith(color: CupertinoColors.black),
+            style: _textStyles.bodysm.copyWith(color: CupertinoColors.black),
           ),
         ],
       ),
@@ -234,9 +236,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
         children: [
           Text(
             'Condition',
-            style: FigmaTextStyles()
-                .headingheading4
-                .copyWith(color: FigmaColors.grey100),
+            style: _textStyles.headingheading4.copyWith(color: FigmaColors.grey100),
           ),
           const SizedBox(height: 16),
           Table(
@@ -248,8 +248,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
               TableRow(
                 children: [
                   _buildConditionLabel('Media Grade'),
-                  _buildConditionValue(
-                      userCollection.condition ?? record.condition),
+                  _buildConditionValue(userCollection.condition ?? record.condition),
                 ],
               ),
               TableRow(
@@ -263,9 +262,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
           if ((userCollection.condition_note ?? '').isNotEmpty)
             Text(
               userCollection.condition_note ?? '',
-              style: FigmaTextStyles()
-                  .bodysm
-                  .copyWith(color: const Color(0xFF4B5563)),
+              style: _textStyles.bodysm.copyWith(color: const Color(0xFF4B5563)),
             ),
         ],
       ),
@@ -277,9 +274,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         label,
-        style: FigmaTextStyles()
-            .headingheading6
-            .copyWith(color: CupertinoColors.black),
+        style: _textStyles.headingheading6.copyWith(color: CupertinoColors.black),
       ),
     );
   }
@@ -289,8 +284,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         value,
-        style:
-        FigmaTextStyles().bodysm.copyWith(color: FigmaColors.primary60),
+        style: _textStyles.bodysm.copyWith(color: FigmaColors.primary60),
       ),
     );
   }
