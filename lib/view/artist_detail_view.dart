@@ -33,6 +33,10 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
         });
       });
     });
+    // 빌드가 완료된 후에 상태 변경을 실행합니다.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ArtistDetailViewModel>().reset();
+    });
   }
 
   @override
@@ -301,11 +305,15 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
         Row(
           children: [
             const SizedBox(width: 4),
-            Text(
-              release.title,
-              style: FigmaTextStyles()
-                  .headingheading5
-                  .copyWith(color: CupertinoColors.black),
+            Expanded(
+              child: Text(
+                release.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: FigmaTextStyles()
+                    .headingheading5
+                    .copyWith(color: CupertinoColors.black),
+              ),
             ),
           ],
         ),
