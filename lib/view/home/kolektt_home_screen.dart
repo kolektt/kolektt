@@ -232,7 +232,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
           decoration: BoxDecoration(
             color: CupertinoColors.black,
             border: Border.all(color: FigmaColors.grey90),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             image: const DecorationImage(
               image: NetworkImage(
                   'https://www.shutterstock.com/image-vector/no-image-available-icon-template-260nw-1036735678.jpg'),
@@ -263,7 +263,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
                   style: TextStyle(
                     color: CupertinoColors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                    fontSize: 32,
                   ),
                   textAlign: TextAlign.end,
                 ),
