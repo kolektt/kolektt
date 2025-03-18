@@ -112,19 +112,21 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                         ),
                       ),
                       // 투명한 뒤로가기 버튼
-                      Positioned(
-                        top: 16,
-                        left: 16,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(
-                            CupertinoIcons.back,
-                            color: CupertinoColors.white,
-                            size: 32,
+                      SafeArea(
+                        child: Positioned(
+                          top: 16,
+                          left: 16,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              CupertinoIcons.back,
+                              color: CupertinoColors.white,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
                           ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
                         ),
                       ),
                     ],
