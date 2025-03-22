@@ -29,15 +29,16 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
   @override
   void initState() {
     super.initState();
-    final model = context.read<RecordDetailsViewModel>();
-    model.collectionRecord = widget.collectionRecord;
-    debugPrint("Model artist: ${model.collectionRecord.record.artist}");
+    final recordDetailsVM = context.read<RecordDetailsViewModel>();
+    recordDetailsVM.collectionRecord = widget.collectionRecord;
+    debugPrint("Model artist: ${recordDetailsVM.collectionRecord.record.artist}");
   }
 
   @override
   Widget build(BuildContext context) {
-    final recordDetailModel = context.watch<RecordDetailsViewModel>();
-    final collectionModel = context.watch<CollectionViewModel>();
+    final recordDetailsVM = context.watch<RecordDetailsViewModel>();
+    final collectionVM = context.watch<CollectionViewModel>();
+    final record = recordDetailsVM.collectionRecord.record;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -47,19 +48,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
             : null,
         trailing: IconButton(
           icon: const Icon(CupertinoIcons.pencil),
-          onPressed: () => Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (_) => CollectionEditPage(
-                collection: widget.collectionRecord,
-                onSave: (userCollection) async {
-                  await recordDetailModel.updateRecord(userCollection);
-                  await recordDetailModel.getRecordDetails();
-                  await collectionModel.fetch();
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
+          onPressed: () => _navigateToEditPage(recordDetailsVM, collectionVM),
         ),
       ),
       child: Stack(
@@ -67,31 +56,45 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
           ListView(
             padding: EdgeInsets.zero,
             children: [
-              _buildCoverImage(recordDetailModel.collectionRecord.record),
-              _buildTitleSection(recordDetailModel.collectionRecord.record, recordDetailModel),
+              _buildCoverImage(record),
+              _buildTitleSection(record, recordDetailsVM),
               const Divider(height: 1),
               _buildRecordDetailsSection(),
               const Divider(height: 1),
               _buildConditionSection(
-                recordDetailModel.collectionRecord.user_collection,
-                recordDetailModel.collectionRecord.record,
+                recordDetailsVM.collectionRecord.user_collection,
+                record,
               ),
               const SizedBox(height: 40),
             ],
           ),
-          Consumer<RecordDetailsViewModel>(
-            builder: (context, model, child) {
-              if (model.isLoading)
-                return Container(
-                  color: CupertinoColors.systemGrey.withOpacity(0.3),
-                  child: const Center(
-                    child: CupertinoActivityIndicator(radius: 15),
-                  ),
-                );
-              return const SizedBox.shrink();
-            },
-          ),
+          if (recordDetailsVM.isLoading)
+            Container(
+              color: CupertinoColors.systemGrey.withOpacity(0.3),
+              child: const Center(
+                child: CupertinoActivityIndicator(radius: 15),
+              ),
+            ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToEditPage(
+      RecordDetailsViewModel recordDetailsVM,
+      CollectionViewModel collectionVM,
+      ) {
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (_) => CollectionEditPage(
+          collection: widget.collectionRecord,
+          onSave: (userCollection) async {
+            await recordDetailsVM.updateRecord(userCollection);
+            await recordDetailsVM.getRecordDetails();
+            await collectionVM.fetch();
+            Navigator.pop(context);
+          },
+        ),
       ),
     );
   }
@@ -108,7 +111,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
     );
   }
 
-  Widget _buildTitleSection(dynamic record, RecordDetailsViewModel model) {
+  Widget _buildTitleSection(dynamic record, RecordDetailsViewModel recordDetailsVM) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -121,7 +124,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
           const SizedBox(height: 4),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => _onArtistPressed(model),
+            onPressed: () => _showArtistActionSheet(recordDetailsVM),
             child: Text(
               record.artist,
               style: _textStyles.bodylg.copyWith(color: const Color(0xFF2563EB)),
@@ -137,22 +140,23 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
     );
   }
 
-  void _onArtistPressed(RecordDetailsViewModel model) {
-    final List<Artist> artistList = model.entityRecord!.artists;
+  void _showArtistActionSheet(RecordDetailsViewModel recordDetailsVM) {
+    final List<Artist> artists = recordDetailsVM.entityRecord!.artists;
     showCupertinoModalPopup(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext popupContext) {
         return CupertinoActionSheet(
           title: const Text('Artist'),
           actions: [
-            for (final artist in artistList)
+            for (final artist in artists)
               CupertinoActionSheetAction(
                 onPressed: () {
-                  Navigator.pop(context);
+                  // popupContext를 사용하여 모달 팝업을 닫습니다.
+                  Navigator.pop(popupContext);
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      builder: (context) => ArtistDetailView(artist: artist),
+                      builder: (_) => ArtistDetailView(artist: artist),
                     ),
                   );
                   debugPrint('Artist: ${artist.toJson()}');
@@ -160,7 +164,7 @@ class _RecordDetailsViewState extends State<RecordDetailsView> {
                 child: Text(artist.name),
               ),
             CupertinoActionSheetAction(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(popupContext),
               child: const Text(
                 '닫기',
                 style: TextStyle(color: CupertinoColors.systemRed),
