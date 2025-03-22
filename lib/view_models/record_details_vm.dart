@@ -72,8 +72,7 @@ class RecordDetailsViewModel extends ChangeNotifier {
   Future<void> getRecordDetails() async {
     try {
       _setLoading(true);
-      final releaseId =
-          int.parse(_collectionRecord.record.resourceUrl.split("/").last);
+      final releaseId = int.parse(_collectionRecord.record.resourceUrl.split("/").last);
       _modelRecord = await searchById.call(releaseId);
       debugPrint("List<DiscogsSearchItem>: ${_modelRecord?.toJson()}");
     } catch (e) {
