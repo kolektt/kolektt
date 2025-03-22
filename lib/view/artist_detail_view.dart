@@ -231,10 +231,10 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
   Widget _buildAlbumGrid() {
     return Consumer<ArtistDetailViewModel>(
       builder: (context, model, _) {
-        if (model.filterRelease == null) {
+        if (model.filteredReleases == null) {
           return const Center(child: CupertinoActivityIndicator());
         }
-        final releases = model.filterRelease!.releases;
+        final releases = model.filteredReleases!.releases;
         final List<Widget> rows = [];
         for (var i = 0; i < (releases.length / 2).ceil(); i++) {
           final firstIndex = i * 2;
