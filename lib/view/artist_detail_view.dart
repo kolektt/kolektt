@@ -17,21 +17,18 @@ class ArtistDetailView extends StatefulWidget {
 }
 
 class _ArtistDetailViewState extends State<ArtistDetailView> {
+  final FigmaTextStyles _textStyles = FigmaTextStyles();
+
   @override
   void initState() {
     super.initState();
-    // 빌드가 완료된 후에 상태 변경을 실행합니다.
+    // 빌드 후 상태 초기화 및 데이터 패치
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final model = context.read<ArtistDetailViewModel>();
-      model.reset().then((_) {
+      model.reset().then((_) async {
         model.artist = widget.artist;
-        model.fetchArtistRelease().then((_) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {});
-            }
-          });
-        });
+        await model.fetchArtistRelease();
+        if (mounted) setState(() {});
       });
     });
   }
@@ -41,231 +38,105 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
     return CupertinoPageScaffold(
       child: Stack(
         children: [
-          // 메인 콘텐츠: 스크롤 가능한 전체 페이지 레이아웃
           SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 382,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(widget.artist.thumbnailUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      // 텍스트 가독성을 위한 그라데이션 오버레이
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              CupertinoColors.black.withOpacity(0.0),
-                              CupertinoColors.black.withOpacity(0.7),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // 아티스트 이름 및 태그 표시
-                      Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              widget.artist.name,
-                              style: const TextStyle(
-                                color: CupertinoColors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 10,
-                              children: [
-                                _buildTag('Alternative Rock'),
-                                _buildTag('RnB'),
-                                _buildTag('24 Albums'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      // 투명한 뒤로가기 버튼
-                      SafeArea(
-                        child: Positioned(
-                          top: 16,
-                          left: 16,
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(
-                              CupertinoIcons.back,
-                              color: CupertinoColors.white,
-                              size: 32,
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // 앨범 그리드
-                Consumer<ArtistDetailViewModel>(
-                  builder: (BuildContext context, ArtistDetailViewModel model, Widget? child) {
-                    return model.filterRelease == null
-                        ? const Center(child: CupertinoActivityIndicator())
-                        : Column(
-                            children: [
-                              // 연도 선택 영역
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    showCupertinoModalPopup(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return CupertinoActionSheet(
-                                          title: model.selectedYear == -1
-                                              ? const Text('연도 선택')
-                                              : Text(
-                                                  '선택된 연도: ${model.selectedYear}'),
-                                          actions: [
-                                            for (final year
-                                                in model.allReleases!.releases
-                                                    .map((e) => e.year)
-                                                    .toSet()
-                                                    .toList()
-                                                  ..sort(
-                                                      (a, b) => b.compareTo(a)))
-                                              CupertinoActionSheetAction(
-                                                onPressed: () async {
-                                                  Navigator.pop(context);
-                                                  await model.selectYear(year);
-                                                },
-                                                child: Text(year.toString()),
-                                              ),
-                                            CupertinoActionSheetAction(
-                                              onPressed: () async {
-                                                Navigator.pop(context);
-                                                await model.clearYear();
-                                              },
-                                              child: const Text('전체'),
-                                            ),
-                                            CupertinoActionSheetAction(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('취소',
-                                                  style: TextStyle(
-                                                      color: CupertinoColors
-                                                          .systemRed)),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: CupertinoColors.systemGrey4),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 12),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          model.selectedYear == -1
-                                              ? Text(
-                                                  '연도 선택',
-                                                  style: FigmaTextStyles()
-                                                      .bodymd
-                                                      .copyWith(
-                                                          color: FigmaColors
-                                                              .grey100),
-                                                )
-                                              : Text('${model.selectedYear}'),
-                                          const Icon(
-                                              CupertinoIcons.chevron_down,
-                                              color:
-                                                  CupertinoColors.systemGrey),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
-                                child: Column(
-                                  children: List.generate(
-                                    (model.filterRelease!.releases.length / 2)
-                                        .ceil(),
-                                    (index) {
-                                      final firstIndex = index * 2;
-                                      final secondIndex = firstIndex + 1;
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 16.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: _buildAlbumItem(model
-                                                  .filterRelease!
-                                                  .releases[firstIndex]),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: secondIndex <
-                                                      model.filterRelease!
-                                                          .releases.length
-                                                  ? _buildAlbumItem(model
-                                                      .filterRelease!
-                                                      .releases[secondIndex])
-                                                  : Container(),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                  },
-                ),
+                _buildHeader(),
+                _buildYearSelection(),
+                _buildAlbumGrid(),
               ],
             ),
           ),
-          // 로딩 오버레이: isLoading이 true일 때 표시
-          Consumer<ArtistDetailViewModel>(
-            builder: (context, model, child) {
-              return model.isLoading
-                  ? Container(
-                      color: CupertinoColors.black.withOpacity(0.3),
-                      child: const Center(
-                        child: CupertinoActivityIndicator(radius: 15),
-                      ),
-                    )
-                  : const SizedBox.shrink();
-            },
-          ),
+          _buildLoadingOverlay(),
         ],
+      ),
+    );
+  }
+
+  /// 상단 헤더: 배경 이미지, 그라데이션, 아티스트 정보, 뒤로가기 버튼
+  Widget _buildHeader() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+      height: 382,
+      width: screenWidth,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(widget.artist.thumbnailUrl),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          _buildGradientOverlay(),
+          _buildHeaderText(),
+          _buildBackButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGradientOverlay() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            CupertinoColors.black.withOpacity(0.0),
+            CupertinoColors.black.withOpacity(0.7),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderText() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Align(
+        alignment: Alignment.bottomLeft,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.artist.name,
+              style: const TextStyle(
+                color: CupertinoColors.white,
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 10,
+              children: [
+                _buildTag('Alternative Rock'),
+                _buildTag('RnB'),
+                _buildTag('24 Albums'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackButton() {
+    return SafeArea(
+      child: Positioned(
+        top: 16,
+        left: 16,
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          icon: const Icon(
+            CupertinoIcons.back,
+            color: CupertinoColors.white,
+            size: 32,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
     );
   }
@@ -279,10 +150,117 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
       ),
       child: Text(
         text,
-        style: FigmaTextStyles()
-            .headingheading5
-            .copyWith(color: FigmaColors.grey100),
+        style: _textStyles.headingheading5.copyWith(color: FigmaColors.grey100),
       ),
+    );
+  }
+
+  /// 연도 선택 영역: 터치 시 연도 선택 액션시트 표시
+  Widget _buildYearSelection() {
+    return Consumer<ArtistDetailViewModel>(
+      builder: (context, model, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: GestureDetector(
+            onTap: () => _showYearSelectionActionSheet(model),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: CupertinoColors.systemGrey4),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  model.selectedYear == -1
+                      ? Text(
+                    '연도 선택',
+                    style: FigmaTextStyles().bodymd.copyWith(color: FigmaColors.grey100),
+                  )
+                      : Text(model.selectedYear.toString()),
+                  const Icon(CupertinoIcons.chevron_down, color: CupertinoColors.systemGrey),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showYearSelectionActionSheet(ArtistDetailViewModel model) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (popupContext) {
+        final sortedYears = model.allReleases!.releases
+            .map((e) => e.year)
+            .toSet()
+            .toList()
+          ..sort((a, b) => b.compareTo(a));
+        return CupertinoActionSheet(
+          title: model.selectedYear == -1
+              ? const Text('연도 선택')
+              : Text('선택된 연도: ${model.selectedYear}'),
+          actions: [
+            for (final year in sortedYears)
+              CupertinoActionSheetAction(
+                onPressed: () async {
+                  Navigator.pop(popupContext);
+                  await model.selectYear(year);
+                },
+                child: Text(year.toString()),
+              ),
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                Navigator.pop(popupContext);
+                await model.clearYear();
+              },
+              child: const Text('전체'),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.pop(popupContext),
+              child: const Text('취소', style: TextStyle(color: CupertinoColors.systemRed)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// 앨범 그리드 영역: 2열 그리드 형태로 앨범 아이템 표시
+  Widget _buildAlbumGrid() {
+    return Consumer<ArtistDetailViewModel>(
+      builder: (context, model, _) {
+        if (model.filterRelease == null) {
+          return const Center(child: CupertinoActivityIndicator());
+        }
+        final releases = model.filterRelease!.releases;
+        final List<Widget> rows = [];
+        for (var i = 0; i < (releases.length / 2).ceil(); i++) {
+          final firstIndex = i * 2;
+          final secondIndex = firstIndex + 1;
+          rows.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Row(
+                children: [
+                  Expanded(child: _buildAlbumItem(releases[firstIndex])),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: secondIndex < releases.length
+                        ? _buildAlbumItem(releases[secondIndex])
+                        : Container(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(children: rows),
+        );
+      },
     );
   }
 
@@ -309,9 +287,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                 release.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: FigmaTextStyles()
-                    .headingheading5
-                    .copyWith(color: CupertinoColors.black),
+                style: _textStyles.headingheading5.copyWith(color: CupertinoColors.black),
               ),
             ),
           ],
@@ -323,9 +299,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
             Expanded(
               child: Text(
                 release.year.toString(),
-                style: FigmaTextStyles()
-                    .bodysm
-                    .copyWith(color: CupertinoColors.black),
+                style: _textStyles.bodysm.copyWith(color: CupertinoColors.black),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -333,9 +307,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
             Expanded(
               child: Text(
                 release.format ?? '',
-                style: FigmaTextStyles()
-                    .headingheading5
-                    .copyWith(color: const Color(0xFF2654FF)),
+                style: _textStyles.headingheading5.copyWith(color: const Color(0xFF2654FF)),
                 textAlign: TextAlign.right,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -343,6 +315,22 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
           ],
         ),
       ],
+    );
+  }
+
+  /// 로딩 오버레이: 모델의 isLoading 상태에 따라 표시
+  Widget _buildLoadingOverlay() {
+    return Consumer<ArtistDetailViewModel>(
+      builder: (context, model, _) {
+        return model.isLoading
+            ? Container(
+          color: CupertinoColors.black.withOpacity(0.3),
+          child: const Center(
+            child: CupertinoActivityIndicator(radius: 15),
+          ),
+        )
+            : const SizedBox.shrink();
+      },
     );
   }
 }
