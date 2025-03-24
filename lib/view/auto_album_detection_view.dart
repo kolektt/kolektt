@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-// CollectionViewModel에서 recognizeAlbum() 사용 (Google Vision + Discogs)
 import '../components/cupertino_chip.dart';
 import '../view_models/collection_vm.dart';
 import 'add_to_collection_view.dart';
@@ -15,60 +14,38 @@ class AutoAlbumDetectionScreen extends StatefulWidget {
   const AutoAlbumDetectionScreen({Key? key}) : super(key: key);
 
   @override
-  State<AutoAlbumDetectionScreen> createState() => _AutoAlbumDetectionScreenState();
+  State<AutoAlbumDetectionScreen> createState() =>
+      _AutoAlbumDetectionScreenState();
 }
 
 class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
   final ImagePicker _picker = ImagePicker();
-  bool hasRunCamera = false; // 카메라 한 번만 실행하기 위한 플래그
+  bool _hasLaunchedCamera = false; // 카메라를 한 번만 실행하기 위한 플래그
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!hasRunCamera) {
-      hasRunCamera = true;
-      // 약간의 지연 후 카메라 실행 (UI가 완전히 빌드된 후)
-      Future.delayed(const Duration(milliseconds: 500), _takePhotoAndDetect);
+    if (!_hasLaunchedCamera) {
+      _hasLaunchedCamera = true;
+      Future.delayed(const Duration(milliseconds: 500), _initiatePhotoCapture);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CollectionViewModel>(
-      builder: (context, vm, child) {
-        if (vm.isLoading)
-          return SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Center(child: CupertinoActivityIndicator()));
+      builder: (context, collectionVM, child) {
+        if (collectionVM.isLoading) return _buildLoadingIndicator(context);
 
         return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(
-            middle: const Text('사진으로 앨범 찾기'),
-            leading: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: const Text("취소"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
+          navigationBar: _buildNavigationBar(context),
           child: SafeArea(
             child: Column(
               children: [
-                // 에러 메시지
-                if (vm.errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      vm.errorMessage!,
-                      style: const TextStyle(color: CupertinoColors.systemRed),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                // 검색 결과
-                _buildPartialMatchingImagesRow(vm),
-                Expanded(child: _buildResultsList(context, vm)),
+                if (collectionVM.errorMessage != null)
+                  _buildErrorMessage(collectionVM.errorMessage!),
+                _buildPartialMatchingImagesRow(collectionVM),
+                Expanded(child: _buildResultsList(collectionVM)),
               ],
             ),
           ),
@@ -77,21 +54,52 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
     );
   }
 
-  /// 예상 이미지 이름 Chip Row
+  /// 로딩 인디케이터 위젯
+  Widget _buildLoadingIndicator(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: const Center(child: CupertinoActivityIndicator()),
+    );
+  }
+
+  /// 네비게이션 바 위젯
+  CupertinoNavigationBar _buildNavigationBar(BuildContext context) {
+    return CupertinoNavigationBar(
+      middle: const Text('사진으로 앨범 찾기'),
+      leading: CupertinoButton(
+        padding: EdgeInsets.zero,
+        child: const Text("취소"),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+  /// 에러 메시지 위젯
+  Widget _buildErrorMessage(String message) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        message,
+        style: const TextStyle(color: CupertinoColors.systemRed),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  /// 부분 매칭 이미지 Chip Row 빌드
   Widget _buildPartialMatchingImagesRow(CollectionViewModel vm) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: vm.partialMatchingImages.map((e) {
+          children: vm.partialMatchingImages.map((imageName) {
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: CupertinoChip(
-                label: e,
-                onTap: () async {
-                  await vm.searchOnDiscogs(e);
-                },
+                label: imageName,
+                onTap: () async => await vm.searchOnDiscogs(imageName),
               ),
             );
           }).toList(),
@@ -101,7 +109,7 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
   }
 
   /// 검색 결과 리스트 빌드
-  Widget _buildResultsList(BuildContext context, CollectionViewModel vm) {
+  Widget _buildResultsList(CollectionViewModel vm) {
     if (!vm.isLoading && vm.errorMessage == null && vm.searchResults.isEmpty) {
       return const Center(
         child: Text(
@@ -115,104 +123,111 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
       itemCount: vm.searchResults.length,
       itemBuilder: (context, index) {
         final record = vm.searchResults[index];
-
-        return TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 300),
-          builder: (context, value, child) {
-            return Opacity(
-              opacity: value,
-              child: Transform.translate(
-                offset: Offset(0, 20 * (1 - value)), // 슬라이드 업 효과
-                child: child,
-              ),
-            );
-          },
-          child: CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              // AddToCollectionScreen으로 이동
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (_) => AddToCollectionScreen(record: record),
-                ),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: CupertinoColors.systemGrey4),
-                ),
-              ),
-              child: Row(
-                children: [
-                  if (record.coverImage.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: FadeInImage.memoryNetwork(
-                        placeholder: kTransparentImage,
-                        image: record.coverImage,
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  else
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemGrey5,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Icon(CupertinoIcons.music_note),
-                    ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          record.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(CupertinoIcons.add),
-                ],
-              ),
-            ),
-          ),
-        );
+        return _buildResultItem(record);
       },
     );
   }
 
-  /// 카메라를 실행하고 사진을 촬영한 후 앨범 인식(= Google Vision + Discogs 검색)
-  /// 문서 스캐너를 실행하고 스캔된 이미지로 앨범 인식
-  Future<void> _takePhotoAndDetect() async {
-    final filePath = await _takePhotoAndDetectIos();
-    final collectionVM = context.read<CollectionViewModel>();
-    await collectionVM.recognizeAlbum(File.fromUri(Uri.parse(filePath)));
+  /// 개별 검색 결과 아이템 빌드
+  Widget _buildResultItem(record) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 300),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () => _navigateToAddToCollection(record),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: CupertinoColors.systemGrey4),
+            ),
+          ),
+          child: Row(
+            children: [
+              _buildRecordImage(record),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  record.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Icon(CupertinoIcons.add),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  Future<String> _takePhotoAndDetectIos() async {
-    try {
-      final imagesPath = await CunningDocumentScanner.getPictures(
-        noOfPages: 1, // Limit the number of pages to 1
+  /// 앨범 커버 이미지 또는 기본 아이콘 표시 위젯
+  Widget _buildRecordImage(record) {
+    if (record.coverImage.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: FadeInImage.memoryNetwork(
+          placeholder: kTransparentImage,
+          image: record.coverImage,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
       );
-      debugPrint("imagesPath: $imagesPath");
-      if (imagesPath == null || imagesPath.isEmpty) {
-        throw Exception('No image path found');
-      }
-      return imagesPath.first;
-    } catch (e) {
-      final collectionVM = context.read<CollectionViewModel>();
-      collectionVM.errorMessage = '문서 스캔 또는 인식 중 오류 발생: ${e.toString()}';
+    } else {
+      return Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemGrey5,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Icon(CupertinoIcons.music_note),
+      );
     }
-    return "";
+  }
+
+  /// AddToCollectionScreen으로 네비게이션
+  void _navigateToAddToCollection(record) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => AddToCollectionScreen(record: record),
+      ),
+    );
+  }
+
+  /// 카메라 실행 및 사진 촬영 후 앨범 인식 호출
+  Future<void> _initiatePhotoCapture() async {
+    final String filePath = await _captureImageFromScanner();
+    if (filePath.isNotEmpty) {
+      final collectionVM = context.read<CollectionViewModel>();
+      await collectionVM.recognizeAlbum(File.fromUri(Uri.parse(filePath)));
+    }
+  }
+
+  /// 문서 스캐너를 통해 사진 촬영 및 이미지 경로 반환
+  Future<String> _captureImageFromScanner() async {
+    try {
+      final List<String>? imagesPath = await CunningDocumentScanner.getPictures(
+        noOfPages: 1,
+      );
+      debugPrint("Captured images path: $imagesPath");
+      if (imagesPath == null) throw Exception('No image path found');
+      return imagesPath.first;
+    } catch (error) {
+      final collectionVM = context.read<CollectionViewModel>();
+      collectionVM.errorMessage = '문서 스캔 또는 인식 중 오류 발생: $error';
+      return "";
+    }
   }
 }
