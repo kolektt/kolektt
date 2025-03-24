@@ -68,7 +68,7 @@ class SettingsView extends StatelessWidget {
                 onPressed: () async {
                   final auth = context.read<AuthViewModel>();
                   await auth.signOut();
-                  Navigator.of(context).pushAndRemoveUntil(
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                     CupertinoPageRoute(builder: (context) => AuthenticationWrapper()),
                         (route) => false, // 모든 이전 라우트를 제거합니다.
                   );
