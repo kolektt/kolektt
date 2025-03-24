@@ -17,12 +17,12 @@ class DiscogsStorageRepositoryImpl implements DiscogsStorageRepository {
     final response = await supabase.from('records').upsert({
       'title': record.title,
       'release_year': record.year,
-      'genre': record.genre.toList(),
+      'genre': record.genre.toList().join(', '),
       'cover_image': record.coverImage,
-      'label': record.label.toList(),
-      'format': record.format.toList(),
+      'label': record.label.toList().join(', '),
+      'format': record.format.toList().join(', '),
       'country': record.country,
-      'style': record.style.toList(),
+      'style': record.style.toList().join(', '),
       'record_id': record.id,
     }, onConflict: 'record_id').select();
   }
