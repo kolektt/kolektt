@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_doc_scanner/flutter_doc_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -15,8 +15,7 @@ class AutoAlbumDetectionScreen extends StatefulWidget {
   const AutoAlbumDetectionScreen({Key? key}) : super(key: key);
 
   @override
-  State<AutoAlbumDetectionScreen> createState() =>
-      _AutoAlbumDetectionScreenState();
+  State<AutoAlbumDetectionScreen> createState() => _AutoAlbumDetectionScreenState();
 }
 
 class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
@@ -195,51 +194,25 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
   /// 카메라를 실행하고 사진을 촬영한 후 앨범 인식(= Google Vision + Discogs 검색)
   /// 문서 스캐너를 실행하고 스캔된 이미지로 앨범 인식
   Future<void> _takePhotoAndDetect() async {
-    if (Platform.isIOS) {
-      await _takePhotoAndDetectIos();
-      return;
-    }
-
-    String uriString = "";
-    try {
-      final dynamic scannedDocs =
-          await FlutterDocScanner().getScannedDocumentAsImages(page: 1);
-      if (scannedDocs == null || scannedDocs.isEmpty) {
-        Navigator.pop(context); // 사용자가 스캔 취소 시 화면 닫기
-        return;
-      }
-
-      uriString = scannedDocs['Uri'];
-
-      // 정규 표현식을 사용해 imageUri 값을 추출합니다.
-      final RegExp regex = RegExp(r'imageUri=([^}]+)');
-      final Match? match = regex.firstMatch(uriString);
-
-      debugPrint('scannedDocs: ${match?.group(1)}');
-
-      final collectionVM = context.read<CollectionViewModel>();
-      await collectionVM
-          .recognizeAlbum(File.fromUri(Uri.parse(match!.group(1).toString())));
-    } catch (e) {
-      final collectionVM = context.read<CollectionViewModel>();
-      collectionVM.errorMessage =
-          '문서 스캔 또는 인식 중 오류 발생: ${e.toString()}, uriString: ${uriString}';
-    }
+    final filePath = await _takePhotoAndDetectIos();
+    final collectionVM = context.read<CollectionViewModel>();
+    await collectionVM.recognizeAlbum(File.fromUri(Uri.parse(filePath)));
   }
 
-  Future<void> _takePhotoAndDetectIos() async {
+  Future<String> _takePhotoAndDetectIos() async {
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-      if (image == null) {
-        Navigator.pop(context); // 사용자가 카메라 취소 시 화면 닫기
-        return;
+      final imagesPath = await CunningDocumentScanner.getPictures(
+        noOfPages: 1, // Limit the number of pages to 1
+      );
+      debugPrint("imagesPath: $imagesPath");
+      if (imagesPath == null || imagesPath.isEmpty) {
+        throw Exception('No image path found');
       }
-
-      final collectionVM = context.read<CollectionViewModel>();
-      await collectionVM.recognizeAlbum(File(image.path));
+      return imagesPath.first;
     } catch (e) {
-      // 만약 별도의 에러 처리 메서드를 쓴다면 사용
-      // collectionVM.setErrorMessage('사진 촬영 또는 인식 중 오류 발생: $e');
+      final collectionVM = context.read<CollectionViewModel>();
+      collectionVM.errorMessage = '문서 스캔 또는 인식 중 오류 발생: ${e.toString()}';
     }
+    return "";
   }
 }
