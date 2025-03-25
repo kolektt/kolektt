@@ -14,7 +14,7 @@ class DiscogsStorageRepositoryImpl implements DiscogsStorageRepository {
   @override
   Future<void> upsertDiscogsRecord(DiscogsSearchItem record) async {
     debugPrint('upsertDiscogsRecord: ${record.toJson()}');
-    final response = await supabase.from('records').upsert({
+    await supabase.from('records').upsert({
       'title': record.title,
       'release_year': record.year,
       'genre': record.genre.toList().join(', '),

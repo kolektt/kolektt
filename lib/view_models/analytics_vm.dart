@@ -5,6 +5,7 @@ import 'package:kolektt/model/local/collection_record.dart';
 import '../model/collection_analytics.dart';
 import '../model/decade_analytics.dart';
 import '../model/genre_analytics.dart';
+import '../model/artist_analytics.dart';
 
 class AnalyticsViewModel extends ChangeNotifier {
   CollectionAnalytics? analytics;
@@ -66,6 +67,17 @@ class AnalyticsViewModel extends ChangeNotifier {
         : 0;
 
     // 5. CollectionAnalytics 객체 생성
+    // Artist analysis - get top 5 artists
+    final sortedArtists = artistCounts.entries
+      .toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+      
+    // Update the artist analysis section
+    final List<ArtistAnalytics> topArtists = sortedArtists
+      .take(5)
+      .map((entry) => ArtistAnalytics(name: entry.key, count: entry.value))
+      .toList();
+  
     analytics = CollectionAnalytics(
       totalRecords: totalRecords,
       mostCollectedGenre: mostCollectedGenre,
@@ -79,8 +91,8 @@ class AnalyticsViewModel extends ChangeNotifier {
           .map(
               (entry) => DecadeAnalytics(decade: entry.key, count: entry.value))
           .toList(),
+      artists: topArtists,
     );
-
     hasData = totalRecords > 0;
     notifyListeners();
   }

@@ -133,10 +133,9 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 3, // Show top 3 artists
+                      itemCount: analyticsVM.analytics!.artists.length,
                       itemBuilder: (context, index) {
-                        // This is a placeholder - you would need to modify your analytics model
-                        // to track artist album counts for a more accurate implementation
+                        final artist = analyticsVM.analytics!.artists[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: Row(
@@ -144,66 +143,35 @@ class _AnalyticsSectionState extends State<AnalyticsSection> {
                               Container(
                                 width: 24,
                                 alignment: Alignment.center,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "${index + 1}",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      index == 0
-                                          ? CupertinoIcons.arrow_up
-                                          : index == 1
-                                              ? CupertinoIcons.minus
-                                              : CupertinoIcons.arrow_down,
-                                      size: 12,
-                                      color: index == 0
-                                          ? Colors.blue
-                                          : index == 1
-                                              ? Colors.grey
-                                              : Colors.red,
-                                    ),
-                                  ],
+                                child: Text(
+                                  "${index + 1}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      index == 0
-                                          ? "BTS"
-                                          : index == 1
-                                              ? "BLACKPINK"
-                                              : "TWICE",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    artist.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Text(
-                                      "${index == 0 ? 52 : index == 1 ? 34 : 28} Albums",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.blue,
-                                      ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "${artist.count} Albums",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: FigmaColors.primary60,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      height: 4,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius: BorderRadius.circular(2),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ), // Add comma here
+                                ],
                               ),
                             ],
                           ),
