@@ -39,6 +39,7 @@ class AddCollectionViewModel extends ChangeNotifier {
   Future<void> addToCollection(
     DiscogsSearchItem record,
     String condition,
+    String note,
     double purchasePrice,
     DateTime purchaseDate,
     List<String> _tagList,
@@ -59,6 +60,7 @@ class AddCollectionViewModel extends ChangeNotifier {
         'condition': condition,
         'purchase_price': purchasePrice,
         'purchase_date': purchaseDate.toIso8601String(),
+        'notes': note,
         'tags': _tagList,
       };
 

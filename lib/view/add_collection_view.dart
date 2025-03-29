@@ -387,7 +387,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                       : CupertinoButton.filled(
                     onPressed: () async {
                       final condition = _selectedCondition;
-                      // final conditionNote = _conditionNoteController.text.trim();
+                      final note = _notesController.text.trim();
                       final priceText = _priceController.text.trim();
 
                       // 모든 필수 항목이 입력되었는지 확인
@@ -436,6 +436,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                       await collectionVM.addToCollection(
                         widget.record,    // 레코드 정보
                         condition,        // 상태
+                        note,    // 노트
                         price,            // 구매가
                         _purchaseDate!,    // 구매일
                         _tagList,         // 태그 리스트
