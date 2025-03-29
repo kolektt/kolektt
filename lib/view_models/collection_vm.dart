@@ -140,7 +140,7 @@ class CollectionViewModel extends ChangeNotifier {
         print('Error adding Discogs record: $e');
       }
 
-      await collectionRepository.insertUserCollection(insertData);
+      await collectionRepository.insert(insertData);
     } catch (e) {
       _errorMessage = '컬렉션 추가 실패: $e';
     } finally {
@@ -151,7 +151,7 @@ class CollectionViewModel extends ChangeNotifier {
 
   Future<void> removeRecord(CollectionRecord record) async {
     try {
-      collectionRepository.deleteUserCollection(record.user_collection.id);
+      collectionRepository.delete(record.user_collection.id);
       _collectionRecords.removeWhere(
           (r) => r.user_collection.id == record.user_collection.id);
       notifyListeners();
@@ -246,7 +246,7 @@ class CollectionViewModel extends ChangeNotifier {
 
     try {
       collectionRecords =
-          await collectionRepository.fetchUserCollection(userId);
+          await collectionRepository.fetch(userId);
       classification = classifyCollections(collectionRecords);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
@@ -280,7 +280,7 @@ class CollectionViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      _collectionRecords = await collectionRepository.filterUserCollection(
+      _collectionRecords = await collectionRepository.fetchFilter(
           userId, _userCollectionClassification);
 
       for (var record in _collectionRecords) {

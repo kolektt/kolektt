@@ -87,7 +87,7 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       _collectionRecords =
-          await collectionRepository.fetchUserCollection(_userId!);
+          await collectionRepository.fetch(_userId!);
     } catch (e) {
       _errorMessage = '컬렉션을 불러오는 중 오류가 발생했습니다: $e';
       debugPrint('Error fetching user collection: $e');

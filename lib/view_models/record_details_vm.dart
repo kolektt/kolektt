@@ -62,7 +62,7 @@ class RecordDetailsViewModel extends ChangeNotifier {
   // 레코드 업데이트
   Future<void> updateRecord(UserCollection record) async {
     try {
-      await collectionRepository.updateUserCollection(record);
+      await collectionRepository.update(record);
       debugPrint("Record updated: ${record.toJson()}");
     } catch (e) {
       debugPrint('Error in updateRecord: $e');

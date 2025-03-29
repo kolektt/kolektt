@@ -12,23 +12,23 @@ class CollectionRepositoryImpl implements CollectionRepository {
   CollectionRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<CollectionRecord>> fetchUserCollection(String userId) async {
+  Future<List<CollectionRecord>> fetch(String userId) async {
     List<CollectionRecord> _collectionRecords = await remoteDataSource.fetchUserCollection(userId);
     return _collectionRecords;
   }
 
   @override
-  Future<void> insertUserCollection(Map<String, dynamic> data) {
+  Future<void> insert(Map<String, dynamic> data) {
     return remoteDataSource.insertUserCollection(data);
   }
 
   @override
-  Future<void> updateUserCollection(UserCollection data) {
+  Future<void> update(UserCollection data) {
     return remoteDataSource.updateUserCollection(data);
   }
 
   @override
-  Future<void> deleteUserCollection(String id) {
+  Future<void> delete(String id) {
     return remoteDataSource.deleteUserCollection(id);
   }
 
@@ -43,7 +43,7 @@ class CollectionRepositoryImpl implements CollectionRepository {
   }
 
   @override
-  Future<List<CollectionRecord>> filterUserCollection(String userId, UserCollectionClassification classification) async {
+  Future<List<CollectionRecord>> fetchFilter(String userId, UserCollectionClassification classification) async {
     return await remoteDataSource.filterUserCollection(userId, classification);
   }
 }
