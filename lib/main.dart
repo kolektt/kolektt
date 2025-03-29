@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kolektt/data/repositories/lens_repository_impl.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -42,6 +43,10 @@ import 'package:kolektt/view_models/profile_vm.dart';
 import 'package:kolektt/view_models/record_details_vm.dart';
 import 'package:kolektt/view_models/sale_vm.dart';
 import 'package:kolektt/view_models/search_vm.dart';
+
+import 'data/repositories/gemini_repository_impl.dart';
+import 'data/repositories/supabase_storage_repository_impl.dart';
+import 'domain/usecases/recognize_album.dart';
 
 /// 기본 색상 (Primary Blue: #0036FF)
 const Color primaryColor = Color(0xFF0036FF);
@@ -91,6 +96,11 @@ class AppProviders {
       // 컬렉션 관련 뷰모델
       ChangeNotifierProvider(
         create: (_) => CollectionViewModel(
+          recognizeAlbumUseCase: RecognizeAlbumUseCase(
+            storageRepository: SupabaseStorageRepository(),
+            lensRepository: LensApiRepository(),
+            geminiRepository: GeminiApiRepository(),
+          ),
           searchAndUpsertUseCase: SearchAndUpsertDiscogsRecords(
             discogsRepository: discogsRepository,
             discogsStorageRepository:
