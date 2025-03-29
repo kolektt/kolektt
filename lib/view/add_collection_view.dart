@@ -3,21 +3,22 @@ import 'package:intl/intl.dart';
 import 'package:kolektt/data/models/discogs_search_response.dart';
 import 'package:provider/provider.dart';
 
+import '../view_models/add_collection_vm.dart';
 import '../view_models/collection_vm.dart';
 
-class AddToCollectionScreen extends StatefulWidget {
+class AddCollectionView extends StatefulWidget {
   final DiscogsSearchItem record;
 
-  const AddToCollectionScreen({
+  const AddCollectionView({
     Key? key,
     required this.record,
   }) : super(key: key);
 
   @override
-  State<AddToCollectionScreen> createState() => _AddToCollectionScreenState();
+  State<AddCollectionView> createState() => _AddCollectionViewState();
 }
 
-class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
+class _AddCollectionViewState extends State<AddCollectionView> {
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _newTagController = TextEditingController();
@@ -176,7 +177,7 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final collectionVM = context.watch<CollectionViewModel>();
+    final collectionVM = context.watch<AddCollectionViewModel>();
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -441,7 +442,7 @@ class _AddToCollectionScreenState extends State<AddToCollectionScreen> {
                       );
 
                       if (collectionVM.errorMessage == null) {
-                        collectionVM.fetch();
+                        context.read<CollectionViewModel>().fetch();
                         Navigator.pop(context);
                       }
                     },

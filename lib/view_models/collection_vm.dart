@@ -26,9 +26,7 @@ class CollectionViewModel extends ChangeNotifier {
   final RecognizeAlbumUseCase recognizeAlbumUseCase;
 
   CollectionRepository collectionRepository;
-  AlbumRecognitionRepository albumRecognitionRepository;
   ProfileRepository _profileRepository = ProfileRepository();
-  DiscogsRecordRepository discogsRecordRepository;
 
   File? selectedImage;
   RecognitionResult? recognitionResult;
@@ -103,51 +101,7 @@ class CollectionViewModel extends ChangeNotifier {
     required SearchAndUpsertDiscogsRecords this.searchAndUpsertUseCase,
     required DiscogsRepository discogs_repository,
     required CollectionRepository this.collectionRepository,
-    required AlbumRecognitionRepository this.albumRecognitionRepository,
-    required DiscogsRecordRepository this.discogsRecordRepository,
   });
-
-  Future<void> addToCollection(
-    DiscogsSearchItem record,
-    String condition,
-    double purchasePrice,
-    DateTime purchaseDate,
-    List<String> _tagList,
-  ) async {
-    _isAdding = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final user = supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('로그인이 필요합니다.');
-      }
-
-      // user_collections 테이블 구조에 맞춰 insert
-      final insertData = {
-        'record_id': record.id.toInt(),
-        'condition': condition,
-        'purchase_price': purchasePrice,
-        'purchase_date': purchaseDate.toIso8601String(),
-        'tags': _tagList,
-      };
-
-      try {
-        await addDiscogsRecordToDB(record);
-        print('Discogs record added successfully.');
-      } catch (e) {
-        print('Error adding Discogs record: $e');
-      }
-
-      await collectionRepository.insert(insertData);
-    } catch (e) {
-      _errorMessage = '컬렉션 추가 실패: $e';
-    } finally {
-      _isAdding = false;
-      notifyListeners();
-    }
-  }
 
   Future<void> removeRecord(CollectionRecord record) async {
     try {
@@ -198,15 +152,6 @@ class CollectionViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addDiscogsRecordToDB(DiscogsSearchItem record) async {
-    try {
-      await discogsRecordRepository.addDiscogsRecord(record);
-      print('Discogs record added successfully.');
-    } catch (e) {
-      log('Error inserting record: $e');
-      rethrow;
-    }
-  }
 
   Future<void> fetch() async {
     try {

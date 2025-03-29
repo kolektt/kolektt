@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kolektt/data/repositories/lens_repository_impl.dart';
+import 'package:kolektt/view_models/add_collection_vm.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -109,17 +110,16 @@ class AppProviders {
           discogs_repository: discogsRepository,
           collectionRepository:
               CollectionRepositoryImpl(remoteDataSource: collectionRemote),
-          albumRecognitionRepository: AlbumRecognitionRepositoryImpl(
-            dataSource: GoogleVisionDataSource(
-              apiKey: dotenv.env["GOOGLE_CLOUD_API_KEY"] ?? '',
-              project: dotenv.env["GOOGLE_CLOUD_PROJECT_ID"] ?? '',
-            ),
-          ),
-          discogsRecordRepository: DiscogsRecordRepositoryImpl(
-            recordDataSource: RecordDataSource(supabase: supabase),
-          ),
         ),
       ),
+
+      ChangeNotifierProvider(
+          create: (_) => AddCollectionViewModel(
+              collectionRepository:
+                  CollectionRepositoryImpl(remoteDataSource: collectionRemote),
+              discogsRecordRepository: DiscogsRecordRepositoryImpl(
+                recordDataSource: RecordDataSource(supabase: supabase),
+              ))),
 
       // 애널리틱스 뷰모델
       ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),

@@ -8,7 +8,7 @@ import 'package:transparent_image/transparent_image.dart';
 
 import '../components/cupertino_chip.dart';
 import '../view_models/collection_vm.dart';
-import 'add_to_collection_view.dart';
+import 'add_collection_view.dart';
 
 class AutoAlbumDetectionScreen extends StatefulWidget {
   const AutoAlbumDetectionScreen({Key? key}) : super(key: key);
@@ -201,7 +201,7 @@ class _AutoAlbumDetectionScreenState extends State<AutoAlbumDetectionScreen> {
     Navigator.push(
       context,
       CupertinoPageRoute(
-        builder: (_) => AddToCollectionScreen(record: record),
+        builder: (_) => AddCollectionView(record: record),
       ),
     );
   }
