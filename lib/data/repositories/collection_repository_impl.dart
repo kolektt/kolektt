@@ -1,6 +1,7 @@
 // repository/collection_repository_impl.dart
 import 'package:kolektt/model/local/collection_record.dart';
 
+import '../../domain/entities/collection_entry.dart';
 import '../../domain/repositories/collection_repository.dart';
 import '../../model/supabase/user_collection.dart';
 import '../datasources/collection_remote_data_source.dart';
@@ -18,8 +19,8 @@ class CollectionRepositoryImpl implements CollectionRepository {
   }
 
   @override
-  Future<void> insert(Map<String, dynamic> data) {
-    return remoteDataSource.insertUserCollection(data);
+  Future<void> insert(CollectionEntry data) {
+    return remoteDataSource.insertUserCollection(data.toJson());
   }
 
   @override

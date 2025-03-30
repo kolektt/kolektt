@@ -110,7 +110,7 @@ class AddCollectionViewModel extends ChangeNotifier {
         tags: _tagList,
       );
 
-      await collectionRepository.insert(collectionEntry.toJson());
+      await collectionRepository.insert(collectionEntry);
     } catch (error) {
       errorMessage = '컬렉션 추가 실패: $error';
     } finally {
