@@ -13,7 +13,7 @@ class DiscogsRecordRepositoryImpl extends DiscogsRecordRepository {
   Future<void> addDiscogsRecord(DiscogsSearchItem item) async {
     // DiscogsSearchItem을 Record 형태의 JSON으로 변환
     final recordJson = _convertDiscogsSearchItemToRecordJson(item);
-    print("recordJson: $recordJson");
+    log("recordJson: $recordJson");
     await recordDataSource.insertRecord(recordJson);
   }
 
