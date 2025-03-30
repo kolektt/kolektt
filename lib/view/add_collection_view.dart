@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:kolektt/data/models/discogs_search_response.dart';
 import 'package:provider/provider.dart';
 
+import '../domain/entities/record_condition.dart';
 import '../view_models/add_collection_vm.dart';
 import '../view_models/collection_vm.dart';
 
@@ -19,39 +20,20 @@ class AddCollectionView extends StatefulWidget {
 }
 
 class _AddCollectionViewState extends State<AddCollectionView> {
-  final TextEditingController _notesController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _newTagController = TextEditingController();
-
-  final List<String> _conditionOptions = [
-    'Mint (M)',
-    'Near Mint (NM)',
-    'Very Good Plus (VG+)',
-    'Very Good (VG)',
-    'Good Plus (G+)',
-    'Good (G)',
-    'Fair (F)',
-    'Poor (P)'
-  ];
-
-  String _selectedCondition = 'Very Good Plus (VG+)'; // 기본값
-
-  DateTime? _purchaseDate;
-  List<String> _tagList = [];
-
   void _showConditionPicker() {
+    final model = context.read<AddCollectionViewModel>();
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
           title: const Text('상태 선택'),
           message: const Text('원하는 상태를 선택해주세요.'),
-          actions: _conditionOptions.map((option) {
+          actions: RecordCondition.values.map((option) {
             return CupertinoActionSheetAction(
-              child: Text(option),
+              child: Text(option.name),
               onPressed: () {
                 setState(() {
-                  _selectedCondition = option;
+                  model.selectedCondition = option;
                 });
                 Navigator.pop(context);
               },
@@ -70,6 +52,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
 
   void _showDatePicker() {
     final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    final model = context.read<AddCollectionViewModel>();
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -110,11 +93,11 @@ class _AddCollectionViewState extends State<AddCollectionView> {
               Expanded(
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.date,
-                  initialDateTime: _purchaseDate ?? DateTime.now(),
+                  initialDateTime: model.purchaseDate,
                   maximumDate: DateTime.now(),
                   onDateTimeChanged: (date) {
                     setState(() {
-                      _purchaseDate = date;
+                      model.purchaseDate = date;
                     });
                   },
                 ),
@@ -127,6 +110,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
   }
 
   Widget _buildEditableTag(String tag) {
+    final model = context.read<AddCollectionViewModel>();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       margin: const EdgeInsets.only(bottom: 4),
@@ -146,7 +130,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
           GestureDetector(
             onTap: () {
               setState(() {
-                _tagList.remove(tag);
+                model.tagList.remove(tag);
               });
             },
             child: const Icon(
@@ -168,10 +152,17 @@ class _AddCollectionViewState extends State<AddCollectionView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<AddCollectionViewModel>().record = widget.record;
+  }
+
+  @override
   void dispose() {
-    _notesController.dispose();
-    _priceController.dispose();
-    _newTagController.dispose();
+    final model = context.read<AddCollectionViewModel>();
+    model.notesController.dispose();
+    model.priceController.dispose();
+    model.newTagController.dispose();
     super.dispose();
   }
 
@@ -236,7 +227,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _selectedCondition,
+                          collectionVM.selectedCondition.name,
                           style: const TextStyle(
                             color: CupertinoColors.label,
                             fontSize: 16,
@@ -257,7 +248,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                 Container(
                   decoration: _getInputDecoration(),
                   child: CupertinoTextField.borderless(
-                    controller: _priceController,
+                    controller: collectionVM.priceController,
                     keyboardType: TextInputType.number,
                     placeholder: '구매/추가 가격 (숫자만)',
                     padding: const EdgeInsets.all(16),
@@ -282,9 +273,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _purchaseDate != null
-                              ? DateFormat('yyyy년 MM월 dd일').format(_purchaseDate!)
-                              : '구매일 선택',
+                          DateFormat('yyyy년 MM월 dd일').format(collectionVM.purchaseDate),
                           style: const TextStyle(
                             color: CupertinoColors.label,
                             fontSize: 16,
@@ -305,7 +294,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                 Container(
                   decoration: _getInputDecoration(),
                   child: CupertinoTextField.borderless(
-                    controller: _notesController,
+                    controller: collectionVM.notesController,
                     placeholder: '추가 노트(메모)',
                     padding: const EdgeInsets.all(16),
                     maxLines: 3,
@@ -328,17 +317,17 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      if (_tagList.isNotEmpty)
+                      if (collectionVM.tagList.isNotEmpty)
                         Wrap(
                           spacing: 8,
-                          children: _tagList.map((tag) => _buildEditableTag(tag)).toList(),
+                          children: collectionVM.tagList.map((tag) => _buildEditableTag(tag)).toList(),
                         ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
                           Expanded(
                             child: CupertinoTextField(
-                              controller: _newTagController,
+                              controller: collectionVM.newTagController,
                               placeholder: '새 태그 입력',
                               padding: const EdgeInsets.all(16),
                             ),
@@ -347,12 +336,12 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: const Text('추가'),
                             onPressed: () {
-                              final newTag = _newTagController.text.trim();
-                              if (newTag.isNotEmpty && !_tagList.contains(newTag)) {
+                              final newTag = collectionVM.newTagController.text.trim();
+                              if (newTag.isNotEmpty && !collectionVM.tagList.contains(newTag)) {
                                 setState(() {
-                                  _tagList.add(newTag);
+                                  collectionVM.tagList.add(newTag);
                                 });
-                                _newTagController.clear();
+                                collectionVM.newTagController.clear();
                               }
                             },
                           ),
@@ -386,34 +375,29 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                       ? const Center(child: CupertinoActivityIndicator())
                       : CupertinoButton.filled(
                     onPressed: () async {
-                      final condition = _selectedCondition;
-                      final note = _notesController.text.trim();
-                      final priceText = _priceController.text.trim();
+                      final condition = collectionVM.selectedCondition;
 
                       // 모든 필수 항목이 입력되었는지 확인
-                      if (condition.isEmpty ||
-                          priceText.isEmpty ||
-                          _purchaseDate == null) {
-                        showCupertinoDialog(
-                          context: context,
-                          builder: (context) {
-                            return CupertinoAlertDialog(
-                              title: const Text('입력 오류'),
-                              content: const Text('모든 항목을 작성해주세요.'),
-                              actions: [
-                                CupertinoDialogAction(
-                                  child: const Text('확인'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                        return;
-                      }
+                      // if (condition.isEmpty) {
+                      //   showCupertinoDialog(
+                      //     context: context,
+                      //     builder: (context) {
+                      //       return CupertinoAlertDialog(
+                      //         title: const Text('입력 오류'),
+                      //         content: const Text('모든 항목을 작성해주세요.'),
+                      //         actions: [
+                      //           CupertinoDialogAction(
+                      //             child: const Text('확인'),
+                      //             onPressed: () => Navigator.pop(context),
+                      //           ),
+                      //         ],
+                      //       );
+                      //     },
+                      //   );
+                      //   return;
+                      // }
 
-                      final price = double.tryParse(priceText) ?? 0.0;
-                      if (price == 0.0) {
+                      if (collectionVM.price == 0.0) {
                         showCupertinoDialog(
                           context: context,
                           builder: (context) {
@@ -433,14 +417,7 @@ class _AddCollectionViewState extends State<AddCollectionView> {
                       }
 
                       // ViewModel의 addToCollection 메서드가 추가 필드들을 받도록 업데이트 되어있다고 가정합니다.
-                      await collectionVM.addToCollection(
-                        widget.record,    // 레코드 정보
-                        condition,        // 상태
-                        note,    // 노트
-                        price,            // 구매가
-                        _purchaseDate!,    // 구매일
-                        _tagList,         // 태그 리스트
-                      );
+                      await collectionVM.addToCollection();
 
                       if (collectionVM.errorMessage == null) {
                         context.read<CollectionViewModel>().fetch();
