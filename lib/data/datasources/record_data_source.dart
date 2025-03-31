@@ -1,4 +1,4 @@
-// data/datasources/record_data_source.dart
+import 'package:kolektt/exceptions/data_source_exception.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:developer';
 
@@ -9,29 +9,25 @@ class RecordDataSource {
 
   Future<void> insertRecord(Map<String, dynamic> recordJson) async {
     try {
-      // Create a copy of the record to avoid modifying the original
+      // 원본 데이터를 수정하지 않기 위해 복사본 생성
       final Map<String, dynamic> processedRecord = {...recordJson};
-      
-      // Convert array fields to JSON strings if they exist
+
+      // 배열 형태의 필드를 문자열로 변환 (쉼표로 구분)
       if (processedRecord['genre'] is List) {
         processedRecord['genre'] = processedRecord['genre'].join(', ');
       }
-      
       if (processedRecord['label'] is List) {
         processedRecord['label'] = processedRecord['label'].join(', ');
       }
-      
       if (processedRecord['style'] is List) {
         processedRecord['style'] = processedRecord['style'].join(', ');
       }
-      
       if (processedRecord['format'] is List) {
         processedRecord['format'] = processedRecord['format'].join(', ');
       }
-      
-      // Add artist field if missing (required by schema)
+
+      // 필수 스키마에 맞춰 artist 필드 추가
       if (!processedRecord.containsKey('artist') || processedRecord['artist'] == null) {
-        // Extract artist from title or set a default
         final title = processedRecord['title'] as String? ?? '';
         if (title.contains('-')) {
           processedRecord['artist'] = title.split('-')[0].trim();
@@ -40,27 +36,28 @@ class RecordDataSource {
           processedRecord['artist'] = 'Unknown Artist';
         }
       }
-      
-      // Ensure all required fields have at least empty string values
+
+      // 필수 필드가 없으면 빈 문자열로 채움
       final requiredFields = ['title', 'artist', 'genre', 'label', 'format', 'style', 'country'];
       for (final field in requiredFields) {
         if (!processedRecord.containsKey(field) || processedRecord[field] == null) {
           processedRecord[field] = '';
         }
       }
-      
+
       log('Processed record for insertion: $processedRecord');
-      
+
       final response = await supabase
           .from('records')
           .upsert(processedRecord, onConflict: 'record_id')
           .select();
-          
+
       log('insertRecord response: $response');
     } catch (e, stackTrace) {
       log('Error inserting record: $e');
       log('Stack trace: $stackTrace');
-      throw Exception('Error inserting record: $e');
+      // 발생한 예외를 커스텀 예외로 감싸 상위 레이어로 전달
+      throw DataSourceException('Error inserting record', e);
     }
   }
 }
