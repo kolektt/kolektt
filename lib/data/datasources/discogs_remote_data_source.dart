@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:kolektt/exceptions/data_source_exception.dart';
 
 import '../models/artist_release.dart';
 import '../models/discogs_record.dart';
@@ -46,19 +47,18 @@ class DiscogsRemoteDataSource {
       );
 
       if (response.statusCode != 200) {
-        throw Exception(
-            'Failed to load search results: ${response.statusCode}');
+        throw DataSourceException('Failed to load search results: ${response.statusCode}');
       }
 
-      final Map<String, dynamic> data = json.decode(response.body);
-      debugPrint("Discogs search results: ${data}");
-      final DiscogsSearchResponse discogs_search_response = DiscogsSearchResponse.fromJson(data);
-      debugPrint('Discogs search response: ${discogs_search_response}');
-      final List<DiscogsSearchItem> results = discogs_search_response.results;
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      debugPrint("Discogs search results: $jsonData");
+      final DiscogsSearchResponse discogsSearchResponse = DiscogsSearchResponse.fromJson(jsonData);
+      debugPrint('Discogs search response: $discogsSearchResponse');
+      final List<DiscogsSearchItem> results = discogsSearchResponse.results;
       return results;
     } catch (e) {
       debugPrint('Error searching Discogs: $e');
-      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      throw DataSourceException('네트워크 오류가 발생했습니다. 다시 시도해주세요.', e);
     }
   }
 
@@ -76,19 +76,17 @@ class DiscogsRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final DiscogsRecord discogsRecord = DiscogsRecord.fromJson(data);
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        final DiscogsRecord discogsRecord = DiscogsRecord.fromJson(jsonData);
         debugPrint('Discogs release: ${discogsRecord.title}');
         return discogsRecord;
       } else {
-        debugPrint(
-          'Failed to load release: ${response.statusCode} - ${response.body}',
-        );
-        throw Exception('Release 조회 실패 (Status: ${response.statusCode})');
+        debugPrint('Failed to load release: ${response.statusCode} - ${response.body}');
+        throw DataSourceException('Release 조회 실패 (Status: ${response.statusCode})');
       }
     } catch (e) {
       debugPrint('Error fetching release: $e');
-      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      throw DataSourceException('네트워크 오류가 발생했습니다. 다시 시도해주세요.', e);
     }
   }
 
@@ -111,14 +109,12 @@ class DiscogsRemoteDataSource {
         debugPrint('Discogs release: ${discogsRecord.title}');
         return discogsRecord;
       } else {
-        debugPrint(
-          'Failed to load release: ${response.statusCode} - ${response.body}',
-        );
-        throw Exception('Release 조회 실패 (Status: ${response.statusCode})');
+        debugPrint('Failed to load release: ${response.statusCode} - ${response.body}');
+        throw DataSourceException('Release 조회 실패 (Status: ${response.statusCode})');
       }
     } catch (e) {
       debugPrint('Error fetching release: $e');
-      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      throw DataSourceException('네트워크 오류가 발생했습니다. 다시 시도해주세요.', e);
     }
   }
 
@@ -135,25 +131,23 @@ class DiscogsRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final Artist artist = Artist.fromJson(data);
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        final Artist artist = Artist.fromJson(jsonData);
         debugPrint('Discogs artist: ${artist.toJson()}');
         return artist;
       } else {
-        debugPrint(
-          'Failed to load artist: ${response.statusCode} - ${response.body}',
-        );
-        throw Exception('Artist 조회 실패 (Status: ${response.statusCode})');
+        debugPrint('Failed to load artist: ${response.statusCode} - ${response.body}');
+        throw DataSourceException('Artist 조회 실패 (Status: ${response.statusCode})');
       }
     } catch (e) {
       debugPrint('Error fetching artist: $e');
-      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      throw DataSourceException('네트워크 오류가 발생했습니다. 다시 시도해주세요.', e);
     }
   }
 
   Future<ArtistRelease> getArtistReleaseByUrl(String url) async {
     final uri = Uri.parse('$url?key=$apiKey&secret=$apiSecret');
-    debugPrint('Fetching Discogs Artist: $uri');
+    debugPrint('Fetching Discogs Artist Release: $uri');
 
     try {
       final response = await http.get(
@@ -165,19 +159,17 @@ class DiscogsRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final ArtistRelease artistRelease = ArtistRelease.fromJson(data);
-        debugPrint('Discogs artist: ${artistRelease.toJson()}');
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        final ArtistRelease artistRelease = ArtistRelease.fromJson(jsonData);
+        debugPrint('Discogs artist release: ${artistRelease.toJson()}');
         return artistRelease;
       } else {
-        debugPrint(
-          'Failed to load artist: ${response.statusCode} - ${response.body}',
-        );
-        throw Exception('Artist 조회 실패 (Status: ${response.statusCode})');
+        debugPrint('Failed to load artist release: ${response.statusCode} - ${response.body}');
+        throw DataSourceException('Artist 조회 실패 (Status: ${response.statusCode})');
       }
     } catch (e) {
-      debugPrint('Error fetching artist: $e');
-      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      debugPrint('Error fetching artist release: $e');
+      throw DataSourceException('네트워크 오류가 발생했습니다. 다시 시도해주세요.', e);
     }
   }
 }
