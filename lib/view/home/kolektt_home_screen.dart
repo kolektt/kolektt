@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 import 'package:kolektt/figma_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -279,7 +278,7 @@ class _KolekttHomeScreenState extends State<KolekttHomeScreen> {
     return GestureDetector(
       onTap: () async {
         Navigator.of(context).push(
-            CupertinoBottomSheetRoute(builder: (context) => SearchView()));
+            CupertinoSheetRoute(builder: (context) => SearchView()));
       },
       child: Container(
         height: 48,

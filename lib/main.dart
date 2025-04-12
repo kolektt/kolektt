@@ -9,8 +9,6 @@ import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 
 // 내부 모듈 (DataSources, Repositories, UseCases, Views, ViewModels)
 import 'package:kolektt/data/datasources/collection_remote_data_source.dart';
@@ -183,27 +181,25 @@ class KolekttApp extends StatelessWidget {
 
     return MultiProvider(
       providers: AppProviders(supabase: supabaseClient).providers,
-      child: CupertinoBottomSheetRepaintBoundary(
-        child: CupertinoApp(
-          title: 'Kolektt',
-          theme: CupertinoThemeData(
-            brightness: Brightness.light,
-            primaryColor: primaryColor,
-            scaffoldBackgroundColor: CupertinoColors.systemBackground,
-            barBackgroundColor: CupertinoColors.systemGrey6,
-            textTheme: const CupertinoTextThemeData(
-              textStyle: TextStyle(
-                fontFamily: 'PlusJakartaSans',
-                fontSize: 17.0,
-                color: CupertinoColors.label,
-              ),
+      child:CupertinoApp(
+        title: 'Kolektt',
+        theme: CupertinoThemeData(
+          brightness: Brightness.light,
+          primaryColor: primaryColor,
+          scaffoldBackgroundColor: CupertinoColors.systemBackground,
+          barBackgroundColor: CupertinoColors.systemGrey6,
+          textTheme: const CupertinoTextThemeData(
+            textStyle: TextStyle(
+              fontFamily: 'PlusJakartaSans',
+              fontSize: 17.0,
+              color: CupertinoColors.label,
             ),
           ),
-          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-            DefaultMaterialLocalizations.delegate,
-          ],
-          home: const AuthenticationWrapper(),
         ),
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+          DefaultMaterialLocalizations.delegate,
+        ],
+        home: const AuthenticationWrapper(),
       ),
     );
   }

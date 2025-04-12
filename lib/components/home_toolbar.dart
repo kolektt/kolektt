@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 
 import '../view/SearchView.dart';
 import '../view/notification.dart';
@@ -16,7 +15,7 @@ class HomeToolbar extends StatelessWidget {
           child: Icon(CupertinoIcons.search),
           onPressed: () async {
             Navigator.of(context).push(
-                CupertinoBottomSheetRoute(builder: (context) => SearchView()));
+                CupertinoSheetRoute(builder: (context) => SearchView()));
           },
         ),
         CupertinoButton(
@@ -24,7 +23,7 @@ class HomeToolbar extends StatelessWidget {
           child: Icon(CupertinoIcons.bell),
           onPressed: () async {
             Navigator.of(context).push(
-                CupertinoBottomSheetRoute(builder: (context) => NotificationsView()));
+                CupertinoSheetRoute(builder: (context) => NotificationsView()));
           },
         ),
       ],
